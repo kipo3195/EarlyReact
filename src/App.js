@@ -26,7 +26,6 @@ function Test(){
   )
 }
 
-
 function TestAsync(){
 
   const [asyncItem, setAsyncItem] = useState(null);
@@ -49,12 +48,13 @@ function TestAsync(){
     </div>
   )
 }
-
+// 주석 추가 
 function App() {
   return (
       <div>
         <Test></Test>
         <TestAsync></TestAsync>
+      
       </div>
   );
 }
