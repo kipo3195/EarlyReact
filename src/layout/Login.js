@@ -27,8 +27,8 @@ function Login(props){
   
     return(
         <div className='login'>
-        <h2>LoginComponent</h2>
-        <form onSubmit={event=>{
+        <h2 id='loginTitle' >Early</h2>
+        <form id='loginFoam' onSubmit={event=>{
             event.preventDefault();
             const userId = event.target.username.value;
             const password = event.target.password.value;
@@ -41,9 +41,24 @@ function Login(props){
             사용자 id : <input type='text' name='username' placeholder='사용자 id email 형식'></input>
             <br/>
             비밀번호 : <input type='password' name='password' placeholder='비밀번호'></input>
-            <p><input type='submit' value='로그인'></input></p>
+            <p><input id='loginSubmit' type='submit' value='로그인'></input></p>
           </form>
+          <p id='loginEtc'>
+          <a href='' className='loginEtcClass' onClick={event=>{
+            event.preventDefault();
+            props.findId();
+          }}>계정찾기</a>|
+          <a href='' className='loginEtcClass' onClick={event=>{
+            event.preventDefault();
+            props.findPw();
+          }}>비밀번호 찾기</a>|
+          <a href='' className='loginEtcClass' onClick={event=>{
+            event.preventDefault();
+            props.joinPage();
+          }}>회원가입</a>
+          </p>
         </div>
+        
     )
 }
 

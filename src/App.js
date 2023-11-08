@@ -8,6 +8,9 @@ import Header from './layout/Header';
 import Footer from './layout/Footer';
 import Login from './layout/Login';
 import Home from './layout/Home';
+import Join from './layout/Join';
+import FindId from './layout/FindId';
+import FindPw from './layout/FindPw';
 
 function Test(){
   const [item, setItem] = useState([]);
@@ -81,11 +84,22 @@ function App() {
       }).catch(function(error){
         console.log(error);
         alert(' 아이디(로그인 전용 아이디) 또는 비밀번호를 잘못 입력했습니다. 입력하신 내용을 다시 확인해주세요.');
-        
       })
+    }} joinPage={()=>{
+      setMode('joinPage');
+    }} findPw={()=>{
+      setMode('findPw')
+    }} findId={()=>{
+      setMode('findId')
     }}></Login>
-  }else if(mode == 'home'){
+  }else if(mode === 'home'){
     content = <Home></Home>
+  }else if(mode === 'joinPage'){
+    content = <Join></Join>
+  }else if(mode === 'findPw'){
+    content = <FindPw></FindPw>
+  }else if(mode === 'findId'){
+    content = <FindId></FindId>
   }
 
   return (

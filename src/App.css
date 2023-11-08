@@ -42,6 +42,7 @@
   background-color: skyblue;
   height: 100px ;
   margin: 10px 200px;
+  width: 70%;
 
 }
 
@@ -49,22 +50,94 @@
 
   background-color: skyblue;
   height: 600px ;
+  width: 70%;
   margin: 50px 200px;
 
+}
+
+#loginTitle{
+  color: white;
+  font-family: 'Times New Roman', Times, serif;
+  padding: 5% 50% 5% 45%;
+  width: 200px;
+  height: 100px;
+}
+
+#loginFoam{
+  padding: 0% 50% 0% 40%;
+  width: 400px;
+  height: 100px;
+}
+
+#loginSubmit{
+  background-color: white;
+  color: skyblue;
+  border: none;
+  padding: 30px 100px;
+}
+#loginSubmit:hover{
+  cursor : pointer;
+}
+
+#loginEtc{
+  padding: 40px 40% 0% 40%;
+  color: white;
+}
+
+.loginEtcClass{
+  text-decoration: none;
+  color: white;
+  padding: 8px;
+  font-size: 13px;
+}
+
+.loginEtcClass:hover{
+  text-decoration: underline;
 }
 
 .home{
 
   background-color: skyblue;
   height: 600px ;
+  width: 70%;
   margin: 50px 200px;
 
 }
+
+.join{
+  background-color: skyblue;
+  height: 600px ;
+  width: 70%;
+  margin: 50px 200px;
+}
+
+
+.findId{
+  background-color: skyblue;
+  height: 600px ;
+  width: 70%;
+  margin: 50px 200px;
+}
+
+
+.findPw{
+  background-color: skyblue;
+  height: 600px ;
+  width: 70%;
+  margin: 50px 200px;
+}
+
+
+
+
+
+
 
 .footer{
 
   background-color: skyblue;
   height: 100px ;
-  margin: 10px 200px;
+  width: 70%;
+  margin: 50px 200px;
 
 }
