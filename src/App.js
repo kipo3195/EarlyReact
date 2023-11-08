@@ -4,6 +4,11 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import cookie from 'react-cookies';
 
+import Header from './layout/Header';
+import Footer from './layout/Footer';
+import Login from './layout/Login';
+import Home from './layout/Home';
+
 function Test(){
   const [item, setItem] = useState([]);
 
@@ -50,55 +55,48 @@ function TestAsync(){
   )
 }
 
-// 로그인 요청 컴포넌트 
-function LoginComponent(props){
-  return(
-      <div>
-        <h2>LoginComponent</h2>
-        <form onSubmit={event=>{
-          event.preventDefault();
-          const userId = event.target.username.value;
-          const password = event.target.password.value;
-          props.loginRequest(userId, password);
-        }}>
-          사용자 id : <input type='text' name='username'  placeholder='사용자 id email 형식'></input>
-          <br/>
-          비밀번호 : <input type='password' name='password' placeholder='비밀번호'></input>
-          <p><input type='submit' value='로그인'></input></p>
-        </form>
-      </div>
-  )
-}
+
 
 // 주석 추가 
 function App() {
+
+  // 최초 진입시 'login' 
+  const [mode, setMode] = useState('login');
+
+  let content = null;
+
+  if(mode === 'login'){
+    content = <Login loginRequest={(userId, password)=>{
+      axios({
+        method:'post',
+        url : 'http://localhost:8080/login',
+        data:{
+          "username":userId,
+          "password":password
+        }
+      }).then(function(response){
+        const flag = response.data.flag;
+        console.log(flag);
+        setMode('home');
+      }).catch(function(error){
+        console.log(error);
+        alert(' 아이디(로그인 전용 아이디) 또는 비밀번호를 잘못 입력했습니다. 입력하신 내용을 다시 확인해주세요.');
+        
+      })
+    }}></Login>
+  }else if(mode == 'home'){
+    content = <Home></Home>
+  }
+
   return (
+    
       <div>
         {/* <Test></Test>
         <TestAsync></TestAsync> */}
-        <LoginComponent loginRequest={(userId, password)=>{
-          console.log(userId, password)
-           axios({
-            method:'post',
-            url : 'http://localhost:8080/login',
-            data:{
-              "username":userId,
-              "password":password
-            }
-            }).then(function(response){
-              const flag = response.data.flag;
-              if(flag === 'success'){
-                alert("로그인 성공 !")
-                const jwt = response.data.token;
-                console.log(jwt);
-              }else{
-                alert("로그인 실패 !");
-              }
-            }).catch(function(error){
-              console.log(error);
-              alert("로그인 실패 ! 입력한 정보를 확인하세요.");
-            })
-        }}></LoginComponent>
+        <Header></Header>
+        {content}
+        <Footer></Footer>
+
       </div>
   );
 }
