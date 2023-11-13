@@ -69,13 +69,13 @@
   height: 100px;
 }
 
-#loginSubmit{
+#submit{
   background-color: white;
   color: skyblue;
   border: none;
-  padding: 30px 100px;
+  padding: 30px 110px;
 }
-#loginSubmit:hover{
+#submit:hover{
   cursor : pointer;
 }
 
@@ -111,6 +111,40 @@
   margin: 50px 200px;
 }
 
+#joinTitle{
+  color: white;
+  font-family: 'Times New Roman', Times, serif;
+  padding: 5% 50% 0% 45%;
+  width: 200px;
+  height: 60px;
+}
+
+.joinTable{
+  text-align: right;
+  font-weight:bold;
+  width: 200px;
+  padding: 0% 10% 0% 33%;
+}
+
+#joinDupBtn{
+  background-color: white;
+  color: skyblue;
+  border: none;
+  padding: 15px 100px;
+  width: 280px;
+}
+
+#joinDupBtn:hover{
+  cursor : pointer;
+}
+
+#joinBtn{
+  background-color: white;
+  color: skyblue;
+  border: none;
+  padding: 15px 100px;
+  width: 280px;
+}
 
 .findId{
   background-color: skyblue;

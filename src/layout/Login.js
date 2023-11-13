@@ -24,8 +24,8 @@ import { useEffect, useState } from 'react';
 
 function Login(props){
 
-  
     return(
+      // 최초 메인페이지는 login
         <div className='login'>
         <h2 id='loginTitle' >Early</h2>
         <form id='loginFoam' onSubmit={event=>{
@@ -41,7 +41,7 @@ function Login(props){
             사용자 id : <input type='text' name='username' placeholder='사용자 id email 형식'></input>
             <br/>
             비밀번호 : <input type='password' name='password' placeholder='비밀번호'></input>
-            <p><input id='loginSubmit' type='submit' value='로그인'></input></p>
+            <p><input id='submit' type='submit' value='로그인'></input></p>
           </form>
           <p id='loginEtc'>
           <a href='' className='loginEtcClass' onClick={event=>{

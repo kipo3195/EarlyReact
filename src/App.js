@@ -63,11 +63,12 @@ function TestAsync(){
 // 주석 추가 
 function App() {
 
-  // 최초 진입시 'login' 
+  // 최초 진입시 'login' useState를 통해 set하면 App이 갱신
   const [mode, setMode] = useState('login');
 
   let content = null;
 
+  // data는 post 방식일때 body
   if(mode === 'login'){
     content = <Login loginRequest={(userId, password)=>{
       axios({
