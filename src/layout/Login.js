@@ -55,6 +55,7 @@ function Login(props){
           <a href='' className='loginEtcClass' onClick={event=>{
             event.preventDefault();
             props.joinPage();
+            //props.authenticationPage();
           }}>회원가입</a>
           </p>
         </div>

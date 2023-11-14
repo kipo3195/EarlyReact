@@ -153,7 +153,6 @@
   margin: 50px 200px;
 }
 
-
 .findPw{
   background-color: skyblue;
   height: 600px ;
@@ -163,6 +162,25 @@
 
 
 
+.authentication{
+  background-color: skyblue;
+  height: 600px ;
+  width: 70%;
+  margin: 50px 200px;
+}
+#authenticationTitle{
+  color: white;
+  font-family: 'Times New Roman', Times, serif;
+  padding: 5% 50% 0% 45%;
+  width: 200px;
+  height: 60px;
+}
+.authenticationTable{
+  text-align: right;
+  font-weight:bold;
+  width: 200px;
+  padding: 0% 10% 0% 33%;
+}
 
 
 

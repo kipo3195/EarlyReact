@@ -11,6 +11,7 @@ import Home from './layout/Home';
 import Join from './layout/Join';
 import FindId from './layout/FindId';
 import FindPw from './layout/FindPw';
+import Authentication from './layout/Authentication';
 
 function Test(){
   const [item, setItem] = useState([]);
@@ -60,7 +61,6 @@ function TestAsync(){
 
 
 
-// 주석 추가 
 function App() {
 
   // 최초 진입시 'login' useState를 통해 set하면 App이 갱신
@@ -80,12 +80,15 @@ function App() {
         }
       }).then(function(response){
         const flag = response.data.flag;
-        console.log(flag);
+        const token = response.data.token;
+        console.log(flag, token);
         setMode('home');
       }).catch(function(error){
         console.log(error);
         alert(' 아이디(로그인 전용 아이디) 또는 비밀번호를 잘못 입력했습니다. 입력하신 내용을 다시 확인해주세요.');
       })
+    }} authenticationPage={()=>{
+      setMode('authenticationPage');
     }} joinPage={()=>{
       setMode('joinPage');
     }} findPw={()=>{
@@ -95,8 +98,14 @@ function App() {
     }}></Login>
   }else if(mode === 'home'){
     content = <Home></Home>
+  }else if(mode === 'authenticationPage'){
+    content = <Authentication></Authentication>
   }else if(mode === 'joinPage'){
-    content = <Join></Join>
+    content = <Join successJoin={()=>{
+      setMode('login');
+    }} back={()=>{
+      setMode('login');
+    }}></Join>
   }else if(mode === 'findPw'){
     content = <FindPw></FindPw>
   }else if(mode === 'findId'){
