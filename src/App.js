@@ -85,7 +85,6 @@ function App() {
       }).then(function(response){
         const flag = response.data.flag;
         const accesstoken  = response.data.token;
-        console.log(accesstoken);
         axios.defaults.headers.common['Authorization'] = `Bearer ${accesstoken}`;
         
         setMode('home');
@@ -103,7 +102,9 @@ function App() {
       setMode('findId')
     }}></Login>
   }else if(mode === 'home'){
-    content = <Home></Home>
+    content = <Home logout={()=>{
+      setMode('login');
+    }}></Home>
   }else if(mode === 'authenticationPage'){
     content = <Authentication></Authentication>
   }else if(mode === 'joinPage'){
