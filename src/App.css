@@ -2,6 +2,8 @@
   text-align: center;
 }
 
+
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -37,63 +39,35 @@
   }
 } */
 
+@font-face {
+  font-family: 'early';
+  src: url('/src/font/NanumAReumDeuRiGgocNaMu.woff');
+}
+@font-face {
+  font-family: 'koko';
+  src: url('/src/font/NanumKoKoCe.woff');
+}
+@font-face {
+  font-family: 'DDobak';
+  src: url('/src/font/NanumDdoBagDdoBag.woff');
+}
+@font-face {
+  font-family: 'Buri';
+  src: url('/src/font/MaruBuri-Regular.woff2');
+}
+@font-face {
+  font-family: 'BuriBord';
+  src: url('/src/font/MaruBuri-Bold.woff2');
+}
+
+
 .header{
-  
-  background-color: skyblue;
-  height: 100px ;
+  height: 140px ;
   margin: 10px 200px;
   width: 70%;
-
 }
 
-.login{
 
-  background-color: skyblue;
-  height: 600px ;
-  width: 70%;
-  margin: 50px 200px;
-
-}
-
-#loginTitle{
-  color: white;
-  font-family: 'Times New Roman', Times, serif;
-  padding: 5% 50% 5% 45%;
-  width: 200px;
-  height: 100px;
-}
-
-#loginFoam{
-  padding: 0% 50% 0% 40%;
-  width: 400px;
-  height: 100px;
-}
-
-#submit{
-  background-color: white;
-  color: skyblue;
-  border: none;
-  padding: 30px 110px;
-}
-#submit:hover{
-  cursor : pointer;
-}
-
-#loginEtc{
-  padding: 40px 40% 0% 40%;
-  color: white;
-}
-
-.loginEtcClass{
-  text-decoration: none;
-  color: white;
-  padding: 8px;
-  font-size: 13px;
-}
-
-.loginEtcClass:hover{
-  text-decoration: underline;
-}
 
 .home{
 
@@ -104,47 +78,6 @@
 
 }
 
-.join{
-  background-color: skyblue;
-  height: 600px ;
-  width: 70%;
-  margin: 50px 200px;
-}
-
-#joinTitle{
-  color: white;
-  font-family: 'Times New Roman', Times, serif;
-  padding: 5% 50% 0% 45%;
-  width: 200px;
-  height: 60px;
-}
-
-.joinTable{
-  text-align: right;
-  font-weight:bold;
-  width: 200px;
-  padding: 0% 10% 0% 33%;
-}
-
-#joinDupBtn{
-  background-color: white;
-  color: skyblue;
-  border: none;
-  padding: 15px 100px;
-  width: 280px;
-}
-
-#joinDupBtn:hover{
-  cursor : pointer;
-}
-
-#joinBtn{
-  background-color: white;
-  color: skyblue;
-  border: none;
-  padding: 15px 100px;
-  width: 280px;
-}
 
 .findId{
   background-color: skyblue;
@@ -187,9 +120,19 @@
 
 .footer{
 
-  background-color: skyblue;
-  height: 100px ;
+  /* 
+  중앙으로 보내기 
+    display : flex;
+    justify-content: center;  
+
+  */
+  display: flex;
+  justify-content: center;
+  /* background-color: skyblue; */
+  
+  height: 10px ;
   width: 70%;
   margin: 50px 200px;
-
+  font-size: 14px;
+  
 }

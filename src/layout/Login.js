@@ -1,6 +1,7 @@
 
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import '../css/login.css';
 
 // 로그인 요청 컴포넌트 
 // function LoginComponent(props){
@@ -27,38 +28,72 @@ function Login(props){
     return(
       // 최초 메인페이지는 login
         <div className='login'>
-        <h2 id='loginTitle' >Early</h2>
-        <form id='loginFoam' onSubmit={event=>{
-            event.preventDefault();
-            const userId = event.target.username.value;
-            const password = event.target.password.value;
-            props.loginRequest(userId, password);
 
-            // 계정정보가 틀렸을때 비밀번호 값 초기화
-            event.target.password.value = '';
-                       
-          }}>
-            사용자 id : <input type='text' name='username' placeholder='사용자 id email 형식'></input>
-            <br/>
-            비밀번호 : <input type='password' name='password' placeholder='비밀번호'></input>
-            <p><input id='submit' type='submit' value='로그인'></input></p>
-          </form>
-          <p id='loginEtc'>
-          <a href='' className='loginEtcClass' onClick={event=>{
-            event.preventDefault();
-            props.findId();
-          }}>계정찾기</a>|
-          <a href='' className='loginEtcClass' onClick={event=>{
-            event.preventDefault();
-            props.findPw();
-          }}>비밀번호 찾기</a>|
-          <a href='' className='loginEtcClass' onClick={event=>{
-            event.preventDefault();
-            props.joinPage();
-            //props.authenticationPage();
-          }}>회원가입</a>
-          </p>
-        </div>
+          <div id='loginTitle'>
+              <table>
+                  <tr>
+                    <td id='titleSide'></td>
+                    <td id='title'>Early</td>
+                    <td id='titleSide'></td>
+                  </tr>
+              </table>
+          </div>
+        
+         <div id='loginContents'>
+          
+              <form onSubmit={event=>{
+                  event.preventDefault();
+                  const userId = event.target.username.value;
+                  const password = event.target.password.value;
+                  props.loginRequest(userId, password);
+
+                  // 계정정보가 틀렸을때 비밀번호 값 초기화
+                  event.target.password.value = '';                   
+                }}>
+                  <table id='loginTable'>
+                    <tr>
+                      <td>
+                        <input type='text' name='username' placeholder=' 계정' size="30"></input>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <input type='password' name='password' placeholder=' 비밀번호' size="30"></input>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <input type='checkbox'></input>
+                      </td>
+                    </tr>
+                    <tr>
+                      
+                        <input id='loginSubmit' type='submit' value='로그인' ></input>
+                      
+                    </tr>  
+                  </table>
+              </form>
+            
+          </div>   
+          
+          
+          <div id ='loginFooter'>
+              <a href='' className='loginEtcHref' onClick={event=>{
+                event.preventDefault();
+                props.findId();
+              }}>계정찾기</a>  ｜
+              <a href='' className='loginEtcHref' onClick={event=>{
+                event.preventDefault();
+                props.findPw();
+              }}>비밀번호 찾기</a> ｜
+              <a href='' className='loginEtcHref' onClick={event=>{
+                event.preventDefault();
+                props.joinPage();
+                //props.authenticationPage();
+              }}>회원가입</a>
+               
+            </div> 
+       </div>
         
     )
 }
