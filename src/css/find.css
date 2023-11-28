@@ -1,0 +1,120 @@
+/*id 찾기 메인 div*/
+.findId{
+    
+    height: 600px ;
+    width: 70%;
+    margin: 50px 200px;
+  }
+  
+  /*pw 찾기 메인 div*/
+  .findPw{
+    
+    height: 600px ;
+    width: 70%;
+    margin: 50px 200px;
+  }
+
+ /*공통 1*/
+  #findTitle{
+    width: 100%;
+    height: 70px;
+  }
+
+  /*공통 2*/
+  #findEarly{
+    color: white;
+    font-family: Buri;
+    font-size: 30px;
+    background-color: rgb(161, 220, 240);
+    padding-top: 10px;
+    text-align: center;
+    border-radius: 10px;
+    
+  }
+ 
+    /*공통 3*/
+  #findTitleSide{
+    background-color: rgb(255, 255, 255);
+    width: 14%;
+  }
+  
+
+  /*********************************/
+
+  #findIdTitle{
+    padding-top: 40px;
+    font-family: BuriBord;
+    text-align: center;
+  }
+
+  
+  #findTable{
+    margin-top: 50px;
+    width: 100%;
+    text-align: center;
+    border-collapse: separate;
+    border-spacing: 10px 10px;
+    
+  }
+
+   .findTableMainTd{
+    text-align: right;
+    padding-right: 8%;
+    font-family: BuriBord;
+   }
+   
+  .findTableSideTd{
+    padding: 15px;
+    width: 31%;
+  }
+
+
+  .findTableTd{
+    width: 33%;
+  }
+
+
+  /* 찾기 버튼*/
+  #findSubmit{
+    margin-top: 50px;
+    margin-bottom: 10px;
+    font-family: Buri;
+    font-size: 20px;
+    border: white;
+    background-color: rgb(161, 220, 240);
+    color: white;
+    width: 280px;
+    height: 60px;
+  }
+  #findSubmit:hover{
+    cursor: pointer;
+  }
+
+
+  /*뒤로가기*/
+  #findTableALinkTd{
+    padding-top: 50px;
+    
+  }
+
+  #findTableALink{
+    text-decoration: none;
+    color: inherit;
+  }
+
+
+  /*pw찾기에서 계정 찾기로 이동 */
+  #findTableFindIdALink{
+    text-decoration: none;
+    color: rgb(58, 143, 177);
+  }
+  #findTableFindIdALink:hover{
+    text-decoration: underline;
+
+  }
+
+  #findTableFindIdALinkTd{
+    font-size: 15px;
+    font-family: Buri;
+
+  }

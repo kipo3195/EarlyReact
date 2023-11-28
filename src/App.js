@@ -114,9 +114,15 @@ function App() {
       setMode('login');
     }}></Join>
   }else if(mode === 'findPw'){
-    content = <FindPw></FindPw>
+    content = <FindPw back={()=>{
+      setMode('login');
+    }} findId={()=>{
+      setMode('findId');
+    }}></FindPw>
   }else if(mode === 'findId'){
-    content = <FindId></FindId>
+    content = <FindId back={()=>{
+      setMode('login');
+    }}></FindId>
   }
 
   return (

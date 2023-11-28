@@ -156,17 +156,23 @@ const Join = (props) => {
                             <td className='joinTableSideTd'></td>
                             <td id='joinTableSubmit'><input id='joinSubmit' type="submit" value='Join'></input></td>
                             <td className='joinTableSideTd'></td>
+                        </tr>
+                        <br/>
+                        <tr>
+                            <td className='joinTableSideTd'></td>
+                            <td>
+                                <a id ='joinTableALink' href='' onClick={event=>{
+                                    event.preventDefault();
+                                    props.back();
+                                }}>뒤로가기</a>
+                            </td>
+                            <td className='joinTableSideTd'></td>
                         </tr>    
                     </table>
                 </form>
             </div>
            
-            <div>
-                <a href='' onClick={event=>{
-                    event.preventDefault();
-                    props.back();
-                }}>뒤로가기</a>
-            </div>
+           
         </div>
     )
 }
