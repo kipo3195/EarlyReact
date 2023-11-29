@@ -31,11 +31,13 @@ function Login(props){
 
           <div id='loginTitle'>
               <table>
-                  <tr>
-                    <td id='titleSide'></td>
-                    <td id='title'>Early</td>
-                    <td id='titleSide'></td>
-                  </tr>
+                <tbody>
+                    <tr>
+                      <td id='titleSide'></td>
+                      <td id='title'>Early</td>
+                      <td id='titleSide'></td>
+                    </tr>
+                  </tbody>
               </table>
           </div>
         
@@ -51,26 +53,28 @@ function Login(props){
                   event.target.password.value = '';                   
                 }}>
                   <table id='loginTable'>
-                    <tr>
-                      <td>
-                        <input type='text' name='username' placeholder=' 계정' size="30"></input>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <input type='password' name='password' placeholder=' 비밀번호' size="30"></input>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <input type='checkbox'></input>
-                      </td>
-                    </tr>
-                    <tr>
-                      
-                        <input id='loginSubmit' type='submit' value='로그인' ></input>
-                      
-                    </tr>  
+                    <tbody>
+                      <tr>
+                        <td>
+                          <input type='text' name='username' placeholder=' 계정' size="30"></input>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <input type='password' name='password' placeholder=' 비밀번호' size="30"></input>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <input type='checkbox'></input>
+                        </td>
+                      </tr>
+                      <tr>
+                        
+                          <input id='loginSubmit' type='submit' value='로그인' ></input>
+                        
+                      </tr>  
+                    </tbody>
                   </table>
               </form>
             
