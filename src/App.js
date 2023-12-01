@@ -14,6 +14,7 @@ import Join from './common/layout/Join';
 import FindId from './common/layout/FindId';
 import FindPw from './common/layout/FindPw';
 import Authentication from './common/layout/Authentication';
+import UserHeader from './user/layout/UserHeader';
 
 import User from './user/layout/User';
 
@@ -78,6 +79,7 @@ function App() {
   
   let header = null;
   let content = null;
+  let footer = null;
 
   let navigate = useNavigate();
   
@@ -103,13 +105,15 @@ function App() {
        // 인증 완료 이후에 useNavigate를 이용하여 url을 변경함. 단, useNavigate를 사용하기 위해서는 react-router-dom 설치가 필요하며,
        // useNagivate hook을 사용하는 상위 컴포넌트 (현재의 상위 컴포넌트는 App)는 <BrowserRouter> 컴포넌트로 감싸 있어야 한다. (index.js 확인)
       navigate('/user'); 
-      setMode('home');
+      setMode('user');
         
       }).catch(function(error){
         console.log(error);
         alert(' 아이디(로그인 전용 아이디) 또는 비밀번호를 잘못 입력했습니다. 입력하신 내용을 다시 확인해주세요.');
       })
+      
     }} authenticationPage={()=>{
+      
       setMode('authenticationPage');
     }} joinPage={()=>{
       navigate('/join');
@@ -119,7 +123,7 @@ function App() {
     }} findId={()=>{
       setMode('findId')
     }}></Login>
-
+    footer = <Footer></Footer>
   }else if(mode === 'authenticationPage'){
     content = <Authentication></Authentication>
   }else if(mode === 'joinPage'){
@@ -139,8 +143,8 @@ function App() {
     content = <FindId back={()=>{
       setMode('login');
     }}></FindId>
-  }else if(mode === 'home'){
-    header = <Header></Header>
+  }else if(mode === 'user'){
+    header = <UserHeader></UserHeader>
     content = <User back={()=>{
       navigate('/');
       setMode('login');
@@ -155,7 +159,7 @@ function App() {
 
           {header}
           {content}
-          <Footer></Footer>
+          {footer}
         
       </div>
   );

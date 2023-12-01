@@ -41,23 +41,23 @@
 
 @font-face {
   font-family: 'early';
-  src: url('/src/font/NanumAReumDeuRiGgocNaMu.woff');
+  src: url('/src/etc/font/NanumAReumDeuRiGgocNaMu.woff');
 }
 @font-face {
   font-family: 'koko';
-  src: url('/src/font/NanumKoKoCe.woff');
+  src: url('/src/etc/font/NanumKoKoCe.woff');
 }
 @font-face {
   font-family: 'DDobak';
-  src: url('/src/font/NanumDdoBagDdoBag.woff');
+  src: url('/src/etc/font/NanumDdoBagDdoBag.woff');
 }
 @font-face {
   font-family: 'Buri';
-  src: url('/src/font/MaruBuri-Regular.woff2');
+  src: url('/src/etc/font/MaruBuri-Regular.woff2');
 }
 @font-face {
   font-family: 'BuriBord';
-  src: url('/src/font/MaruBuri-Bold.woff2');
+  src: url('/src/etc/font/MaruBuri-Bold.woff2');
 }
 
 

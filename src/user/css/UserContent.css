@@ -1,0 +1,23 @@
+#userMainDiv{
+    /*float : left 끝! */
+    clear: both;
+    border: 5px solid gray;
+   
+    height: 200px;
+}
+
+#userListDiv{
+    border: 5pt solid skyblue;
+    width: 20%;
+    height: 100px;
+    float: left;
+}
+
+
+#userDetailDiv{
+    border: 5pt groove green;
+    width: 50%;
+    height: 100px;
+    margin: 0px 10px 0px 10px;
+    float: left;
+}

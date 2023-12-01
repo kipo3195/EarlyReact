@@ -1,0 +1,41 @@
+
+
+#userHeader{
+    padding: 50px;
+}
+
+/* userHeader Title*/
+
+#userHeaderTitle{
+    
+    width: 20%;
+    height: 90px;
+    float: left;
+    margin: 5px 10px 0px 15px;
+    font-family: BuriBord;
+    text-align: center;
+    font-size: 50px;
+    background-color: rgb(161, 220, 240) ;
+    color: white;
+    padding-top: 15px;
+    border-radius: 10px;
+
+
+    
+}
+
+
+
+
+.userHeaderUl li{
+
+    float: left;
+    list-style-type: none;
+    background-color: rgb(161, 220, 240);
+    width: 80px;
+    height: 80px;
+    text-align: center;
+    margin: 10px;
+    border-radius: 5px;
+
+}
