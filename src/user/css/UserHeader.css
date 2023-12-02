@@ -1,41 +1,53 @@
 
-
+/*브라우저 상단 간격 */
 #userHeader{
-    padding: 50px;
-}
-
-/* userHeader Title*/
-
-#userHeaderTitle{
+    width: 95%;
+    padding: 5px;
     
-    width: 20%;
-    height: 90px;
-    float: left;
-    margin: 5px 10px 0px 15px;
+}
+/* userHeader Title Early!*/
+#userHeaderTitle{
+    width: 380px;
     font-family: BuriBord;
     text-align: center;
-    font-size: 50px;
+    font-size: 55px;
     background-color: rgb(161, 220, 240) ;
     color: white;
-    padding-top: 15px;
-    border-radius: 10px;
+    border-radius: 10px;    
+}
 
+#userHeaderTable{
+    border-spacing: 5px;
+}
 
-    
+/* userHeader nav*/
+.userHeaderTd{
+    background-color: rgb(161, 220, 240);
+    width: 70px;
+    border-radius: 7px;
+    text-align: center;    
+    border: 3px solid rgb(161, 220, 240);
+}
+.userHeaderTd:hover{
+    background-color: white;
+    border: 3px solid rgb(161, 220, 240);
+    cursor: pointer;
 }
 
 
+@media only screen and (max-width:800px){
 
-
-.userHeaderUl li{
-
-    float: left;
-    list-style-type: none;
-    background-color: rgb(161, 220, 240);
-    width: 80px;
-    height: 80px;
-    text-align: center;
-    margin: 10px;
-    border-radius: 5px;
-
+    #userHeaderTitle{
+        height: 70px;
+        font-size: 30px;
+        width: 120px;
+    }
+    .userHeaderTdImg{
+        width: 40px;
+        height: 40px;
+    }
+    #userHeaderTable{
+        border-spacing: 2px;
+    }
+    
 }

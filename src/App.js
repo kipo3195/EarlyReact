@@ -127,6 +127,7 @@ function App() {
   }else if(mode === 'authenticationPage'){
     content = <Authentication></Authentication>
   }else if(mode === 'joinPage'){
+    header = <Header></Header>
     content = <Join successJoin={()=>{
       setMode('login');
     }} back={()=>{
@@ -134,12 +135,14 @@ function App() {
       setMode('login');
     }}></Join>
   }else if(mode === 'findPw'){
+    header = <Header></Header>
     content = <FindPw back={()=>{
       setMode('login');
     }} findId={()=>{
       setMode('findId');
     }}></FindPw>
   }else if(mode === 'findId'){
+    header = <Header></Header>
     content = <FindId back={()=>{
       setMode('login');
     }}></FindId>
