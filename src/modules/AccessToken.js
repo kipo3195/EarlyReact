@@ -15,31 +15,34 @@ async function AccessToken (_flag, _errorCode){
     // 단 await를 사용하면 자동으로 Promise 객체를 만드는 것 처럼 보임. 
     // 그래서 AccessToken을 호출 하는 곳에서 return 데이터를 확인해 보면 Promise 객체가 반환 되는 것을 확인함. 
     // Promise 객체의 PromiseResult에 접근해서 데이터를 사용하면 된다. .then으로 접근 할 수 있다.
+    // console.log(_flag, _errorCode);
+    if(_flag ==='fail' && _errorCode === '400'){
+        await axios({
+            method:'POST',
+            url:'http://localhost:8080/user/accessToken'
+        }).then(function(response){
+            const flag = response.data.flag;
+            
+            if(flag === 'success'){
+            
+                result = 'success';
+                const accesstoken  = response.data.token;
+                axios.defaults.headers.common['Authorization'] = `Bearer ${accesstoken}`;
+            }else if(flag === 'fail'){
+                
+                result = 'logout';
+                axios.defaults.headers.common['Authorization'] = null;
+                
+            }
+        }).catch(function(error){
+            console.log(error);
+        })
 
-        if(_flag ==='fail' && _errorCode === '400'){
-            await axios({
-                method:'POST',
-                url:'http://localhost:8080/user/accessToken'
-            }).then(function(response){
-                const flag = response.data.flag;
-                if(flag === 'success'){
-                    // 성공
-                    const accesstoken  = response.data.token;
-                    axios.defaults.headers.common['Authorization'] = `Bearer ${accesstoken}`;
-                }else if(flag === 'fail'){
-                    result = 'logout';
-                    axios.defaults.headers.common['Authorization'] = null;
-                    alert('로그인 기간이 만료되어 로그아웃 됩니다.')
-                }
-            }).catch(function(error){
-                console.log(error);
-            })
+    }else{
+        // 만료안됨
+    }
 
-        }else{
-            // 만료안됨
-        }
-
-        return result;
+    return result;
 
 }
 

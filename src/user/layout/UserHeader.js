@@ -18,69 +18,66 @@ function UserHeader(props){
                         <tr>
                             <th id='userHeaderTitle'>Early!</th>
 
-                            <td id='address' 
-                            className='userHeaderTd'><img className='userHeaderTdImg' src={address} width='45' alt='address'
-                            onClick={event=>{
+                            <td id='address' onClick={event=>{
                                 event.preventDefault();
                                 props.address();
-                            }}></img></td>
+                            }} className='userHeaderTd'><img className='userHeaderTdImg' src={address} width='45' alt='address'
+                            ></img></td>
 
-                            <td id='chat'
-                             className='userHeaderTd'><img className='userHeaderTdImg' src={chat} width='45' alt='chat'
-                             onClick={event=>{
+                            <td id='chat'onClick={event=>{
                                 event.preventDefault();
                                 props.chat();
-                             }}></img></td>
+                             }} className='userHeaderTd'><img className='userHeaderTdImg' src={chat} width='45' alt='chat'
+                             ></img></td>
 
-                            <td id='message'
-                             className='userHeaderTd'><img className='userHeaderTdImg' src={message} width='45' alt='message'
-                             onClick={event=>{
+                            <td id='message' onClick={event=>{
                                 event.preventDefault();
                                 props.message();
-                             }}></img></td>
+                             }} className='userHeaderTd'><img className='userHeaderTdImg' src={message} width='45' alt='message'
+                            ></img></td>
 
-                            <td id='email'
-                             className='userHeaderTd'><img className='userHeaderTdImg' src={email} width='45' alt='email'
-                             onClick={event=>{
+                            <td id='email' onClick={event=>{
                                 event.preventDefault();
                                 props.email();
-                             }}></img></td>
+                             }} className='userHeaderTd'><img className='userHeaderTdImg' src={email} width='45' alt='email'
+                             ></img></td>
 
-                            <td id='calendar'
-                             className='userHeaderTd'><img className='userHeaderTdImg' src={calendar} alt='calendar'
-                             onClick={event=>{
+                            <td id='calendar' onClick={event=>{
                                 event.preventDefault();
                                 props.calendar();
-                             }}></img></td>
+                             }} className='userHeaderTd'><img className='userHeaderTdImg' src={calendar} alt='calendar'
+                             ></img></td>
 
-                            <td id='env'
-                             className='userHeaderTd'><img className='userHeaderTdImg' src={env} width='45' alt='env'
-                             onClick={event=>{
+                            <td id='env' onClick={event=>{
                                 event.preventDefault();
                                 props.env();
-                             }}></img></td>
+                             }} className='userHeaderTd'><img className='userHeaderTdImg' src={env} width='45' alt='env'
+                             ></img></td>
                            
                             <td className='userMenuTd'>
-                            <a id ='findTableALink' href='' onClick={event=>{
+                                <tr className ='userMenuTr' onClick={event=>{
                                 event.preventDefault();
                                 props.cs();
-                            }}>고객센터</a>
+                                }}>고객센터
+                                </tr>
                             </td>
 
                             <td className='userMenuTd'>
-                            <a id ='findTableALink' href='' onClick={event=>{
+                                <tr className ='userMenuTr' onClick={event=>{
                                 event.preventDefault();
                                 props.info();
-                            }}>마이페이지</a>
+                                }}>마이페이지
+                                </tr>
                             </td>
 
                             <td className='userMenuTd'>
-                            <a id ='findTableALink' href='' onClick={event=>{
+                                <tr className ='userMenuTr' onClick={event=>{
                                 event.preventDefault();
                                 if(window.confirm('로그아웃 하시겠습니까?')){
                                     props.logout();
                                 }
-                            }}>로그아웃</a>
+                                }}>로그아웃
+                                </tr>
                             </td>
                         </tr>
                     </tbody>

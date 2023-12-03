@@ -34,6 +34,24 @@
     cursor: pointer;
 }
 
+/* userHeader ETC*/
+.userMenuTd{
+    /*높이 정렬*/
+    vertical-align: top;
+}
+.userMenuTr{
+    font-family: buri;
+    font-size: 13px;
+    vertical-align: top;
+    color: rgb(130, 131, 132);
+}
+.userMenuTr:hover{
+    text-decoration: underline;
+    color: black;
+    cursor: pointer;
+}
+
+
 
 @media only screen and (max-width:800px){
 

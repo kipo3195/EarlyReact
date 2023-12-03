@@ -92,6 +92,54 @@ function App() {
   let footer = null;
 
   let navigate = useNavigate();
+
+
+  // 이벤트 전 토큰 검증 + access 토큰 재발급 
+  async function checkToken(){
+    var tokenFlag = null; 
+    var tokenErrorCode = null;
+    var result = null;
+
+    await axios({
+        method:'GET',
+        url : 'http://localhost:8080/user/tokenVerification'
+    }).then(function(response){
+      
+      tokenFlag = response.data.flag;
+      tokenErrorCode = response.data.error_code;
+
+      if(tokenFlag === 'success'){
+        result = 'success';
+      }else if(tokenErrorCode === '403'){
+        // 바로 로그아웃 처리 refresh 토큰이 없는것으로 판단.
+        alert('로그인 기간이 만료되어 로그아웃 됩니다.1');
+        setMode('login');
+      }else{
+        // access 토큰 만료 
+        const promise = AccessToken(tokenFlag, tokenErrorCode);
+
+        promise.then(result =>{
+          if(result === 'logout'){
+            alert('로그인 기간이 만료되어 로그아웃 됩니다.2');
+            setMode('login');
+            navigate('/');
+          }else{
+           console.log('재발급 완료', result);
+           
+          }
+
+        }).catch(function(error){
+          console.log(error);
+        })
+
+      }
+      
+    }).catch(function(error){
+      console.log(error);
+    })
+    
+    return result;
+  }
   
   // data는 post 방식일때 body
   if(mode === 'login'){  
@@ -107,15 +155,17 @@ function App() {
       }).then(function(response){
         const flag = response.data.flag;
         const accesstoken  = response.data.token;
-        axios.defaults.headers.common['Authorization'] = `Bearer ${accesstoken}`;
         
-        //정상인지 판단
-
-
-       // 인증 완료 이후에 useNavigate를 이용하여 url을 변경함. 단, useNavigate를 사용하기 위해서는 react-router-dom 설치가 필요하며,
-       // useNagivate hook을 사용하는 상위 컴포넌트 (현재의 상위 컴포넌트는 App)는 <BrowserRouter> 컴포넌트로 감싸 있어야 한다. (index.js 확인)
-      navigate('/user'); 
-      setMode('user');
+        if(flag === 'success' && accesstoken !== null){
+          axios.defaults.headers.common['Authorization'] = `Bearer ${accesstoken}`;
+          
+          // 인증 완료 이후에 useNavigate를 이용하여 url을 변경함. 단, useNavigate를 사용하기 위해서는 react-router-dom 설치가 필요하며,
+          // useNagivate hook을 사용하는 상위 컴포넌트 (현재의 상위 컴포넌트는 App)는 <BrowserRouter> 컴포넌트로 감싸 있어야 한다. (index.js 확인)
+          navigate('/user'); 
+          setMode('user');
+        }else{
+          alert('로그인 실패');
+        }
         
       }).catch(function(error){
         console.log(error);
@@ -157,7 +207,6 @@ function App() {
       setMode('login');
     }}></FindId>
   }else if(mode.startsWith('user')){
-    console.log(mode);
     header = <UserHeader logout={()=>{
       // 로그 아웃시 access token 초기화 처리.
       // 해주지 않는다면 로그아웃 이후에도 해당 브라우저는 access token을 가지고 있어서 서버에 요청가능해짐.
@@ -167,20 +216,42 @@ function App() {
       navigate('/');
       setMode('login');
     }} cs={()=>{
+      navigate('/user/cs');
       setMode('user/cs');
     }} info={()=>{
+      navigate('/user/info');
       setMode('user/info');
     }} address={()=>{
+      navigate('/user/address');
       setMode('user/address');
     }} chat={()=>{
-      setMode('user/chat');
+      var result = null;
+      // 20231203 토큰 검증 로직 추가함. 
+      var resultPromise = checkToken();
+      resultPromise.then(result =>{
+        if(result === 'success'){
+          navigate('/user/chat');
+          setMode('user/chat');
+        }else{
+          
+         console.log(result);
+        }
+      }).catch(function(error){
+        console.log(error);
+      })
+    
     }} message={()=>{
+
+      navigate('/user/message');
       setMode('user/message');
     }} email={()=>{
+      navigate('/user/email');
       setMode('user/email');
     }} calendar={()=>{
+      navigate('/user/calendar');
       setMode('user/calendar');
     }} env={()=>{
+      navigate('/user/env');
       setMode('user/env');
     }}
 
@@ -188,13 +259,14 @@ function App() {
     var modes = mode.split("/");
 
     if(mode === 'user'){
+      // 메인 페이지 호출
       content = <User></User>
     }else{
+      // 이벤트에 따른 페이지 호출
       for(var i = 0; i < modes.length; i++){
         if(i === 1){
           var url = modes[i];
           //url 정의 
-          console.log(url);
 
           if(url === 'address'){
             content = <UserAddress></UserAddress>
