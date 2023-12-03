@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import cookie from 'react-cookies';
 import { BrowserRouter as Router, Route, Routes, Link, useNavigate } from 'react-router-dom';
 
+import AccessToken from './modules/AccessToken';
 
 import Header from './common/layout/Header';
 import Footer from './common/layout/Footer';
@@ -17,6 +18,15 @@ import Authentication from './common/layout/Authentication';
 import UserHeader from './user/layout/UserHeader';
 
 import User from './user/layout/User';
+import UserAddress from './user/layout/UserAddress';
+import UserChat from './user/layout/UserChat';
+import UserMessage from './user/layout/UserMessage';
+import UserEmail from './user/layout/UserEmail';
+import UserCalendar from './user/layout/UserCalendar';
+import UserEnv from './user/layout/UserEnv';
+import UserCs from './user/layout/UserCs';
+import UserInfo from './user/layout/UserInfo';
+
 
 
 
@@ -146,12 +156,67 @@ function App() {
     content = <FindId back={()=>{
       setMode('login');
     }}></FindId>
-  }else if(mode === 'user'){
-    header = <UserHeader></UserHeader>
-    content = <User back={()=>{
+  }else if(mode.startsWith('user')){
+    console.log(mode);
+    header = <UserHeader logout={()=>{
+      // 로그 아웃시 access token 초기화 처리.
+      // 해주지 않는다면 로그아웃 이후에도 해당 브라우저는 access token을 가지고 있어서 서버에 요청가능해짐.
+      // 쿠키영역에 있는 refresh 토큰은 삭제 되지 않는데 어차피 서버에서는 access token을 가장 먼저 체크하기도 하고 다시 로그인하면 
+      // 쿠키영역 업데이트함. 
+      axios.defaults.headers.common['Authorization'] = null;
       navigate('/');
       setMode('login');
-    }}></User>
+    }} cs={()=>{
+      setMode('user/cs');
+    }} info={()=>{
+      setMode('user/info');
+    }} address={()=>{
+      setMode('user/address');
+    }} chat={()=>{
+      setMode('user/chat');
+    }} message={()=>{
+      setMode('user/message');
+    }} email={()=>{
+      setMode('user/email');
+    }} calendar={()=>{
+      setMode('user/calendar');
+    }} env={()=>{
+      setMode('user/env');
+    }}
+
+    ></UserHeader>
+    var modes = mode.split("/");
+
+    if(mode === 'user'){
+      content = <User></User>
+    }else{
+      for(var i = 0; i < modes.length; i++){
+        if(i === 1){
+          var url = modes[i];
+          //url 정의 
+          console.log(url);
+
+          if(url === 'address'){
+            content = <UserAddress></UserAddress>
+          }else if(url === 'chat'){
+            content = <UserChat></UserChat>
+          }else if(url === 'message'){
+            content = <UserMessage></UserMessage>
+          }else if(url === 'email'){
+            content = <UserEmail></UserEmail>
+          }else if(url === 'calendar'){
+            content = <UserCalendar></UserCalendar>
+          }else if(url === 'env'){
+            content = <UserEnv></UserEnv>
+          }else if(url === 'cs'){
+            content = <UserCs></UserCs>
+          }else if(url === 'info'){ 
+            content = <UserInfo></UserInfo>
+          }
+          // 더 커지면 url.append(modes[i]) 해서 url로 조건문 체크
+        }
+      }
+    }
   }
 
   return (
@@ -163,7 +228,7 @@ function App() {
           {header}
           {content}
           {footer}
-        
+
       </div>
   );
 }

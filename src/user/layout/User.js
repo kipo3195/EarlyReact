@@ -8,28 +8,10 @@ function User(props){
     
 
     return(
-        
-        <div id ='userMainDiv'>
-            <div id ='userListDiv'>
-
-            </div>
-            <div id ='userDetailDiv'>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td></td>
-                            <td>
-                            <a id ='findTableALink' href='' onClick={event=>{
-                                event.preventDefault();
-                                props.back();
-                            }}>뒤로가기</a>
-                            </td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div>
+            userHome입니다.
         </div>
+       
     )
  
    
