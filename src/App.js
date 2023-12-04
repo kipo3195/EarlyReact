@@ -95,10 +95,11 @@ function App() {
 
 
   // 이벤트 전 토큰 검증 + access 토큰 재발급 
-  async function checkToken(){
+  async function checkToken(mode){
     var tokenFlag = null; 
     var tokenErrorCode = null;
-    var result = null;
+
+    var nav = '/' + mode;
 
     await axios({
         method:'GET',
@@ -109,23 +110,30 @@ function App() {
       tokenErrorCode = response.data.error_code;
 
       if(tokenFlag === 'success'){
-        result = 'success';
+        // 정상 요청
+        navigate(nav);
+        setMode(mode);
       }else if(tokenErrorCode === '403'){
         // 바로 로그아웃 처리 refresh 토큰이 없는것으로 판단.
-        alert('로그인 기간이 만료되어 로그아웃 됩니다.1');
+        alert('로그인 기간이 만료되어 로그아웃 됩니다');
+        navigate('/');
         setMode('login');
       }else{
         // access 토큰 만료 
         const promise = AccessToken(tokenFlag, tokenErrorCode);
 
-        promise.then(result =>{
-          if(result === 'logout'){
-            alert('로그인 기간이 만료되어 로그아웃 됩니다.2');
-            setMode('login');
+        promise.then(promiseResult =>{
+          if(promiseResult === 'logout'){
+          
+            alert('로그인 기간이 만료되어 로그아웃 됩니다.')
             navigate('/');
-          }else{
-           console.log('재발급 완료', result);
-           
+            setMode('login');
+
+          }else if(promiseResult === 'success'){
+
+            navigate(nav);
+            setMode(mode);
+
           }
 
         }).catch(function(error){
@@ -137,8 +145,6 @@ function App() {
     }).catch(function(error){
       console.log(error);
     })
-    
-    return result;
   }
   
   // data는 post 방식일때 body
@@ -216,43 +222,43 @@ function App() {
       navigate('/');
       setMode('login');
     }} cs={()=>{
+
       navigate('/user/cs');
       setMode('user/cs');
+      
     }} info={()=>{
-      navigate('/user/info');
-      setMode('user/info');
+      
+      checkToken('user/info');
     }} address={()=>{
-      navigate('/user/address');
-      setMode('user/address');
+      
+      checkToken('user/address');
+    
     }} chat={()=>{
-      var result = null;
-      // 20231203 토큰 검증 로직 추가함. 
-      var resultPromise = checkToken();
-      resultPromise.then(result =>{
-        if(result === 'success'){
-          navigate('/user/chat');
-          setMode('user/chat');
-        }else{
-          
-         console.log(result);
-        }
-      }).catch(function(error){
-        console.log(error);
-      })
+      
+      // 토큰 검증 로직 20231204
+      // 각 함수별로 보여줄 페이지의 mode를 던져주면 내부에서 navigate를 사용하여 url도 처리함
+      // 1. tokenVerification url 호출하여 현재 브라우저가 갖는 access token으로 1차 검증
+      // 2. access token이 만료된 경우 refresh 토큰으로 2차 검증 AccessToken.js
+      // 3. 만료인지 재발급인지 판단해서 promise 객체를 리턴, promiseResult가 success인지 logout인지에 따라 처리(navigate, setMode);
+      // 4. 정상이라면 checkToken에 던지는 매개변수에 맞는 페이지 및 navigate 처리, logout이라면 로그인 페이지로 이동처리.
+      checkToken('user/chat');
     
     }} message={()=>{
 
-      navigate('/user/message');
-      setMode('user/message');
+      checkToken('user/message');
+    
     }} email={()=>{
-      navigate('/user/email');
-      setMode('user/email');
+
+      checkToken('user/email');
+
     }} calendar={()=>{
-      navigate('/user/calendar');
-      setMode('user/calendar');
+    
+      checkToken('user/calendar');
+
     }} env={()=>{
-      navigate('/user/env');
-      setMode('user/env');
+      
+      checkToken('user/env');
+      
     }}
 
     ></UserHeader>
