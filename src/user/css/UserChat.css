@@ -1,0 +1,37 @@
+
+
+
+#chatListDiv{
+    
+    float: left;
+    border: 2px solid black;
+    width: 380px;
+    height: 720px;
+    padding : 0 5px;
+    margin-right: 2px;
+}
+
+#chatListTable{
+    width: 100%;
+    padding-top: 3px;
+}
+
+
+#contentDiv{
+    float: left;
+    border: 2px solid blue;
+    height: 720px;
+    width: 60%;
+}
+
+.chatListTr{
+    width: 90%;
+    border: 2px solid gold;
+    padding: 2.5px;
+    height: 60px;
+}
+
+.chatListTr:hover{
+    cursor: pointer;
+    background-color: rgb(228, 241, 245);
+}

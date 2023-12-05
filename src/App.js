@@ -27,6 +27,7 @@ import UserEnv from './user/layout/UserEnv';
 import UserCs from './user/layout/UserCs';
 import UserInfo from './user/layout/UserInfo';
 
+import ChatList from './modules/ChatList';
 
 
 
@@ -277,7 +278,21 @@ function App() {
           if(url === 'address'){
             content = <UserAddress></UserAddress>
           }else if(url === 'chat'){
-            content = <UserChat></UserChat>
+            
+
+            
+            // 여기서 비동기로 채팅방 리스트 및 데이터 가져오기
+            let chatListPromise = ChatList();
+            chatListPromise.then(chatListPromiseResult =>{
+              
+              console.log(chatListPromiseResult);
+             
+            
+              // 여기는 비동기  content안에 데이터를 넣어줘야하는데..
+              
+            })
+            // content = <UserChat list={chatListPromiseResult}></UserChat>
+            
           }else if(url === 'message'){
             content = <UserMessage></UserMessage>
           }else if(url === 'email'){
