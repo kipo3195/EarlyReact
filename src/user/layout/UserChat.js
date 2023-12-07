@@ -1,5 +1,6 @@
 import '../css/UserChat.css';
 import axios from 'axios';
+import Parser from 'html-react-parser';
 axios.defaults.withCredentials = true;
 
 
@@ -7,18 +8,26 @@ axios.defaults.withCredentials = true;
 
 function UserChat(props){
     
-    console.log('UserChat', props);
-    const items = ['a','b','c','d','e','f','g','h','i','j'];
+    console.log('UserChat', props.list);
+    var roomInfo = props.list.room_info;
+    // const items = ['a','b','c','d','e','f','g','h','i','j'];
+    console.log(roomInfo);
+    const items = [roomInfo];
+    const jsonData = JSON.parse(items);
+    console.log(jsonData);
 
+    const newItem = [jsonData];
     return(
+        
         <div>
             <div id ='chatListDiv'>
                 <table id ='chatListTable'>
                     <tbody>
+                        {newItem.map((item) =>
+                        <tr key={item}>
 
-                        {items.map((item) =>
-                        <tr>
-                            <td className='chatListTr' key={item}>{item}</td>
+                            <td>방제목 : {item.chat_room_title}</td>
+                            <td>{item.chat_participants}</td>
                         </tr>
                         )}            
 

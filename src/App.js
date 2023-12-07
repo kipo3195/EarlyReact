@@ -87,10 +87,14 @@ function App() {
 
   // 최초 진입시 'login' useState를 통해 set하면 App이 갱신
   const [mode, setMode] = useState('login');
+  const [list, setList] = useState(null);
   
   let header = null;
   let content = null;
   let footer = null;
+            
+  
+  console.log(list); //왜 3번씩 호출 되는거?
 
   let navigate = useNavigate();
 
@@ -278,20 +282,18 @@ function App() {
           if(url === 'address'){
             content = <UserAddress></UserAddress>
           }else if(url === 'chat'){
-            
 
-            
-            // 여기서 비동기로 채팅방 리스트 및 데이터 가져오기
-            let chatListPromise = ChatList();
-            chatListPromise.then(chatListPromiseResult =>{
-              
-              console.log(chatListPromiseResult);
-             
-            
-              // 여기는 비동기  content안에 데이터를 넣어줘야하는데..
-              
-            })
-            // content = <UserChat list={chatListPromiseResult}></UserChat>
+            if(list === null){
+              var chatListPromiseResult = null;
+              let chatListPromise = ChatList();
+              chatListPromise.then(chatListPromiseResult =>{
+                
+                console.log(chatListPromiseResult.props.list);
+                setList(chatListPromiseResult.props.list);
+              })
+            }else{
+              content = <UserChat list={list}></UserChat>
+            }
             
           }else if(url === 'message'){
             content = <UserMessage></UserMessage>
