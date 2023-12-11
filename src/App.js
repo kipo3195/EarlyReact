@@ -93,7 +93,6 @@ function App() {
   let content = null;
   let footer = null;
             
-  
   console.log(list); //왜 3번씩 호출 되는거?
 
   let navigate = useNavigate();
@@ -306,6 +305,8 @@ function App() {
           }else if(url === 'cs'){
             content = <UserCs></UserCs>
           }else if(url === 'info'){ 
+            setList(null);
+            console.log(list);
             content = <UserInfo></UserInfo>
           }
           // 더 커지면 url.append(modes[i]) 해서 url로 조건문 체크
