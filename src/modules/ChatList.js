@@ -5,7 +5,7 @@ import UserChat from '../user/layout/UserChat';
 
 async function ChatList(){
 
-    var data = null;
+    var returnData = null;
 
     await axios({
         method:'post',
@@ -13,7 +13,8 @@ async function ChatList(){
     }).then(function(response){
 
         console.log(response);
-        data = response.data;
+        returnData = response.data;
+        console.log(returnData);
 
     }).catch(function(error){
 
@@ -21,7 +22,7 @@ async function ChatList(){
     
     })
 
-    return <UserChat list={data}></UserChat>
+    return returnData;
 
     
 }

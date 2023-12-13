@@ -22,7 +22,7 @@ async function AccessToken (_flag, _errorCode){
             url:'http://localhost:8080/user/accessToken'
         }).then(function(response){
             const flag = response.data.flag;
-            console.log(flag);
+            
             if(flag === 'success'){
             
                 result = 'success';

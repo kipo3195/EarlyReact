@@ -26,8 +26,10 @@ import UserCalendar from './user/layout/UserCalendar';
 import UserEnv from './user/layout/UserEnv';
 import UserCs from './user/layout/UserCs';
 import UserInfo from './user/layout/UserInfo';
+import UserNoChat from './user/layout/UserNoChat';
 
 import ChatList from './modules/ChatList';
+
 
 
 
@@ -83,28 +85,28 @@ function TestAsync(){
 
 
 
+
 function App() {
 
   // 최초 진입시 'login' useState를 통해 set하면 App이 갱신
   const [mode, setMode] = useState('login');
   const [list, setList] = useState(null);
   
+
   let header = null;
   let content = null;
   let footer = null;
-            
-  console.log(list); //왜 3번씩 호출 되는거?
+          
 
   let navigate = useNavigate();
-
-
+  
   // 이벤트 전 토큰 검증 + access 토큰 재발급 
   async function checkToken(mode){
     var tokenFlag = null; 
     var tokenErrorCode = null;
 
     var nav = '/' + mode;
-
+   
     await axios({
         method:'GET',
         url : 'http://localhost:8080/user/tokenVerification'
@@ -113,15 +115,19 @@ function App() {
       tokenFlag = response.data.flag;
       tokenErrorCode = response.data.error_code;
 
+      console.log(tokenFlag);
       if(tokenFlag === 'success'){
         // 정상 요청
+        console.log('success', mode);
         navigate(nav);
         setMode(mode);
       }else if(tokenErrorCode === '403'){
         // 바로 로그아웃 처리 refresh 토큰이 없는것으로 판단.
         alert('로그인 기간이 만료되어 로그아웃 됩니다');
         navigate('/');
+        setList(null);
         setMode('login');
+        
       }else{
         // access 토큰 만료 
         const promise = AccessToken(tokenFlag, tokenErrorCode);
@@ -131,10 +137,11 @@ function App() {
           
             alert('로그인 기간이 만료되어 로그아웃 됩니다.')
             navigate('/');
+            setList(null);
             setMode('login');
 
           }else if(promiseResult === 'success'){
-
+            console.log('access token success', mode);
             navigate(nav);
             setMode(mode);
 
@@ -152,7 +159,8 @@ function App() {
   }
   
   // data는 post 방식일때 body
-  if(mode === 'login'){  
+  if(mode === 'login'){ 
+    
     header = <Header></Header>
     content = <Login loginRequest={(userId, password)=>{
       axios({
@@ -224,6 +232,8 @@ function App() {
       // 쿠키영역 업데이트함. 
       axios.defaults.headers.common['Authorization'] = null;
       navigate('/');
+      // mode를 변경하는 것 보다 list를 빼는 것을 먼저처리함으로 써 로그아웃시 리스트 데이터를 초기화시킴
+      setList(null);
       setMode('login');
     }} cs={()=>{
 
@@ -264,7 +274,6 @@ function App() {
       checkToken('user/env');
       
     }}
-
     ></UserHeader>
     var modes = mode.split("/");
 
@@ -277,21 +286,36 @@ function App() {
         if(i === 1){
           var url = modes[i];
           //url 정의 
-
           if(url === 'address'){
             content = <UserAddress></UserAddress>
           }else if(url === 'chat'){
-
             if(list === null){
+              // 채팅 리스트를 매번 호출 하는 것은 무리가 있다. 최초 한번 요청하고 이후에 
+              // 특정 시간이 지났을때나 받아오면 어떨까?
+              // 한번만 받아와서 실시간 패킷을 받았을때 리스트를 갱신 - 방정보를 알아야함. 
+
+              console.log('리스트 최초 호출')
               var chatListPromiseResult = null;
               let chatListPromise = ChatList();
               chatListPromise.then(chatListPromiseResult =>{
                 
-                console.log(chatListPromiseResult.props.list);
-                setList(chatListPromiseResult.props.list);
+                setList(chatListPromiseResult.chat_list);
               })
             }else{
-              content = <UserChat list={list}></UserChat>
+              // 최초 호출로 리스트 정보 받고 .... 리스트만 랜더링
+              // 리스트가 없거나 사용자 토큰으로 받을 수 없는 경우 다르게 조건처리해야함. 
+              console.log(list);
+              if(list === "C403"){
+                // access token 발급 사용자가 아님(서버 DB에 없는 경우)
+                alert('비정상적인 토큰으로 서버에 요청하므로 로그아웃 됩니다.');
+                setList(null);
+                setMode('login');
+              }else if(list === "C404"){
+                // 채팅 리스트가 없는경우
+                content = <UserNoChat></UserNoChat>
+              }else{
+                content = <UserChat list={list}></UserChat>
+              }
             }
             
           }else if(url === 'message'){
@@ -305,8 +329,6 @@ function App() {
           }else if(url === 'cs'){
             content = <UserCs></UserCs>
           }else if(url === 'info'){ 
-            setList(null);
-            console.log(list);
             content = <UserInfo></UserInfo>
           }
           // 더 커지면 url.append(modes[i]) 해서 url로 조건문 체크

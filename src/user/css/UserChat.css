@@ -28,13 +28,52 @@
     width: 90%;
     padding: 2.5px;
     height: 50px;
+    
+
 }
+
 
 .chatListTr:hover{
     cursor: pointer;
     background-color: rgb(248, 252, 206);
 }
 
-.chatListTd{
-    border: 1px solid rgb(140, 140, 145);
+.chatListTitleTd{
+
+    font-family: buriBord;
+    
+    font-size: 14px;
+    float: left;
+    
+    /* 너비 고정 */
+    width: 190px;
+    height: 50%;
+
+}
+
+.chatListUsersTd{
+    
+    font-family: buri;
+    font-size: 9px;
+    
+    float: left;
+    width: 36%;
+    height: 50%;
+    vertical-align: middle;
+    padding-top: 5px;
+    padding-left: 5px;
+
+}
+
+.chatListLastDateTd{
+    font-family: buri;
+    font-size: 9px;
+    padding-top: 5px;
+    float: left;
+}
+
+
+/* userNoChat*/
+#userNoChatTd{
+    font-family: buri;
 }
