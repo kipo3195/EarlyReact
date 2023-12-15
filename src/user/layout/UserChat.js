@@ -1,5 +1,8 @@
 import '../css/UserChat.css';
 import axios from 'axios';
+import * as StompJs from "@stomp/stompjs";
+
+
 axios.defaults.withCredentials = true;
 
 
@@ -7,6 +10,12 @@ axios.defaults.withCredentials = true;
 
 function UserChat(props){
     
+   
+    const stompClient = new StompJs.Client({
+        brokerURL : 'wss://localhost:8080/earlyShake'
+    });
+
+
     console.log('UserChat', props.list);
     const items = [props.list];
     console.log(items);
@@ -71,7 +80,30 @@ function UserChat(props){
 
             {/*컨텐츠 영역*/}
             <div id ='contentDiv'>
-
+                    <tablt>
+                        <tbody>
+                            <tr>
+                                <td><input type ='button' value='연결' onClick={(event)=>{
+                                    event.preventDefault();
+                                    
+                                    stompClient.activate();
+                                    
+                                    stompClient.onConnect = function (frame) {
+                                        console.log(frame);
+                                      };
+                                     
+                                    // stompClient.onWebSocketError = (error) => {
+                                    //     console.error('Error with websocket## : ', error);
+                                    // };
+                                    
+                                }}></input></td>
+                            </tr>
+                            <tr>
+                                <td><input type ='text'></input></td>
+                                <td><input type ='submit' value='전송'></input></td>
+                            </tr>
+                        </tbody>
+                    </tablt>
             </div>
         </div>
     )
