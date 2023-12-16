@@ -1,20 +1,12 @@
 import '../css/UserChat.css';
 import axios from 'axios';
 import * as StompJs from "@stomp/stompjs";
-
+import * as SockJS from "sockjs-client";
 
 axios.defaults.withCredentials = true;
 
 
-
-
 function UserChat(props){
-    
-   
-    const stompClient = new StompJs.Client({
-        brokerURL : 'wss://localhost:8080/earlyShake'
-    });
-
 
     console.log('UserChat', props.list);
     const items = [props.list];
@@ -84,17 +76,30 @@ function UserChat(props){
                         <tbody>
                             <tr>
                                 <td><input type ='button' value='연결' onClick={(event)=>{
+
                                     event.preventDefault();
+                                    // 연결 
+                        
+                                    const stompClient = new StompJs.Client({
+                                        //brokerURL : "ws://localhost:8080/ws",
+                                        webSocketFactory: () => new SockJS("/earlyShake"), 
+                                        debug : function(data) {
+                                            console.log(data);
+                                        }, 
+                                       // reconnectDelay: 5000, // 자동 재 연결
+                                        heartbeatIncoming: 4000,
+                                        heartbeatOutgoing: 4000,
+                                        onConnect:()=>{
+                                            console.log("connect web socket");
+                                            // 이때 구독추가 
+                                        },
+                                        onStompError: (frame) => {
+                                            console.error(frame);
+                                          },
+                                    });
                                     
-                                    stompClient.activate();
-                                    
-                                    stompClient.onConnect = function (frame) {
-                                        console.log(frame);
-                                      };
-                                     
-                                    // stompClient.onWebSocketError = (error) => {
-                                    //     console.error('Error with websocket## : ', error);
-                                    // };
+                                    stompClient.activate(); // 활성화
+                                    console.log("done");
                                     
                                 }}></input></td>
                             </tr>
