@@ -4,7 +4,8 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import cookie from 'react-cookies';
 import { BrowserRouter as Router, Route, Routes, Link, useNavigate } from 'react-router-dom';
-
+import * as StompJs from "@stomp/stompjs";
+import * as SockJS from "sockjs-client";
 import AccessToken from './modules/AccessToken';
 
 import Header from './common/layout/Header';
@@ -91,7 +92,8 @@ function App() {
   // 최초 진입시 'login' useState를 통해 set하면 App이 갱신
   const [mode, setMode] = useState('login');
   const [list, setList] = useState(null);
-  
+  const [client, setClient] = useState(null);
+  var stompClient = null;
 
   let header = null;
   let content = null;
@@ -99,6 +101,16 @@ function App() {
           
 
   let navigate = useNavigate();
+
+  function webSocketCallback(stompClient){
+        // 로그인 완료 + 웹소켓 구독(자신의 ID) 완료
+
+        setClient(stompClient);
+        // 인증 완료 이후에 useNavigate를 이용하여 url을 변경함. 단, useNavigate를 사용하기 위해서는 react-router-dom 설치가 필요하며,
+        // useNagivate hook을 사용하는 상위 컴포넌트 (현재의 상위 컴포넌트는 App)는 <BrowserRouter> 컴포넌트로 감싸 있어야 한다. (index.js 확인)
+        navigate('/user'); 
+        setMode('user');
+  }
   
   // 이벤트 전 토큰 검증 + access 토큰 재발급 
   async function checkToken(mode){
@@ -175,12 +187,37 @@ function App() {
         const accesstoken  = response.data.token;
         
         if(flag === 'success' && accesstoken !== null){
+          // httpOnly header
           axios.defaults.headers.common['Authorization'] = `Bearer ${accesstoken}`;
           
-          // 인증 완료 이후에 useNavigate를 이용하여 url을 변경함. 단, useNavigate를 사용하기 위해서는 react-router-dom 설치가 필요하며,
-          // useNagivate hook을 사용하는 상위 컴포넌트 (현재의 상위 컴포넌트는 App)는 <BrowserRouter> 컴포넌트로 감싸 있어야 한다. (index.js 확인)
-          navigate('/user'); 
-          setMode('user');
+          // 웹소켓 구독 추가 
+          stompClient = new StompJs.Client({
+            //brokerURL : "ws://localhost:8080/ws",
+            webSocketFactory: () => new SockJS("/earlyShake"), 
+            debug : function(data) {
+                console.log(data);
+            }, 
+            // reconnectDelay: 5000, // 자동 재 연결
+            heartbeatIncoming: 4000,
+            heartbeatOutgoing: 4000,
+            onConnect:()=>{
+                // console.log("connect web socket userID : ", userId);
+                // 자신의 ID를 url로 하는 구독 추가, setClient
+                stompClient.subscribe("/sub/channels/" + userId, webSocketCallback(stompClient));
+            },
+            onStompError: (frame) => {
+                console.error(frame);
+              },
+        });
+        
+        stompClient.activate(); // 활성화(없으면 Connect함수 호출하지 않음. )
+        
+        // 이하 로직 webSocketCallback으로 이동함. 20231217
+        // 인증 완료 이후에 useNavigate를 이용하여 url을 변경함. 단, useNavigate를 사용하기 위해서는 react-router-dom 설치가 필요하며,
+        //   useNagivate hook을 사용하는 상위 컴포넌트 (현재의 상위 컴포넌트는 App)는 <BrowserRouter> 컴포넌트로 감싸 있어야 한다. (index.js 확인)
+        //   navigate('/user'); 
+        //   setMode('user');
+ 
         }else{
           alert('로그인 실패');
         }
@@ -314,7 +351,7 @@ function App() {
                 // 채팅 리스트가 없는경우
                 content = <UserNoChat></UserNoChat>
               }else{
-                content = <UserChat list={list}></UserChat>
+                content = <UserChat list={list} client={client}></UserChat>
               }
             }
             

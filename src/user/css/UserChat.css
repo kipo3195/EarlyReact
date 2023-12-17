@@ -77,3 +77,19 @@
 #userNoChatTd{
     font-family: buri;
 }
+
+#chatRoomTitle{
+    border: 1px solid grey;
+    height: 10%;
+}
+
+#chatRoomContents{
+    border: 1px solid black;
+    height: 65%;
+}
+
+#chatRoomText{
+    border: 1px solid red;
+    height: 20%;
+}
+
