@@ -20,10 +20,12 @@ function UserChat(props){
     //채팅 데이터 jsonArray
     // console.log(jsonData);
 
+    const userId = props.userId;
+    
 
     // 방제목 생성 함수 
     function makeTitle(t){
-        return t.split('|')[0] + ' 외 ' + t.split('|').length+'명';
+        return t.split('|')[0] + ' 외 ' + (t.split('|').length - 1)+'명';
     }
 
     // 리스트 마지막 일자 생성 함수 
@@ -43,7 +45,7 @@ function UserChat(props){
 
     // 룸 클릭시 해당 방으로 이동하는 함수
     function roomClick(chatRoomSeq, chatRoomUsers, chatRoomTitle){
-        
+        console.log("여기", chatRoomUsers);
         if(chatRoomTitle === null){
             setTitle(makeTitle(chatRoomUsers));
         }else{
@@ -60,13 +62,15 @@ function UserChat(props){
         if(message === null || message === ''){
             return;
         }
-
+        console.log(client.userId);
         client.publish({
+            // 데이터를 보내는 경로 /app + 서버(UserChatController)의 @MessageMapping(/test/message)
             destination:"/app/test/message",
             body:JSON.stringify({
                 chatRoomKey : roomKey,
                 chatContents : message,
-                chatReceiver : recevier
+                chatReceiver : recevier,
+                chatSender : userId
             })
         });
 

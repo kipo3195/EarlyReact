@@ -93,6 +93,7 @@ function App() {
   const [mode, setMode] = useState('login');
   const [list, setList] = useState(null);
   const [client, setClient] = useState(null);
+  const [userId, setUserId] = useState(null);
   var stompClient = null;
 
   let header = null;
@@ -102,9 +103,9 @@ function App() {
 
   let navigate = useNavigate();
 
-  function webSocketCallback(stompClient){
+  function webSocketCallback(stompClient, userId){
         // 로그인 완료 + 웹소켓 구독(자신의 ID) 완료
-
+        setUserId(userId);
         setClient(stompClient);
         // 인증 완료 이후에 useNavigate를 이용하여 url을 변경함. 단, useNavigate를 사용하기 위해서는 react-router-dom 설치가 필요하며,
         // useNagivate hook을 사용하는 상위 컴포넌트 (현재의 상위 컴포넌트는 App)는 <BrowserRouter> 컴포넌트로 감싸 있어야 한다. (index.js 확인)
@@ -137,6 +138,11 @@ function App() {
         // 바로 로그아웃 처리 refresh 토큰이 없는것으로 판단.
         alert('로그인 기간이 만료되어 로그아웃 됩니다');
         navigate('/');
+        if(client !== null){
+            console.log(client);
+            client.disconnect();
+            console.log(client);
+        }
         setList(null);
         setMode('login');
         
@@ -203,11 +209,13 @@ function App() {
             onConnect:()=>{
                 // console.log("connect web socket userID : ", userId);
                 // 자신의 ID를 url로 하는 구독 추가, setClient
-                stompClient.subscribe("/sub/channels/" + userId, webSocketCallback(stompClient));
+                stompClient.subscribe("/topic/user/" + userId);
+                stompClient.subscribe("/queue/user/" + userId, webSocketCallback(stompClient, userId));
             },
             onStompError: (frame) => {
                 console.error(frame);
               },
+        
         });
         
         stompClient.activate(); // 활성화(없으면 Connect함수 호출하지 않음. )
@@ -270,6 +278,7 @@ function App() {
       axios.defaults.headers.common['Authorization'] = null;
       navigate('/');
       // mode를 변경하는 것 보다 list를 빼는 것을 먼저처리함으로 써 로그아웃시 리스트 데이터를 초기화시킴
+
       setList(null);
       setMode('login');
     }} cs={()=>{
@@ -351,7 +360,7 @@ function App() {
                 // 채팅 리스트가 없는경우
                 content = <UserNoChat></UserNoChat>
               }else{
-                content = <UserChat list={list} client={client}></UserChat>
+                content = <UserChat list={list} client={client} userId ={userId}></UserChat>
               }
             }
             
