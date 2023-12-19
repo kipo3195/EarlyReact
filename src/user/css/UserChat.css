@@ -89,7 +89,31 @@
 }
 
 #chatRoomText{
-    border: 1px solid red;
     height: 20%;
 }
 
+/*채팅 입력창*/
+#chatTable{
+    width: 100%;
+}
+
+#chatTextArea{
+    border: none;
+    resize: none;
+    background-color: rgb(255, 255, 255);
+}
+
+#chatTextArea:focus {
+    outline: none;
+  }
+
+#chatRoomButton {   
+    background-color: rgb(224, 224, 224);
+    height: 4.5%;
+
+}
+
+#chatTextSend{
+    float: right;
+    margin-right: 5px;
+}

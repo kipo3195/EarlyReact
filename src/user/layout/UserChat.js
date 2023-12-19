@@ -10,6 +10,9 @@ function UserChat(props){
     const [roomKey, setRoomKey] = useState(null);
     const [title, setTitle] = useState(null);
     const [recevier, setRecevier] = useState(null);
+    const [contents, setContents ] = useState(null);
+    const [contentLines,setContentLines ] = useState([]);
+
     
     // 웹소켓 클라이언트
     var client = props.client;
@@ -20,7 +23,7 @@ function UserChat(props){
     //채팅 데이터 jsonArray
     // console.log(jsonData);
 
-    const userId = props.userId;
+    const sender = props.userId;
     
 
     // 방제목 생성 함수 
@@ -60,9 +63,10 @@ function UserChat(props){
     function sendMessage(message){
         console.log(roomKey, message);
         if(message === null || message === ''){
+            alert('못보냄');
             return;
         }
-        console.log(client.userId);
+
         client.publish({
             // 데이터를 보내는 경로 /app + 서버(UserChatController)의 @MessageMapping(/test/message)
             destination:"/app/test/message",
@@ -70,10 +74,36 @@ function UserChat(props){
                 chatRoomKey : roomKey,
                 chatContents : message,
                 chatReceiver : recevier,
-                chatSender : userId
+                chatSender : sender
             })
         });
 
+        let json ={
+
+            userid :sender,
+            lineData : message
+            
+            }     
+       
+        contentLines.push(json);
+        console.log(contentLines);
+        
+    }
+    // textarea 데이터 입력시 
+    function changeContents(e){
+
+        setContents(e.target.value);
+    
+    }
+
+    // textarea에서 엔터 클릭시 일단 
+    function enterSend(e){
+
+        if(e.code === 'Enter' || e.key ==='Enter'){
+            
+            sendMessage(contents);
+        }
+    
     }
 
 
@@ -123,31 +153,57 @@ function UserChat(props){
             {/*컨텐츠 영역*/}
             <div id ='contentDiv'>
                 <div id ='chatRoomTitle'>
-                    <th id='chatRoomTitleTh'>{title}</th>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th id='chatRoomTitleTh'>{title}</th>
+                            </tr>
+                        </tbody>
+                    </table>     
                 </div>
 
                 <div id ='chatRoomContents'>
-                    chat room contents area
+                    {contentLines.map((item)=>{
+              
+                    })}
                 </div>
 
                 <div id ='chatRoomText'>
                     <form onSubmit={event=>{
                         event.preventDefault();
-                        
                         // stomp pub
-                        sendMessage(event.target.chatMessage.value);
+                        
+                        //console.log(event.target.chatTextArea.value);
+                        sendMessage(event.target.chatTextArea.value);
+
+                        event.target.chatTextArea.value = null;
 
                         }}>
-                        <table>
+                        <table id ='chatTable'>
                             <tbody>
-                                <tr>    
-                                    <td><textarea id ='chatMessage'></textarea></td>
-                                    <td><input type ='submit' value='전송'></input></td>
+                                <tr>                                
+                                    <td><textarea id='chatTextArea' rows="9" style={{width:"100%"}} placeholder='채팅을 입력해주세요... [줄바꿈 Shift + Enter]'
+                                     onKeyUp={e=> enterSend(e)}
+                                     onChange={e=> changeContents(e)}
+                                     ></textarea></td>
                                 </tr>
                             </tbody>
+                            <tfoot id ='chatRoomButton'>
+                                <tr>                    
+                                    <td colSpan='5'>
+                                        <input type ='button' value='botton1'></input>
+                                        <input type ='button' value='botton2'></input>
+                                        <input type ='button' value='botton3'></input>
+                                        <input id='chatTextSend' type ='submit' value='전송'></input>
+                                    </td>            
+                                </tr>
+                            </tfoot>
                         </table>
                     </form>
-                </div>                                
+                </div>
+
+                <div >
+                </div>
             </div>
         </div>
     )
