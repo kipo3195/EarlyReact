@@ -70,9 +70,9 @@ function Login(props){
                         </td>
                       </tr>
                       <tr>
-                        
-                          <input id='loginSubmit' type='submit' value='로그인' ></input>
-                        
+                          <td>
+                            <input id='loginSubmit' type='submit' value='로그인' ></input>
+                          </td>
                       </tr>  
                     </tbody>
                   </table>

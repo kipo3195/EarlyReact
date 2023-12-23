@@ -33,7 +33,7 @@ function UserChat(props){
     
     if(jsonData !== null){
         userChatList = <UserChatList jsonData={jsonData} enterChatRoom={(chatRoomSeq, chatRoomTitle, chatRoomKey, chatRoomUsers)=>{
-
+            
             setChatRoomSeq(chatRoomSeq);
             setChatRoomTitle(chatRoomTitle);
             setRoomKey(chatRoomKey);
@@ -43,7 +43,11 @@ function UserChat(props){
 
     if(chatRoomSeq !== null) {
         // DB 조회 로직 line데이터 
-        userChatContents = <UserChatContents sender={sender} client={client} chatRoomTitle={chatRoomTitle} chatRoomKey={chatRoomKey} chatRoomUsers={chatRoomUsers}></UserChatContents>
+        userChatContents 
+            = <UserChatContents 
+                sender={sender} client={client} 
+                chatRoomTitle={chatRoomTitle} chatRoomKey={chatRoomKey} 
+                chatRoomUsers={chatRoomUsers} ></UserChatContents>
     }
 
     return(

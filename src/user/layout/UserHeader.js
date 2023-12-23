@@ -54,30 +54,25 @@ function UserHeader(props){
                              }} className='userHeaderTd'><img className='userHeaderTdImg' src={env} width='45' alt='env'
                              ></img></td>
                            
-                            <td className='userMenuTd'>
-                                <tr className ='userMenuTr' onClick={event=>{
+                            <td className='userMenuTd' onClick={event=>{
                                 event.preventDefault();
                                 props.cs();
-                                }}>고객센터
-                                </tr>
+                                }}> 고객센터
                             </td>
 
-                            <td className='userMenuTd'>
-                                <tr className ='userMenuTr' onClick={event=>{
+                            <td className='userMenuTd'onClick={event=>{
                                 event.preventDefault();
                                 props.info();
-                                }}>마이페이지
-                                </tr>
+                                }}> 마이페이지
+                                
                             </td>
 
-                            <td className='userMenuTd'>
-                                <tr className ='userMenuTr' onClick={event=>{
+                            <td className='userMenuTd'onClick={event=>{
                                 event.preventDefault();
                                 if(window.confirm('로그아웃 하시겠습니까?')){
                                     props.logout();
                                 }
                                 }}>로그아웃
-                                </tr>
                             </td>
                         </tr>
                     </tbody>

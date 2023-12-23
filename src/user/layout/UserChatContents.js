@@ -1,81 +1,51 @@
 import '../css/UserChat.css';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+import UserChatContentsInput from './chat/UserChatContentsInput';
 
 axios.defaults.withCredentials = true;
 
 function UserChatContents(props){
-
+    
+    
     // const [title, setTitle] = useState(null);
+    const [contentLines, setContentLines] = useState();
     var title = props.chatRoomTitle;
     var roomKey = props.chatRoomKey;
-    var client = props.client;
+    
     var sender = props.sender;
     var recevier = props.chatRoomUsers;
+
+    console.log('다시호출');
     
-    const [contents, setContents] = useState('');
-    const [contentLines,setContentLines ] = useState([]);
+    const chatContentsInput 
+        = <UserChatContentsInput client={props.client} chatRoomKey={roomKey} recevier={recevier} sender={sender}
 
-      // 전송버튼 클릭시 
-      function sendMessage(message){
-        console.log(roomKey, message);
-        if(message === null || message === ''){
-            alert('못보냄');
-            return;
-        }
-        
-        client.publish({
-            // 데이터를 보내는 경로 /app + 서버(UserChatController)의 @MessageMapping(/test/message)
-            
-            destination:"/app/test/message",
-            body:JSON.stringify({
-                chatRoomKey : roomKey,
-                chatContents : message,
-                chatReceiver : recevier,
-                chatSender : sender
-            })
-        });
+              addLine={(line)=>{
 
-        let json ={
+                // spread 문법. 기존 contentsLines를 얕은 복사 
+                // 사용하지 않는다면 copyContentsLines를 참조할 뿐이다. 
+                // 참조하는 값으로 useState를 사용해 봤자 리액트는 다시 랜더링 하지 않는다. 
+                var copyContentLines = [...contentLines];
+                copyContentLines.push(line);
+                setContentLines(copyContentLines);
 
-            userid :sender,
-            lineData : message
-            
-            }     
-       
-        contentLines.push(json);
-        console.log(contentLines);
-        
-    }
-    // textarea 데이터 입력시 
-    function changeContents(e){
-
-        setContents(e.target.value);
+            }}></UserChatContentsInput>
     
-    }
-
-    // textarea에서 엔터 클릭시 일단 
-    function enterSend(e){
-        e.preventDefault(); //onkeyUp의 기본이벤트를 차단하지 않으면 2번 호출됨. 
-
-        
-        if((contents !=='') && (e.code === 'Enter' || e.key ==='Enter')){
-            console.log(e);
-            
-            setContents('');
-            //sendMessage(contents);
-        }
+    //방이 변경되는 이벤트 호출 시마다 그리는 라인데이터를 초기화 시킴roomKey 자리에는 props의 어떤 데이터를 받아도 됨. 
+    useEffect(()=>{
     
-    }
+        setContentLines([]);
 
-    function enterSendDown(e){
-        
-        console.log(e);
-    }
+    },[roomKey])
 
     return (
-  
+
+        //채팅창
         <div id ='contentDiv'>
+
+            {/* 채팅방 제목 */}
             <div id ='chatRoomTitle'>
                 <table>
                     <tbody>
@@ -86,46 +56,24 @@ function UserChatContents(props){
                 </table>     
             </div>
 
+
+            {/* 채팅방 라인 */}
             <div id ='chatRoomContents'>
-                {contentLines.map((item)=>{
-          
-                })}
+                <table>
+                    <tbody>
+                        {contentLines && contentLines.map((line) =>
+                            <tr className='contentLineTr'>
+                                <td className='contentLineTd'>{line.lineData}</td>    
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
 
-            <div id ='chatRoomText'>
-                <form onSubmit={event=>{
-                    event.preventDefault();
-                    // stomp pub
-                    console.log(event.target.chatTextArea.value);
-                    //sendMessage(event.target.chatTextArea.value);
 
-                    event.target.chatTextArea.value = null;
-
-                    }}>
-                    <table id ='chatTable'>
-                        <tbody>
-                            <tr>                                
-                                <td><textarea id='chatTextArea' rows="9" style={{width:"100%"}} placeholder='채팅을 입력해주세요... [줄바꿈 Shift + Enter]'
-                                 onKeyUp={e=> enterSend(e)}
-                                 onKeyDown={e=> enterSendDown(e)}
-                                 onChange={e=> changeContents(e)}
-                                 value ={contents}
-                                 ></textarea></td>
-                            </tr>
-                        </tbody>
-                        <tfoot id ='chatRoomButton'>
-                            <tr>                    
-                                <td colSpan='5'>
-                                    <input type ='button' value='botton1'></input>
-                                    <input type ='button' value='botton2'></input>
-                                    <input type ='button' value='botton3'></input>
-                                    <input id='chatTextSend' type ='submit' value='전송'></input>
-                                </td>            
-                            </tr>
-                        </tfoot>
-                    </table>
-                </form>
-            </div>
+            {/* 채팅 입력창*/}
+            {chatContentsInput}
+            
         </div>
     
     )

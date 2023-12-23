@@ -117,3 +117,14 @@
     float: right;
     margin-right: 5px;
 }
+
+.contentLineTd{
+    
+    border: 1px solid rgb(17, 134, 180);
+    background-color: rgb(215, 245, 252);
+    width: 300px;
+    font-family: buriBord;
+    padding: 10px;
+    border-radius: 5px;
+    
+}
