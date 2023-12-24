@@ -17,8 +17,6 @@ function UserChatContents(props){
     var sender = props.sender;
     var recevier = props.chatRoomUsers;
 
-    console.log('다시호출');
-    
     const chatContentsInput 
         = <UserChatContentsInput client={props.client} chatRoomKey={roomKey} recevier={recevier} sender={sender}
 
@@ -59,15 +57,17 @@ function UserChatContents(props){
 
             {/* 채팅방 라인 */}
             <div id ='chatRoomContents'>
-                <table>
-                    <tbody>
-                        {contentLines && contentLines.map((line) =>
-                            <tr className='contentLineTr'>
-                                <td className='contentLineTd'>{line.lineData}</td>    
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                <div id='chatRoomContentsChild'>
+                    <table id= 'chatContentsTable' align ='right'>
+                        <tbody>
+                            {contentLines && contentLines.map((line) =>
+                                <tr className='contentLineTr'>
+                                    <td className='contentLineTd'>{line.lineData}</td>    
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
 

@@ -83,10 +83,31 @@
     height: 10%;
 }
 
+/*채팅방 line 부모 div*/ 
 #chatRoomContents{
     border: 1px solid black;
     height: 65%;
+    width: 100%;
+    position: relative;
+    
 }
+
+/*채팅방 line 자식 div*/ 
+/*
+    채팅방 line 아래 부터 정렬 방법
+    부모 div position:relative
+    자식 div position: absolute
+             bottom : 0
+    */ 
+#chatRoomContentsChild{
+    
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+}
+
 
 #chatRoomText{
     height: 20%;
@@ -117,13 +138,16 @@
     float: right;
     margin-right: 5px;
 }
+#chatContentsTable{
+ 
+}
 
 .contentLineTd{
-    
+    font-size: 14px;
     border: 1px solid rgb(17, 134, 180);
     background-color: rgb(215, 245, 252);
     width: 300px;
-    font-family: buriBord;
+    font-family: buri;
     padding: 10px;
     border-radius: 5px;
     

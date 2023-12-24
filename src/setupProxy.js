@@ -5,8 +5,7 @@ module.exports = (app) => {
       "/earlyShake",
       createProxyMiddleware({
         target: "http://localhost:8080",
-        ws: true,
+        ws: false,
       })
     );
   };
-  

@@ -112,6 +112,10 @@ function App() {
         navigate('/user'); 
         setMode('user');
   }
+
+  function onMessageReceived(){
+    console.log('데이터 수신')
+  }
   
   // 이벤트 전 토큰 검증 + access 토큰 재발급 
   async function checkToken(mode){
@@ -139,10 +143,10 @@ function App() {
         alert('로그인 기간이 만료되어 로그아웃 됩니다');
         navigate('/');
         if(client !== null){
-            console.log(client);
-            client.disconnect();
-            console.log(client);
+          //console.log('로그아웃 요청시 sockjs client', client);      -- 웹소켓 연결확인용
+          client.deactivate();
         }
+        setClient(null);
         setList(null);
         setMode('login');
         
@@ -155,6 +159,11 @@ function App() {
           
             alert('로그인 기간이 만료되어 로그아웃 됩니다.')
             navigate('/');
+            if(client !== null){
+              //console.log('로그아웃 요청시 sockjs client', client);      -- 웹소켓 연결확인용
+              client.deactivate();
+            }
+            setClient(null);
             setList(null);
             setMode('login');
 
@@ -176,8 +185,14 @@ function App() {
     })
   }
   
+
+  {/*                     이하 화면                  */}
+
+
   // data는 post 방식일때 body
   if(mode === 'login'){ 
+
+    console.log('login page의 sockjs Client ', client);
     
     header = <Header></Header>
     content = <Login loginRequest={(userId, password)=>{
@@ -193,7 +208,7 @@ function App() {
         const accesstoken  = response.data.token;
         
         if(flag === 'success' && accesstoken !== null){
-          // httpOnly header
+          // httpOnly header에 access token 추가 
           axios.defaults.headers.common['Authorization'] = `Bearer ${accesstoken}`;
           
           // 웹소켓 구독 추가 
@@ -214,7 +229,9 @@ function App() {
             },
             onStompError: (frame) => {
                 console.error(frame);
-              },
+            },
+
+          
         
         });
         
@@ -279,6 +296,13 @@ function App() {
       navigate('/');
       // mode를 변경하는 것 보다 list를 빼는 것을 먼저처리함으로 써 로그아웃시 리스트 데이터를 초기화시킴
 
+      if(client !== null){
+        console.log('로그아웃 요청시 sockjs client', client);     ///-- 웹소켓 연결확인용
+        client.deactivate();
+      }
+      console.log('deactivate sockjs 이후 client', client);      // -- 웹소켓 연결확인용
+      
+      setClient(null);
       setList(null);
       setMode('login');
     }} cs={()=>{
@@ -324,7 +348,8 @@ function App() {
     var modes = mode.split("/");
 
     if(mode === 'user'){
-      // 메인 페이지 호출
+      // console.log('login 이후 메인페이지의 sockjs Client ', client);      -- 웹소켓 연결확인용
+      // 로그인 이후  메인 페이지 호출
       content = <User></User>
     }else{
       // 이벤트에 따른 페이지 호출
@@ -354,6 +379,11 @@ function App() {
               if(list === "C403"){
                 // access token 발급 사용자가 아님(서버 DB에 없는 경우)
                 alert('비정상적인 토큰으로 서버에 요청하므로 로그아웃 됩니다.');
+                if(client !== null){
+                  //console.log('로그아웃 요청시 sockjs client', client);      -- 웹소켓 연결확인용
+                  client.deactivate();
+                }
+                setClient(null);
                 setList(null);
                 setMode('login');
               }else if(list === "C404"){
