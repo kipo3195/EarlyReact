@@ -94,6 +94,10 @@ function App() {
   const [list, setList] = useState(null);
   const [client, setClient] = useState(null);
   const [userId, setUserId] = useState(null);
+
+  //const [chatRoomSeq, setChatRoomSeq]= useState(null);
+  //console.log(chatRoomSeq);
+
   var stompClient = null;
 
   let header = null;
@@ -113,9 +117,15 @@ function App() {
         setMode('user');
   }
 
-  function onMessageReceived(){
-    console.log('데이터 수신')
+  // 웹소켓 구독 url로 데이터 수신 
+  function subCallback(message){
+    if (message.body) {
+      console.log(message.body);
+    } else {
+      
+    }
   }
+
   
   // 이벤트 전 토큰 검증 + access 토큰 재발급 
   async function checkToken(mode){
@@ -224,14 +234,13 @@ function App() {
             onConnect:()=>{
                 // console.log("connect web socket userID : ", userId);
                 // 자신의 ID를 url로 하는 구독 추가, setClient
-                stompClient.subscribe("/topic/user/" + userId);
+                stompClient.subscribe("/topic/user/" + userId, subCallback);
                 stompClient.subscribe("/queue/user/" + userId, webSocketCallback(stompClient, userId));
+                
             },
             onStompError: (frame) => {
                 console.error(frame);
             },
-
-          
         
         });
         
@@ -346,10 +355,11 @@ function App() {
     }}
     ></UserHeader>
     var modes = mode.split("/");
-
+    console.log('user', mode);
     if(mode === 'user'){
       // console.log('login 이후 메인페이지의 sockjs Client ', client);      -- 웹소켓 연결확인용
       // 로그인 이후  메인 페이지 호출
+      
       content = <User></User>
     }else{
       // 이벤트에 따른 페이지 호출

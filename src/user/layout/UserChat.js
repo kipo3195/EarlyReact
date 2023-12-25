@@ -29,20 +29,49 @@ function UserChat(props){
     
     // 발신자 id
     const sender = props.userId;
-    
-    
-    if(jsonData !== null){
-        userChatList = <UserChatList jsonData={jsonData} enterChatRoom={(chatRoomSeq, chatRoomTitle, chatRoomKey, chatRoomUsers)=>{
+
+    function chatRoomCallback(message){
+        if (message.body) {
+            console.log('User chat : ',message.body);
+          } else {
             
+          }
+    }
+    
+    // 리스트 조회
+    if(jsonData !== null){
+        userChatList = <UserChatList jsonData={jsonData} enterChatRoom={(chatRoomSeq, chatRoomTitle, _chatRoomKey, chatRoomUsers)=>{
+
+            if(client !== null){
+                if(chatRoomKey === null){
+                    // 방 최초 입장시 구독
+                    
+                    client.subscribe('/topic/room/'+_chatRoomKey, chatRoomCallback);
+                    console.log('신규구독 추가 url chatRoomSeq : ', _chatRoomKey);
+    
+                }else if(chatRoomKey !== null && chatRoomKey !== _chatRoomKey){
+                    // 다른 방 입장시 기존 방 구독 취소 후 구독
+                    client.unsubscribe('/topic/room/'+chatRoomKey);
+                    console.log('구독 취소 후 새로 구독');
+                    client.subscribe('/topic/room/'+_chatRoomKey, chatRoomCallback);
+                }
+            }
+
             setChatRoomSeq(chatRoomSeq);
             setChatRoomTitle(chatRoomTitle);
-            setRoomKey(chatRoomKey);
+            setRoomKey(_chatRoomKey);
             setChatRoomUsers(chatRoomUsers);
+
+
         }}></UserChatList>
     }
 
-    if(chatRoomSeq !== null) {
+    // 리스트에서 방 선택
+    if(chatRoomSeq !== null && chatRoomKey !== null) {
         // DB 조회 로직 line데이터 
+
+     
+
         userChatContents 
             = <UserChatContents 
                 sender={sender} client={client} 
