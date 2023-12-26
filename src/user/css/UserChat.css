@@ -109,6 +109,9 @@
 }
 
 
+
+
+
 #chatRoomText{
     height: 20%;
 }
@@ -138,17 +141,35 @@
     float: right;
     margin-right: 5px;
 }
-#chatContentsTable{
- 
+
+
+#chatRoomContentsTable{
+    width: 100%;
 }
 
-.contentLineTd{
-    font-size: 14px;
-    border: 1px solid rgb(17, 134, 180);
-    background-color: rgb(215, 245, 252);
-    width: 300px;
+.chatRoomContentsTableTrR{
     font-family: buri;
-    padding: 10px;
+
+}
+
+.chatRoomContentsTableTrL{
+    font-family: buri;
+
+}
+
+.chatRoomContentsTableTrRTd{
     border-radius: 5px;
+    background-color: rgb(249, 249, 216);
+    border: 1px solid rgb(255, 215, 128);
     
+}
+.chatRoomContentsTableTrLTd{
+    border-radius: 5px;
+    background-color: rgb(193, 233, 247);
+    border: 1px solid rgb(81, 150, 234);
+    
+}
+
+.chatRoomContentsTableTrTdETC{
+    width: 25%;
 }

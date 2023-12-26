@@ -32,7 +32,7 @@ function UserChatContentsInput(props){
 
       // 전송버튼 클릭시 
     function sendMessage(message){
-        console.log(roomKey, message);
+        
         if(message === null || message === ''){
             alert('채팅을 전송할 수 없습니다.');
             return;

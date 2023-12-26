@@ -225,9 +225,9 @@ function App() {
           stompClient = new StompJs.Client({
             //brokerURL : "ws://localhost:8080/ws",
             webSocketFactory: () => new SockJS("/earlyShake"), 
-            debug : function(data) {
-                console.log(data);
-            }, 
+            // debug : function(data) {
+            //     console.log(data);
+            // }, 
             // reconnectDelay: 5000, // 자동 재 연결
             heartbeatIncoming: 4000,
             heartbeatOutgoing: 4000,
