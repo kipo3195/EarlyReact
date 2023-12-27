@@ -43,13 +43,14 @@ function UserChatContentsInput(props){
         // 웹소켓 채팅 발신
         client.publish({
             // 데이터를 보내는 경로 /app + 서버(UserChatController)의 @MessageMapping(/test/message)
-            
+            // chatType 동적 처리하기 TODO
             destination:"/app/test/message",
             body:JSON.stringify({
                 chatRoomKey : roomKey,
                 chatContents : message,
                 chatReceiver : recevier,
-                chatSender : sender
+                chatSender : sender,
+                chatType : "C"
             })
         });
 

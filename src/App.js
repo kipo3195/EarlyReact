@@ -400,6 +400,7 @@ function App() {
                 // 채팅 리스트가 없는경우
                 content = <UserNoChat></UserNoChat>
               }else{
+                // 채팅 리스트 존재
                 content = <UserChat list={list} client={client} userId ={userId}></UserChat>
               }
             }

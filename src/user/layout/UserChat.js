@@ -18,8 +18,12 @@ function UserChat(props){
     const [chatRoomTitle, setChatRoomTitle] = useState(null);
     const [chatRoomKey, setRoomKey] = useState(null);
     const [chatRoomUsers, setChatRoomUsers] = useState([null]);
-
+    // 채팅 수신 데이터
     const [recvData, setRecvData] = useState(null);
+
+    // 채팅 라인
+    const [lineData, setLineData] = useState(null);
+
     // 웹소켓 클라이언트
     var client = props.client;
         
@@ -31,6 +35,7 @@ function UserChat(props){
     // 발신자 id
     const sender = props.userId;
 
+    // 입장한 채팅방의 대화 callback 함수 
     function chatRoomCallback(message){
         if (message.body) {
             
@@ -43,8 +48,28 @@ function UserChat(props){
             
           }
     }
-    console.log(jsonData);
-    // 리스트 조회
+
+    // 입장시 해당 방의 line 조회 
+    async function getChatRoomLines(chatRoomKey){
+        var result = null;
+    
+        await axios({
+            method:'POST',
+            url:'http://localhost:8080/user/chatRoomLine',
+            data:{
+                chatRoomKey, chatRoomKey
+            }}).then(function(response){
+                // console.log(response.data);
+                result = response.data;
+            }).catch(function(error){
+                console.log(error);
+                
+            })
+
+            return result;
+    }
+
+    // 방 입장  
     if(jsonData !== null){
         userChatList = <UserChatList jsonData={jsonData} enterChatRoom={(chatRoomSeq, chatRoomTitle, _chatRoomKey, chatRoomUsers)=>{
             
@@ -65,6 +90,17 @@ function UserChat(props){
                     client.subscribe('/topic/room/'+_chatRoomKey, chatRoomCallback, {id:_chatRoomKey});
                 }
             }
+                  
+            // 여기서 DB 조회 한다음 컴포넌트에 데이터 내려주기 
+            // 알수 있는 정보 sender, chatRoomKey
+            const promise = getChatRoomLines(_chatRoomKey);
+            
+            promise.then(promisePromiseResult=>{
+                // console.log(promisePromiseResult);
+                setLineData(promisePromiseResult);
+                // setLineData를 실행하고 이하 set로직들은 실행되지 않음을 확인. 
+            })
+
 
             setChatRoomSeq(chatRoomSeq);
             setChatRoomTitle(chatRoomTitle);
@@ -75,15 +111,15 @@ function UserChat(props){
         }}></UserChatList>
     }
 
-    // 리스트에서 방 선택
+    // 방 입장 이후
     if(chatRoomSeq !== null && chatRoomKey !== null) {
-        // DB 조회 로직 line데이터 
-
+        
         userChatContents 
-            = <UserChatContents 
-                sender={sender} client={client} 
-                chatRoomTitle={chatRoomTitle} chatRoomKey={chatRoomKey} 
-                chatRoomUsers={chatRoomUsers} recvData={recvData}></UserChatContents>
+        = <UserChatContents 
+            sender={sender} client={client} 
+            chatRoomTitle={chatRoomTitle} chatRoomKey={chatRoomKey} 
+            chatRoomUsers={chatRoomUsers} recvData={recvData} lineData={lineData}></UserChatContents>
+      
     }
 
     return(
