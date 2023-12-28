@@ -24,6 +24,9 @@ function UserChat(props){
     // 채팅 라인
     const [lineData, setLineData] = useState(null);
 
+    // 다음 조회시 기준이되는 라인
+    const [nextLine, setNextLine] = useState(null);
+
     // 웹소켓 클라이언트
     var client = props.client;
         
@@ -57,7 +60,7 @@ function UserChat(props){
             method:'POST',
             url:'http://localhost:8080/user/chatRoomLine',
             data:{
-                chatRoomKey, chatRoomKey
+                chatRoomKey : chatRoomKey 
             }}).then(function(response){
                 // console.log(response.data);
                 result = response.data;
@@ -91,34 +94,31 @@ function UserChat(props){
                 }
             }
                   
-            // 여기서 DB 조회 한다음 컴포넌트에 데이터 내려주기 
-            // 알수 있는 정보 sender, chatRoomKey
+            // 여기서 기존 라인 DB 조회 이후 재랜더링
             const promise = getChatRoomLines(_chatRoomKey);
             
             promise.then(promisePromiseResult=>{
-                // console.log(promisePromiseResult);
-                setLineData(promisePromiseResult);
-                // setLineData를 실행하고 이하 set로직들은 실행되지 않음을 확인. 
+                //console.log(promisePromiseResult.chatRoomLine);
+                //console.log(promisePromiseResult.nextLine);
+                setLineData(promisePromiseResult.chatRoomLine);
+                setNextLine(promisePromiseResult.nextLine);
+                setChatRoomSeq(chatRoomSeq);
+                setChatRoomTitle(chatRoomTitle);
+                setRoomKey(_chatRoomKey);
+                setChatRoomUsers(chatRoomUsers);
             })
-
-
-            setChatRoomSeq(chatRoomSeq);
-            setChatRoomTitle(chatRoomTitle);
-            setRoomKey(_chatRoomKey);
-            setChatRoomUsers(chatRoomUsers);
-
 
         }}></UserChatList>
     }
 
-    // 방 입장 이후
+    // 방 입장 및 채팅 라인 수신 recvData
     if(chatRoomSeq !== null && chatRoomKey !== null) {
         
         userChatContents 
         = <UserChatContents 
             sender={sender} client={client} 
             chatRoomTitle={chatRoomTitle} chatRoomKey={chatRoomKey} 
-            chatRoomUsers={chatRoomUsers} recvData={recvData} lineData={lineData}></UserChatContents>
+            chatRoomUsers={chatRoomUsers} recvData={recvData} lineData={lineData} nextLine={nextLine}></UserChatContents>
       
     }
 

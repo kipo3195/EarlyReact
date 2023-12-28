@@ -223,8 +223,8 @@ function App() {
           
           // 웹소켓 구독 추가 
           stompClient = new StompJs.Client({
-            //brokerURL : "ws://localhost:8080/ws",
-            webSocketFactory: () => new SockJS("/earlyShake"), 
+            //brokerURL : "ws://localhost:8080/earlyShake", // 직접접근인데..안됨
+            webSocketFactory: () => new SockJS("/earlyShake"),  //프록시로 접근-서버에서 지정한 endpoint
             // debug : function(data) {
             //     console.log(data);
             // }, 
