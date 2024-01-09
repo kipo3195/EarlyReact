@@ -12,6 +12,10 @@ function UserChatContents(props){
     const [newContentLines, setNewContentLines] = useState();
     const [contentLines, setContentLines] = useState();
     const [nextLine, setNextLine] = useState();
+    
+    // false scroll 하단 위치 (최초, 채팅 입력) 
+    // true scroll 상단으로 고정(더 불러오기)
+    const[scrollFix, setScrollFix] = useState(false);
 
     var title = props.chatRoomTitle;
     var roomKey = props.chatRoomKey;
@@ -22,28 +26,30 @@ function UserChatContents(props){
     var recvData = props.recvData;
     var lineDatas = props.lineData;
 
+    // 스크롤 감지 콜백함수 
     function onScrollCallBack(){
 
         if(scrollRef.current?.scrollTop === 0 && nextLine !== '0'){
-            //nextLine 이 '0'인 경우 최초 호출시 서버에서 하나도 받은게 없음.
+            //nextLine 이 '0'인 경우 최초 호출시 서버에서 하나도 받은게 없음 -> 요청하지 않도록 처리
             const promise = getChatRoomLine();
             promise.then(PromiseResult=>{
                 // console.log(PromiseResult.chatRoomLine);
                 // console.log(PromiseResult.nextLine);
-                var json = JSON.parse(PromiseResult.chatRoomLine);
-                
-                if(json != null){
-                    // 리액트에서 array를 합치는 방법(spread)
-                    const newArr = [
-                        ...json, // 더 불러온 라인
-                        ...contentLines // 기존에 그려진 라인 
-                    ]
-                    // console.log(newArr);
-
-                   setContentLines(newArr);
-                   setNextLine(PromiseResult.nextLine);
-                   
+                if(PromiseResult.chatRoomLine != null){
+                    var json = JSON.parse(PromiseResult.chatRoomLine);
+                    if(json != null){
+                        // 리액트에서 array를 합치는 방법(spread)
+                        const newArr = [
+                            ...json, // 더 불러온 라인
+                            ...contentLines // 기존에 그려진 라인 
+                        ]
+                        // console.log(newArr);
+    
+                       setContentLines(newArr);
+                    }
                 }
+                setScrollFix(true);
+                setNextLine(PromiseResult.nextLine);
 
             })
         }
@@ -74,13 +80,17 @@ function UserChatContents(props){
     // 수신시에는 스크롤의 변경없음. 
     const scrollRef = useRef();
     useEffect(()=>{
-
+    
         // 가장마지막 랜더링 이후에 실행됨.
         // 스크롤 제일 하단에 위치 시키기
         // 스크롤의 최상단의 값을 스크롤의 높이로 처리함. 
-        if(scrollRef.current?.scrollTop === 0){
+        console.log('스크롤 : ',scrollFix);
+        if(scrollRef.current?.scrollTop === 0 && !scrollFix){
             scrollRef.current.scrollTop = scrollRef.current?.scrollHeight;
+        }else if(scrollRef.current?.scrollTop === 0 && scrollFix){
+            scrollRef.current.scrollTop = 10;
         }
+
 
     })
 
@@ -122,6 +132,8 @@ function UserChatContents(props){
             var copyContentLines = [...newContentLines];
             copyContentLines.push(recvLine);
             setNewContentLines(copyContentLines);
+            
+            // 수신시에는 scrollTop이 0이 아니기 때문에 고정됨.
 
         }
     }, [recvData]);
@@ -141,7 +153,7 @@ function UserChatContents(props){
 
                 // 가장 마지막 랜더링시 처리를위해 top을 0으로변경
                 scrollRef.current.scrollTop = 0;
-                
+                setScrollFix(false);
             }}></UserChatContentsInput>
     
     return (
@@ -173,20 +185,20 @@ function UserChatContents(props){
                                 contentLines && contentLines.map((line) => (
                                     (line.chatSender === sender)
                                     ?
-                                    (<tr className='chatRoomContentsTableTrR' align ='right' key ={line.chatSeq}>
-                                        <td className='chatRoomContentsTableTrTdETC'></td>
-                                        <td className='chatRoomContentsTableTrTdETC'></td>
-                                        <td className='chatRoomContentsTableTrRTd'>
+                                    (<tr align ='right' key ={line.chatSeq}>
+                                        <td className='chatRoomContentsTableTdETC'></td>
+                                        <td className='chatRoomContentsTableTdETC'></td>
+                                        <td className='chatRoomContentsTableRTd'>
                                             {line.chatContents}
                                         </td>
                                     </tr>)
                                     :
-                                    (<tr className='chatRoomContentsTableTrL' align ='left' key ={line.chatSeq}>
-                                        <td className='chatRoomContentsTableTrLTd' >
+                                    (<tr align ='left' key ={line.chatSeq}>
+                                        <td className='chatRoomContentsTableLTd' >
                                             {line.chatSender}님의 말 : {line.chatContents}
                                         </td>
-                                        <td className='chatRoomContentsTableTrTdETC'></td>
-                                        <td className='chatRoomContentsTableTrTdETC'></td>
+                                        <td className='chatRoomContentsTableTdETC'></td>
+                                        <td className='chatRoomContentsTableTdETC'></td>
                                     </tr>)
                                 ))
                             }
@@ -198,20 +210,20 @@ function UserChatContents(props){
 
                                    (line.userid === sender)
                                    ? 
-                                   (<tr className='chatRoomContentsTableTrR' align ='right'>
-                                        <td className='chatRoomContentsTableTrTdETC'></td>
-                                        <td className='chatRoomContentsTableTrTdETC'></td>
-                                        <td className='chatRoomContentsTableTrRTd'>
+                                   (<tr align ='right'>
+                                        <td className='chatRoomContentsTableTdETC'></td>
+                                        <td className='chatRoomContentsTableTdETC'></td>
+                                        <td className='chatRoomContentsTableRTd'>
                                             {line.lineData}
                                         </td>
                                    </tr>)
                                    :
-                                    (<tr className='chatRoomContentsTableTrL' align ='left'>
-                                        <td className='chatRoomContentsTableTrLTd' >
+                                    (<tr align ='left'>
+                                        <td className='chatRoomContentsTableLTd' >
                                             {line.userid}님의 말 : {line.lineData}
                                         </td>
-                                        <td className='chatRoomContentsTableTrTdETC'></td>
-                                        <td className='chatRoomContentsTableTrTdETC'></td>
+                                        <td className='chatRoomContentsTableTdETC'></td>
+                                        <td className='chatRoomContentsTableTdETC'></td>
                                     </tr>)
                                 ))
 

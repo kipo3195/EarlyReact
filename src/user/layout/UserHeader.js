@@ -3,6 +3,7 @@ import axios from 'axios';
 import '../css/UserHeader.css'
 import address from '../../etc/img/address.png'
 import chat from '../../etc/img/chat.png'
+import unreadChat from '../../etc/img/unreadChat.png'
 import message from '../../etc/img/message.png'
 import email from '../../etc/img/email.png'
 import calendar from '../../etc/img/calendar.png'
@@ -10,6 +11,8 @@ import env from '../../etc/img/env.png'
 
 
 function UserHeader(props){
+
+    var chatUnread = props.chatUnread;
 
     return(
             <header id ='userHeader'>
@@ -27,8 +30,16 @@ function UserHeader(props){
                             <td id='chat'onClick={event=>{
                                 event.preventDefault();
                                 props.chat();
-                             }} className='userHeaderTd'><img className='userHeaderTdImg' src={chat} width='45' alt='chat'
-                             ></img></td>
+                             }} className='userHeaderTd'>
+                                {
+                                    chatUnread && chatUnread >= 0 
+                                    ?
+                                    <img className='userHeaderTdImg' src={unreadChat} width='45' alt='chat'></img>
+                                    :
+                                    <img className='userHeaderTdImg' src={chat} width='45' alt='chat'></img>
+                                }
+                                
+                                </td>
 
                             <td id='message' onClick={event=>{
                                 event.preventDefault();

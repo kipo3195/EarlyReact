@@ -14,6 +14,11 @@ function UserChatContentsInput(props){
     // textarea에서 엔터 클릭시 일단 
     function enterSend(e){
          e.preventDefault(); //onkeyUp의 기본이벤트를 차단하지 않으면 2번 호출됨. 
+        
+        if(contents === '\n'){
+            setContents('');
+            return;
+        }
 
         if((contents !== '') && (e.code === 'Enter' || e.key ==='Enter')){
             
@@ -23,28 +28,31 @@ function UserChatContentsInput(props){
             }else{
                 if(contents !== '\n'){
                     // 대화내용 없이 엔터는 \n -> 채팅 전송 안함.
-                    sendMessage(contents);
+                    sendMessage(contents, true);
+
+                    
                 }
-                setContents('');
+                
             }
         }
     }
 
       // 전송버튼 클릭시 
-    function sendMessage(message){
+    function sendMessage(message, enterFlag){
         
         if(message === null || message === ''){
-            alert('채팅을 전송할 수 없습니다.');
             return;
         }
-        // 엔터로 전송시 개행처리 제거 
-        message = message.substr(0, message.length-1);
+        if(enterFlag){
+            // 엔터로 전송시 개행처리 \n 제거 
+            message = message.substr(0, message.length-1);
+        }
 
         // 웹소켓 채팅 발신
         client.publish({
             // 데이터를 보내는 경로 /app + 서버(UserChatController)의 @MessageMapping(/test/message)
             // chatType 동적 처리하기 TODO
-            destination:"/app/test/message",
+            destination:"/app/user/chat",
             body:JSON.stringify({
                 chatRoomKey : roomKey,
                 chatContents : message,
@@ -63,11 +71,14 @@ function UserChatContentsInput(props){
 
         //상위 컴포넌트에 알려줌
         props.addLine(line);  
-    
+
+        // textarea 초기화용
+        setContents('');
     }
 
     // 채팅데이터 입력시 
     function changeText(e){
+
         setContents(e.target.value);
      
     }
@@ -78,10 +89,8 @@ function UserChatContentsInput(props){
         <form onSubmit={event=>{
             event.preventDefault();
             // stomp pub
-            console.log(event.target.chatTextArea.value);
-            //sendMessage(event.target.chatTextArea.value);
 
-            event.target.chatTextArea.value = null;
+            sendMessage(event.target.chatTextArea.value, false);
 
             }}>
             <table id ='chatTable'>

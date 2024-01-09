@@ -144,31 +144,39 @@
 
 #chatRoomContentsTable{
     width: 100%;
-}
 
-.chatRoomContentsTableTrR{
+     /* td글자가 많아져도 table 크기를 옆으로 늘리지 않음.*/
+    table-layout: fixed;
     font-family: buri;
-
+    font-size: 14px;
+    padding: 5px 3px 5px 3px;
+    
+    /* tr 간격*/
+    border-collapse: separate;
+	border-spacing: 0 4px;
 }
 
-.chatRoomContentsTableTrL{
-    font-family: buri;
 
-}
-
-.chatRoomContentsTableTrRTd{
+.chatRoomContentsTableRTd{
     border-radius: 5px;
     background-color: rgb(249, 249, 216);
     border: 1px solid rgb(255, 215, 128);
     
+    /*자동 줄바꿈*/
+    word-break: break-all;
+    padding: 3px 6px 3px 6px;
+    
+    /* \n(개행처리) 인식*/
+    white-space:pre-wrap;
+    
 }
-.chatRoomContentsTableTrLTd{
+.chatRoomContentsTableLTd{
     border-radius: 5px;
     background-color: rgb(193, 233, 247);
     border: 1px solid rgb(81, 150, 234);
-    
-}
+    word-break: break-all;
+    padding: 3px 6px 3px 6px;
 
-.chatRoomContentsTableTrTdETC{
-    width: 25%;
+    /* \n(개행처리) 인식*/
+    white-space:pre-wrap;
 }

@@ -95,6 +95,8 @@ function App() {
   const [client, setClient] = useState(null);
   const [userId, setUserId] = useState(null);
 
+  const [chatUnread, setChatUnread] = useState(null);
+
   //const [chatRoomSeq, setChatRoomSeq]= useState(null);
   //console.log(chatRoomSeq);
 
@@ -107,10 +109,11 @@ function App() {
 
   let navigate = useNavigate();
 
-  function webSocketCallback(stompClient, userId){
+  function webSocketCallback(stompClient, userId, chat){
         // 로그인 완료 + 웹소켓 구독(자신의 ID) 완료
         setUserId(userId);
         setClient(stompClient);
+        setChatUnread(parseInt(chat));
         // 인증 완료 이후에 useNavigate를 이용하여 url을 변경함. 단, useNavigate를 사용하기 위해서는 react-router-dom 설치가 필요하며,
         // useNagivate hook을 사용하는 상위 컴포넌트 (현재의 상위 컴포넌트는 App)는 <BrowserRouter> 컴포넌트로 감싸 있어야 한다. (index.js 확인)
         navigate('/user'); 
@@ -120,12 +123,26 @@ function App() {
   // 웹소켓 구독 url로 데이터 수신 
   function subCallback(message){
     if (message.body) {
+      // 여기서 갱신된 건수 받음
+
       console.log(message.body);
+      var unreadJson = JSON.parse(message.body);
+      var type = unreadJson.type;
+
+      if(type === 'chat'){
+        // 신규 채팅 수신 -> 전체 건수 동기화 
+        var chat = unreadJson.chat;
+        setChatUnread(chat);
+      }else if(type ==='msg'){
+        console.log('recv msg unread');
+      }else if(type ==='mail'){
+        console.log('recv msg mail');
+      }
+
     } else {
       
     }
   }
-
   
   // 이벤트 전 토큰 검증 + access 토큰 재발급 
   async function checkToken(mode){
@@ -216,7 +233,9 @@ function App() {
       }).then(function(response){
         const flag = response.data.flag;
         const accesstoken  = response.data.token;
-        
+
+        // 채팅 미확인 건수
+        const chat = response.data.chat;
         if(flag === 'success' && accesstoken !== null){
           // httpOnly header에 access token 추가 
           axios.defaults.headers.common['Authorization'] = `Bearer ${accesstoken}`;
@@ -225,9 +244,9 @@ function App() {
           stompClient = new StompJs.Client({
             //brokerURL : "ws://localhost:8080/earlyShake", // 직접접근인데..안됨
             webSocketFactory: () => new SockJS("/earlyShake"),  //프록시로 접근-서버에서 지정한 endpoint
-            // debug : function(data) {
-            //     console.log(data);
-            // }, 
+            debug : function(data) {
+                console.log(data);
+            }, 
             // reconnectDelay: 5000, // 자동 재 연결
             heartbeatIncoming: 4000,
             heartbeatOutgoing: 4000,
@@ -235,7 +254,7 @@ function App() {
                 // console.log("connect web socket userID : ", userId);
                 // 자신의 ID를 url로 하는 구독 추가, setClient
                 stompClient.subscribe("/topic/user/" + userId, subCallback);
-                stompClient.subscribe("/queue/user/" + userId, webSocketCallback(stompClient, userId));
+                stompClient.subscribe("/queue/user/" + userId, webSocketCallback(stompClient, userId, chat));
                 
             },
             onStompError: (frame) => {
@@ -296,7 +315,7 @@ function App() {
       setMode('login');
     }}></FindId>
   }else if(mode.startsWith('user')){
-    header = <UserHeader logout={()=>{
+    header = <UserHeader chatUnread={chatUnread} logout={()=>{
       // 로그 아웃시 access token 초기화 처리.
       // 해주지 않는다면 로그아웃 이후에도 해당 브라우저는 access token을 가지고 있어서 서버에 요청가능해짐.
       // 쿠키영역에 있는 refresh 토큰은 삭제 되지 않는데 어차피 서버에서는 access token을 가장 먼저 체크하기도 하고 다시 로그인하면 
