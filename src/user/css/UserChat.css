@@ -55,9 +55,8 @@
     
     font-family: buri;
     font-size: 9px;
-    
     float: left;
-    width: 36%;
+    width: 32%;
     height: 50%;
     vertical-align: middle;
     padding-top: 5px;
@@ -70,6 +69,20 @@
     font-size: 9px;
     padding-top: 5px;
     float: left;
+}
+
+.chatListUnreadCountTd{
+    font-size: 10px;
+    font-family: buri;
+    background-color: rgb(145, 141, 243);
+    color: white;
+    border-radius: 20px;
+    height:15px;
+    width: 12px;
+    float: right;
+    text-align: center;
+    margin-top: 4px;
+
 }
 
 
@@ -180,3 +193,4 @@
     /* \n(개행처리) 인식*/
     white-space:pre-wrap;
 }
+

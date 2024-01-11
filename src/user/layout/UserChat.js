@@ -38,6 +38,9 @@ function UserChat(props){
     // 발신자 id
     const sender = props.userId;
 
+    // 신규 수신 채팅방 및 건수 
+    const chatRoomUnread = props.chatRoomUnread;
+
     // 입장한 채팅방의 대화 callback 함수 
     function chatRoomCallback(message){
         if (message.body) {
@@ -74,7 +77,7 @@ function UserChat(props){
 
     // 방 입장  
     if(jsonData !== null){
-        userChatList = <UserChatList jsonData={jsonData} enterChatRoom={(chatRoomSeq, chatRoomTitle, _chatRoomKey, chatRoomUsers)=>{
+        userChatList = <UserChatList chatRoomUnread={chatRoomUnread} jsonData={jsonData} enterChatRoom={(chatRoomSeq, chatRoomTitle, _chatRoomKey, chatRoomUsers)=>{
             
             if(client !== null){
                 if(chatRoomKey === null){
@@ -108,6 +111,9 @@ function UserChat(props){
                 setChatRoomUsers(chatRoomUsers);
             })
 
+        }} chatListReload={()=>{
+            // 더 상위 컴포넌트로 이동
+            props.chatListReload();
         }}></UserChatList>
     }
 

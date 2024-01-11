@@ -94,8 +94,13 @@ function App() {
   const [list, setList] = useState(null);
   const [client, setClient] = useState(null);
   const [userId, setUserId] = useState(null);
-
+  
+  // 전체 건수
   const [chatUnread, setChatUnread] = useState(null);
+  // 수신한 채팅방의 건수 
+  const [chatRoomUnread, setChatRoomUnread] = useState(null);
+
+
 
   //const [chatRoomSeq, setChatRoomSeq]= useState(null);
   //console.log(chatRoomSeq);
@@ -130,9 +135,11 @@ function App() {
       var type = unreadJson.type;
 
       if(type === 'chat'){
-        // 신규 채팅 수신 -> 전체 건수 동기화 
+        // 신규 채팅 수신 -> 전체 건수 및 수신한 채팅 건수 동기화
         var chat = unreadJson.chat;
+        var room = unreadJson.room;
         setChatUnread(chat);
+        setChatRoomUnread(room);
       }else if(type ==='msg'){
         console.log('recv msg unread');
       }else if(type ==='mail'){
@@ -218,8 +225,8 @@ function App() {
 
   // data는 post 방식일때 body
   if(mode === 'login'){ 
-
-    console.log('login page의 sockjs Client ', client);
+    // 어떠한 상황에서 로그아웃 되더라도 다시 로그인 요청시에는 브라우저의accessToken을 전송하지 않도록 함
+    axios.defaults.headers.common['Authorization'] = null;
     
     header = <Header></Header>
     content = <Login loginRequest={(userId, password)=>{
@@ -320,7 +327,7 @@ function App() {
       // 해주지 않는다면 로그아웃 이후에도 해당 브라우저는 access token을 가지고 있어서 서버에 요청가능해짐.
       // 쿠키영역에 있는 refresh 토큰은 삭제 되지 않는데 어차피 서버에서는 access token을 가장 먼저 체크하기도 하고 다시 로그인하면 
       // 쿠키영역 업데이트함. 
-      axios.defaults.headers.common['Authorization'] = null;
+      // axios.defaults.headers.common['Authorization'] = null; -> 페이지가 로그인일때 처리해 주는 것으로 변경함. 
       navigate('/');
       // mode를 변경하는 것 보다 list를 빼는 것을 먼저처리함으로 써 로그아웃시 리스트 데이터를 초기화시킴
 
@@ -400,18 +407,21 @@ function App() {
               chatListPromise.then(chatListPromiseResult =>{
                 
                 setList(chatListPromiseResult.chat_list);
+                
               })
             }else{
               // 최초 호출로 리스트 정보 받고 .... 리스트만 랜더링
               // 리스트가 없거나 사용자 토큰으로 받을 수 없는 경우 다르게 조건처리해야함. 
               console.log(list);
               if(list === "C403"){
+                navigate('/');
                 // access token 발급 사용자가 아님(서버 DB에 없는 경우)
                 alert('비정상적인 토큰으로 서버에 요청하므로 로그아웃 됩니다.');
                 if(client !== null){
                   //console.log('로그아웃 요청시 sockjs client', client);      -- 웹소켓 연결확인용
                   client.deactivate();
                 }
+               
                 setClient(null);
                 setList(null);
                 setMode('login');
@@ -420,7 +430,18 @@ function App() {
                 content = <UserNoChat></UserNoChat>
               }else{
                 // 채팅 리스트 존재
-                content = <UserChat list={list} client={client} userId ={userId}></UserChat>
+                content = <UserChat list={list} client={client} userId ={userId} chatRoomUnread={chatRoomUnread} chatListReload={()=>{
+                  // UserChatList -> UserChat에서 부터 거슬러 온 이벤트 
+          
+                  console.log('리스트 갱신 호출')
+                  var chatListPromiseResult = null;
+                  let chatListPromise = ChatList();
+                  chatListPromise.then(chatListPromiseResult =>{
+                    
+                    setList(chatListPromiseResult.chat_list);
+
+                  })
+                }}></UserChat>
               }
             }
             

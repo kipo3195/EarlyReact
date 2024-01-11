@@ -1,11 +1,23 @@
 import '../css/UserChat.css';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 axios.defaults.withCredentials = true;
 function UserChatList(props){
 
     const jsonData = props.jsonData;
+
+    const chatRoomUnread = props.chatRoomUnread;
+
+    useEffect(()=>{
+        // 신규 채팅 수신한 정보 chatRoomUnread = roomKey|count 
+        // 신규 채팅을 수신한 방은 가장 상단에 적용되어야 한다.
+        // 그러므로 20240110 기준으로 채팅리스트를 모두 가지고 오도록 처리한다.
+        // 이후 페이징 처리를 적용 하도록 한다.
+        console.log(chatRoomUnread);
+        props.chatListReload();
+
+    },[chatRoomUnread]);
 
     // 룸 클릭시 해당 방으로 이동하는 함수
     function roomClick(chatRoomSeq, chatRoomUsers, chatRoomTitle, chatRoomKey){
@@ -69,6 +81,9 @@ function UserChatList(props){
                             </td>
                             <td className='chatListLastDateTd'>
                                 {makeLastDate(item.lastLineKey)}
+                            </td>
+                            <td className='chatListUnreadCountTd'>
+                                {item.unreadCount}
                             </td>
                             <td>
                             <input type='hidden' value={item.chatRoomUsers}></input>
