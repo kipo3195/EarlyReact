@@ -4,10 +4,10 @@ import axios from 'axios';
 
 
 
-async function AccessToken (_flag, _errorCode){
+async function AccessToken (errorCode){
     
     var result = null;
-    // console.log('AccessToken', _flag, _errorCode);
+    console.log('AccessToken.js errorCode', errorCode)
     // access token 재발급 로직 
     // axios는 기본적으로 비동기 처리 라이브러리.
     // 비동기 처리이기 때문에 accessToken 수행 후 result에 값을 할당 하기도 전에 return해 버리는 것이 문제.
@@ -16,7 +16,7 @@ async function AccessToken (_flag, _errorCode){
     // 그래서 AccessToken을 호출 하는 곳에서 return 데이터를 확인해 보면 Promise 객체가 반환 되는 것을 확인함. 
     // Promise 객체의 PromiseResult에 접근해서 데이터를 사용하면 된다. .then으로 접근 할 수 있다.
     // console.log(_flag, _errorCode);
-    if(_flag ==='fail' && _errorCode === '400'){
+    if(errorCode === '400'){
         await axios({
             method:'POST',
             url:'http://localhost:8080/user/accessToken'
@@ -25,6 +25,7 @@ async function AccessToken (_flag, _errorCode){
             
             if(flag === 'success'){
             
+                console.log('엑세스 토큰 갱신시 여기 호출')
                 result = 'success';
                 const accesstoken  = response.data.token;
                 axios.defaults.headers.common['Authorization'] = `Bearer ${accesstoken}`;

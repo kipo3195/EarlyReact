@@ -84,7 +84,7 @@ function UserChatContents(props){
         // 가장마지막 랜더링 이후에 실행됨.
         // 스크롤 제일 하단에 위치 시키기
         // 스크롤의 최상단의 값을 스크롤의 높이로 처리함. 
-        console.log('스크롤 : ',scrollFix);
+        // console.log('스크롤 : ',scrollFix);
         if(scrollRef.current?.scrollTop === 0 && !scrollFix){
             scrollRef.current.scrollTop = scrollRef.current?.scrollHeight;
         }else if(scrollRef.current?.scrollTop === 0 && scrollFix){
@@ -242,4 +242,4 @@ function UserChatContents(props){
     )
 }
 
-export default UserChatContents
+export default UserChatContents;

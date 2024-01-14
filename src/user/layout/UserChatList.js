@@ -14,8 +14,13 @@ function UserChatList(props){
         // 신규 채팅을 수신한 방은 가장 상단에 적용되어야 한다.
         // 그러므로 20240110 기준으로 채팅리스트를 모두 가지고 오도록 처리한다.
         // 이후 페이징 처리를 적용 하도록 한다.
-        console.log(chatRoomUnread);
-        props.chatListReload();
+        // console.log('chatRoomUnread', chatRoomUnread);
+        if(chatRoomUnread !== null){
+            
+            // 최초 채팅리스트 호출시 chatRoomUnread은 null, 이때는 갱신하지 않도록 처리함.
+            props.chatListReload();
+
+        }
 
     },[chatRoomUnread]);
 

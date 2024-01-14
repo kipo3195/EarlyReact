@@ -94,6 +94,9 @@ function App() {
   const [list, setList] = useState(null);
   const [client, setClient] = useState(null);
   const [userId, setUserId] = useState(null);
+
+  // access 토큰 갱신 처리 flag
+  const [accTokenValid, setAccTokenValid] = useState(false);
   
   // 전체 건수
   const [chatUnread, setChatUnread] = useState(null);
@@ -150,45 +153,42 @@ function App() {
       
     }
   }
-  
-  // 이벤트 전 토큰 검증 + access 토큰 재발급 
-  async function checkToken(mode){
-    var tokenFlag = null; 
-    var tokenErrorCode = null;
+ 
+  async function checkToken(_mode){
 
-    var nav = '/' + mode;
-   
-    await axios({
-        method:'GET',
-        url : 'http://localhost:8080/user/tokenVerification'
-    }).then(function(response){
+    var nav = '/' + _mode;
+    console.log('checkToken 호출');
+    const accessTokenPromise = checkAccessToken(_mode);
+    console.log('checkToken 호출 accessTokenPromise :', accessTokenPromise);
+    accessTokenPromise.then(promiseResult=>{
       
-      tokenFlag = response.data.flag;
-      tokenErrorCode = response.data.error_code;
-
-      console.log(tokenFlag);
-      if(tokenFlag === 'success'){
-        // 정상 요청
-        console.log('success', mode);
-        navigate(nav);
-        setMode(mode);
-      }else if(tokenErrorCode === '403'){
-        // 바로 로그아웃 처리 refresh 토큰이 없는것으로 판단.
-        alert('로그인 기간이 만료되어 로그아웃 됩니다');
-        navigate('/');
-        if(client !== null){
-          //console.log('로그아웃 요청시 sockjs client', client);      -- 웹소켓 연결확인용
-          client.deactivate();
-        }
-        setClient(null);
-        setList(null);
-        setMode('login');
-        
-      }else{
-        // access 토큰 만료 
-        const promise = AccessToken(tokenFlag, tokenErrorCode);
-
-        promise.then(promiseResult =>{
+      console.log('checkToken -> accessTokenPromise -> promiseResult', promiseResult);
+      
+      if(promiseResult === 'success'){
+          // 정상 요청
+          // 요청이 같을때 랜더링을 막기위한 처리
+          if(mode !== _mode){
+            navigate(nav);
+            setMode(_mode);
+          }else{
+            setAccTokenValid(true);
+          }
+      }else if(promiseResult === '403'){
+          // 바로 로그아웃 처리 refresh 토큰이 없는것으로 판단.
+          alert('로그인 기간이 만료되어 로그아웃 됩니다 403');
+          navigate('/');
+          if(client !== null){
+            //console.log('로그아웃 요청시 sockjs client', client);      -- 웹소켓 연결확인용
+            client.deactivate();
+          }
+          setClient(null);
+          setList(null);
+          setChatRoomUnread(null);
+          setMode('login');
+      }else if(promiseResult === '400'){
+          // access 토큰 만료 
+          const promise = AccessToken(promiseResult);
+          promise.then(promiseResult =>{
           if(promiseResult === 'logout'){
           
             alert('로그인 기간이 만료되어 로그아웃 됩니다.')
@@ -199,24 +199,64 @@ function App() {
             }
             setClient(null);
             setList(null);
+            setChatRoomUnread(null);
             setMode('login');
 
           }else if(promiseResult === 'success'){
-            console.log('access token success', mode);
-            navigate(nav);
-            setMode(mode);
-
+            console.log('access token success', _mode);
+            
+            // 기존
+            // navigate(nav);
+            // setMode(_mode);
+         
+            if(mode !== _mode){
+              // 다른 페이지 이동
+              navigate(nav);
+              setMode(_mode);
+            }else{
+              // 기존 페이지 유지 
+              setAccTokenValid(true);
+            }
           }
 
         }).catch(function(error){
           console.log(error);
         })
+        }
 
+      })
+  };
+
+
+  // 이벤트 전 access 토큰 검증 
+  async function checkAccessToken(_mode){
+    console.log('access 토큰 체크 시작');
+    //  20240114 tokenFlag는 checkAccessToken 호출시return값. 단, 요청하는 mode가 다를때는 set해서 재랜더링 return값 사용불가 
+    var tokenFlag = null; 
+    var tokenErrorCode = null;
+   
+    var result = null; 
+    await axios({
+        method:'GET',
+        url : 'http://localhost:8080/user/tokenVerification'
+    }).then(function(response){
+      
+      tokenFlag = response.data.flag;
+      tokenErrorCode = response.data.error_code;
+
+      console.log('checkAccessToken', tokenFlag, tokenErrorCode);
+
+      if(tokenFlag === 'success'){
+        result = tokenFlag;
+      }else {
+        result = tokenErrorCode;
       }
       
     }).catch(function(error){
       console.log(error);
     })
+
+    return result;
   }
   
 
@@ -339,6 +379,7 @@ function App() {
       
       setClient(null);
       setList(null);
+      setChatRoomUnread(null);
       setMode('login');
     }} cs={()=>{
 
@@ -348,6 +389,7 @@ function App() {
     }} info={()=>{
       
       checkToken('user/info');
+      console.log('user/info 호출');
     }} address={()=>{
       
       checkToken('user/address');
@@ -359,7 +401,7 @@ function App() {
       // 1. tokenVerification url 호출하여 현재 브라우저가 갖는 access token으로 1차 검증
       // 2. access token이 만료된 경우 refresh 토큰으로 2차 검증 AccessToken.js
       // 3. 만료인지 재발급인지 판단해서 promise 객체를 리턴, promiseResult가 success인지 logout인지에 따라 처리(navigate, setMode);
-      // 4. 정상이라면 checkToken에 던지는 매개변수에 맞는 페이지 및 navigate 처리, logout이라면 로그인 페이지로 이동처리.
+      // 4. 정상이라면 checkAccessToken에 던지는 매개변수에 맞는 페이지 및 navigate 처리, logout이라면 로그인 페이지로 이동처리.
       checkToken('user/chat');
     
     }} message={()=>{
@@ -399,7 +441,8 @@ function App() {
             if(list === null){
               // 채팅 리스트를 매번 호출 하는 것은 무리가 있다. 최초 한번 요청하고 이후에 
               // 특정 시간이 지났을때나 받아오면 어떨까?
-              // 한번만 받아와서 실시간 패킷을 받았을때 리스트를 갱신 - 방정보를 알아야함. 
+              // 한번만 받아와서 실시간 패킷을 받았을때 리스트를 갱신 - 방정보를 알아야함.
+              // 실시간 패킷 수신시 리스트 갱신 요청함. 
 
               console.log('리스트 최초 호출')
               var chatListPromiseResult = null;
@@ -412,7 +455,7 @@ function App() {
             }else{
               // 최초 호출로 리스트 정보 받고 .... 리스트만 랜더링
               // 리스트가 없거나 사용자 토큰으로 받을 수 없는 경우 다르게 조건처리해야함. 
-              console.log(list);
+              // console.log(list);
               if(list === "C403"){
                 navigate('/');
                 // access token 발급 사용자가 아님(서버 DB에 없는 경우)
@@ -424,22 +467,36 @@ function App() {
                
                 setClient(null);
                 setList(null);
+                setChatRoomUnread(null);
                 setMode('login');
               }else if(list === "C404"){
                 // 채팅 리스트가 없는경우
                 content = <UserNoChat></UserNoChat>
               }else{
                 // 채팅 리스트 존재
+                if(accTokenValid == true){
+
+                  console.log('토큰 검증 완료 accTokenValid : ', accTokenValid);
+
+                   var chatListPromiseResult = null;
+                   let chatListPromise = ChatList();
+                   chatListPromise.then(chatListPromiseResult =>{
+                     console.log('리스트 갱신 요청  : ', chatListPromiseResult.chat_list)
+                     setList(chatListPromiseResult.chat_list);
+                     setAccTokenValid(false);
+                    })
+                 }
+
                 content = <UserChat list={list} client={client} userId ={userId} chatRoomUnread={chatRoomUnread} chatListReload={()=>{
                   // UserChatList -> UserChat에서 부터 거슬러 온 이벤트 
-          
-                  console.log('리스트 갱신 호출')
-                  var chatListPromiseResult = null;
-                  let chatListPromise = ChatList();
-                  chatListPromise.then(chatListPromiseResult =>{
-                    
-                    setList(chatListPromiseResult.chat_list);
 
+                  let tokenCheckPromise = checkToken(mode);
+                  console.log('chatListReload -> checkToken 호출', tokenCheckPromise);
+                  tokenCheckPromise.then(PromiseResult=>{
+                    if(PromiseResult === 'success'){
+                      console.log('chatListReload -> checkToken -> PromiseResult', PromiseResult);
+                      setAccTokenValid(true);
+                    }
                   })
                 }}></UserChat>
               }
