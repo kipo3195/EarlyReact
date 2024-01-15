@@ -127,7 +127,8 @@ function UserChatContents(props){
             var json = JSON.parse(props.recvData);
             let recvLine = {
                 userid : json.chatSender,
-                lineData : json.chatContents    
+                lineData : json.chatContents,
+                unreadCount : json.chatUnreadCount   
             };
             var copyContentLines = [...newContentLines];
             copyContentLines.push(recvLine);
@@ -188,6 +189,7 @@ function UserChatContents(props){
                                     (<tr align ='right' key ={line.chatSeq}>
                                         <td className='chatRoomContentsTableTdETC'></td>
                                         <td className='chatRoomContentsTableTdETC'></td>
+                                        <td className='chatRoomContentsTableTdETC'></td>
                                         <td className='chatRoomContentsTableRTd'>
                                             {line.chatContents}
                                         </td>
@@ -197,6 +199,7 @@ function UserChatContents(props){
                                         <td className='chatRoomContentsTableLTd' >
                                             {line.chatSender}님의 말 : {line.chatContents}
                                         </td>
+                                        <td id ='unreadCount'>{line.chatUnreadCount}</td>
                                         <td className='chatRoomContentsTableTdETC'></td>
                                         <td className='chatRoomContentsTableTdETC'></td>
                                     </tr>)
@@ -213,6 +216,7 @@ function UserChatContents(props){
                                    (<tr align ='right'>
                                         <td className='chatRoomContentsTableTdETC'></td>
                                         <td className='chatRoomContentsTableTdETC'></td>
+                                        <td className='chatRoomContentsTableTdETC'></td>
                                         <td className='chatRoomContentsTableRTd'>
                                             {line.lineData}
                                         </td>
@@ -222,6 +226,7 @@ function UserChatContents(props){
                                         <td className='chatRoomContentsTableLTd' >
                                             {line.userid}님의 말 : {line.lineData}
                                         </td>
+                                        <td id ='unreadCount'>{line.unreadCount}</td>
                                         <td className='chatRoomContentsTableTdETC'></td>
                                         <td className='chatRoomContentsTableTdETC'></td>
                                     </tr>)

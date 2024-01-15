@@ -44,7 +44,7 @@ function UserChat(props){
     // 입장한 채팅방의 대화 callback 함수 
     function chatRoomCallback(message){
         if (message.body) {
-            
+            console.log('body : ', message.body);
             var recvJson = JSON.parse(message.body);
             var chatSender = recvJson.chatSender;
             if(sender !== chatSender){
@@ -79,6 +79,9 @@ function UserChat(props){
     if(jsonData !== null){
         userChatList = <UserChatList chatRoomUnread={chatRoomUnread} jsonData={jsonData} enterChatRoom={(chatRoomSeq, chatRoomTitle, _chatRoomKey, chatRoomUsers)=>{
             
+            // 토큰 검증 
+
+
             if(client !== null){
                 if(chatRoomKey === null){
             

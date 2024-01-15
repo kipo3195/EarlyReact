@@ -194,3 +194,10 @@
     white-space:pre-wrap;
 }
 
+#unreadCount{
+    font-size: 10px;
+    color:rgb(248, 185, 36);
+    padding-left : 4px;
+    font-family: buriBord;
+}
+

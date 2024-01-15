@@ -292,7 +292,7 @@ function App() {
             //brokerURL : "ws://localhost:8080/earlyShake", // 직접접근인데..안됨
             webSocketFactory: () => new SockJS("/earlyShake"),  //프록시로 접근-서버에서 지정한 endpoint
             debug : function(data) {
-                console.log(data);
+                // console.log(data);
             }, 
             // reconnectDelay: 5000, // 자동 재 연결
             heartbeatIncoming: 4000,
@@ -489,15 +489,16 @@ function App() {
 
                 content = <UserChat list={list} client={client} userId ={userId} chatRoomUnread={chatRoomUnread} chatListReload={()=>{
                   // UserChatList -> UserChat에서 부터 거슬러 온 이벤트 
+                  checkToken(mode);
 
-                  let tokenCheckPromise = checkToken(mode);
-                  console.log('chatListReload -> checkToken 호출', tokenCheckPromise);
-                  tokenCheckPromise.then(PromiseResult=>{
-                    if(PromiseResult === 'success'){
-                      console.log('chatListReload -> checkToken -> PromiseResult', PromiseResult);
-                      setAccTokenValid(true);
-                    }
-                  })
+                  // 20240114 checkToken안에서 setAccTokenValid하기 때문에 비동기 처리를 기다릴 필요없음.
+                  // console.log('chatListReload -> checkToken 호출', tokenCheckPromise);
+                  // tokenCheckPromise.then(PromiseResult=>{
+                  //   if(PromiseResult === 'success'){
+                  //     console.log('채팅 promiseResult 호출 점검', PromiseResult);
+                  //     setAccTokenValid(true);
+                  //   }
+                  // })
                 }}></UserChat>
               }
             }
