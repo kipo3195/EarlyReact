@@ -32,8 +32,6 @@ import UserNoChat from './user/layout/UserNoChat';
 import ChatList from './modules/ChatList';
 
 
-
-
 axios.defaults.url="http://localhost"
 axios.defaults.withCredentials = true;
 // 서버와 refreshToken cookie를 주고 받기 위한 설정
