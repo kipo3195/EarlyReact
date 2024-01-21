@@ -6,7 +6,10 @@ import cookie from 'react-cookies';
 import { BrowserRouter as Router, Route, Routes, Link, useNavigate } from 'react-router-dom';
 import * as StompJs from "@stomp/stompjs";
 import * as SockJS from "sockjs-client";
-import AccessToken from './modules/AccessToken';
+ import AccessToken from './modules/AccessToken';
+
+/* eslint import/no-webpack-loader-syntax: off */
+import Worker from 'worker-loader!./modules/accessTokenWorker';
 
 import Header from './common/layout/Header';
 import Footer from './common/layout/Footer';
@@ -92,16 +95,17 @@ function App() {
   const [list, setList] = useState(null);
   const [client, setClient] = useState(null);
   const [userId, setUserId] = useState(null);
-
-  // access 토큰 갱신 처리 flag
-  const [accTokenValid, setAccTokenValid] = useState(false);
   
+  // accesstoken 갱신 worker
+  const [tokenWorker, setTokenWorker] = useState(null);
+  // accesstoken을 header에 갱신하기 위함
+  const [token, setToken] = useState(null);
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
   // 전체 건수
   const [chatUnread, setChatUnread] = useState(null);
   // 수신한 채팅방의 건수 
   const [chatRoomUnread, setChatRoomUnread] = useState(null);
-
-
 
   //const [chatRoomSeq, setChatRoomSeq]= useState(null);
   //console.log(chatRoomSeq);
@@ -112,11 +116,45 @@ function App() {
   let content = null;
   let footer = null;
           
-
   let navigate = useNavigate();
 
-  function webSocketCallback(stompClient, userId, chat){
+  // access token 갱신 스레드
+  function accessTokenRefresh(accesstoken, userId, worker){
+   
+    // 최초 accesstoken 넘겨줌 -> accessTokenWorker의 addEventListener
+    worker.postMessage({
+      userId: userId,
+      accesstoken : accesstoken
+    });
+
+    worker.onmessage = e => {
+      // accessTokenWorker의 postMessage 결과
+      const { _accesstoken } = e.data;
+
+      // 변경된 access Token을 다시 accessTokenWorker의 addEventListener 넘겨줌 (무한반복)
+      worker.postMessage({
+        userId: userId,
+        accesstoken : _accesstoken
+      });
+
+      // 갱신된 token을 set하여 axios.defaults.headers.common['Authorization'] = `Bearer ${token}`; 변경처리 하기위함
+      setToken(_accesstoken);
+  
+    }
+
+  }
+
+  function webSocketCallback(stompClient, userId, chat, accesstoken){
         // 로그인 완료 + 웹소켓 구독(자신의 ID) 완료
+
+        // 20240121 - access token refresh worker 시작 
+        const worker = new Worker();
+        accessTokenRefresh(accesstoken, userId, worker);
+
+        // 로그인 후 최초 axios.defaults.headers.common['Authorization'] = `Bearer ${token}`; 처리를 위함 
+        setToken(accesstoken);
+        // 로그아웃시 worker를 삭제처리 하기 위해 전역관리를 위함
+        setTokenWorker(worker);
         setUserId(userId);
         setClient(stompClient);
         setChatUnread(parseInt(chat));
@@ -131,7 +169,7 @@ function App() {
     if (message.body) {
       // 여기서 갱신된 건수 받음
 
-      console.log(message.body);
+      //console.log(message.body);
       var unreadJson = JSON.parse(message.body);
       var type = unreadJson.type;
 
@@ -160,66 +198,85 @@ function App() {
     console.log('checkToken 호출 accessTokenPromise :', accessTokenPromise);
     accessTokenPromise.then(promiseResult=>{
       
-      console.log('checkToken -> accessTokenPromise -> promiseResult', promiseResult);
-      
       if(promiseResult === 'success'){
           // 정상 요청
           // 요청이 같을때 랜더링을 막기위한 처리
           if(mode !== _mode){
             navigate(nav);
             setMode(_mode);
-          }else{
-            setAccTokenValid(true);
           }
+          // else{
+          //   setAccTokenValid(true);
+          // }
       }else if(promiseResult === '403'){
-          // 바로 로그아웃 처리 refresh 토큰이 없는것으로 판단.
-          alert('로그인 기간이 만료되어 로그아웃 됩니다 403');
+          // 서버 체크시 jwt가 없거나 유효하지 않은 것으로 판단(만료와는 다름)
+          alert('인증정보가 유효하지 않는 요청이므로 로그아웃 됩니다.');
           navigate('/');
           if(client !== null){
             //console.log('로그아웃 요청시 sockjs client', client);      -- 웹소켓 연결확인용
             client.deactivate();
           }
+          tokenWorker.terminate();
+          setTokenWorker(null);
           setClient(null);
           setList(null);
           setChatRoomUnread(null);
           setMode('login');
       }else if(promiseResult === '400'){
-          // access 토큰 만료 
-          const promise = AccessToken(promiseResult);
-          promise.then(promiseResult =>{
-          if(promiseResult === 'logout'){
+
+        // jwt 토큰 만료시
+        alert('로그인 기간이 만료되어 로그아웃 됩니다.');
+        navigate('/');
+        if(client !== null){
+          //console.log('로그아웃 요청시 sockjs client', client);      -- 웹소켓 연결확인용
+          client.deactivate();
+        }
+        tokenWorker.terminate();
+        setTokenWorker(null);
+        setClient(null);
+        setList(null);
+        setChatRoomUnread(null);
+        setMode('login');
+
+
+        // 20240121 기존로직 - access 만료시 자동 갱신 처리를 위한 로직
+        //   // access 토큰 만료 
+        //   const promise = AccessToken(promiseResult);
+        //   promise.then(promiseResult =>{
+        //   if(promiseResult === 'logout'){
           
-            alert('로그인 기간이 만료되어 로그아웃 됩니다.')
-            navigate('/');
-            if(client !== null){
-              //console.log('로그아웃 요청시 sockjs client', client);      -- 웹소켓 연결확인용
-              client.deactivate();
-            }
-            setClient(null);
-            setList(null);
-            setChatRoomUnread(null);
-            setMode('login');
+        //     alert('로그인 기간이 만료되어 로그아웃 됩니다.')
+        //     navigate('/');
+        //     if(client !== null){
+        //       //console.log('로그아웃 요청시 sockjs client', client);      -- 웹소켓 연결확인용
+        //       client.deactivate();
+        //     }
+        //     setClient(null);
+        //     setList(null);
+        //     setChatRoomUnread(null);
+        //     setMode('login');
 
-          }else if(promiseResult === 'success'){
-            console.log('access token success', _mode);
+        //   }else if(promiseResult === 'success'){
+        //     console.log('access token success', _mode);
             
-            // 기존
-            // navigate(nav);
-            // setMode(_mode);
+        //     // 기존
+        //     // navigate(nav);
+        //     // setMode(_mode);
          
-            if(mode !== _mode){
-              // 다른 페이지 이동
-              navigate(nav);
-              setMode(_mode);
-            }else{
-              // 기존 페이지 유지 
-              setAccTokenValid(true);
-            }
-          }
+        //     if(mode !== _mode){
+        //       // 다른 페이지 이동
+        //       navigate(nav);
+        //       setMode(_mode);
+        //     }else{
+        //       // 기존 페이지 유지 
+        //       setAccTokenValid(true);
+        //     }
+        //   }
 
-        }).catch(function(error){
-          console.log(error);
-        })
+        // }).catch(function(error){
+        //   console.log(error);
+        // })
+
         }
 
       })
@@ -283,7 +340,8 @@ function App() {
         const chat = response.data.chat;
         if(flag === 'success' && accesstoken !== null){
           // httpOnly header에 access token 추가 
-          axios.defaults.headers.common['Authorization'] = `Bearer ${accesstoken}`;
+          //axios.defaults.headers.common['Authorization'] = `Bearer ${accesstoken}`;
+          // console.log('변경 전 ',accesstoken );
           
           // 웹소켓 구독 추가 
           stompClient = new StompJs.Client({
@@ -299,7 +357,7 @@ function App() {
                 // console.log("connect web socket userID : ", userId);
                 // 자신의 ID를 url로 하는 구독 추가, setClient
                 stompClient.subscribe("/topic/user/" + userId, subCallback);
-                stompClient.subscribe("/queue/user/" + userId, webSocketCallback(stompClient, userId, chat));
+                stompClient.subscribe("/queue/user/" + userId, webSocketCallback(stompClient, userId, chat, accesstoken));
                 
             },
             onStompError: (frame) => {
@@ -309,12 +367,15 @@ function App() {
         });
         
         stompClient.activate(); // 활성화(없으면 Connect함수 호출하지 않음. )
-        
+       
         // 이하 로직 webSocketCallback으로 이동함. 20231217
         // 인증 완료 이후에 useNavigate를 이용하여 url을 변경함. 단, useNavigate를 사용하기 위해서는 react-router-dom 설치가 필요하며,
         //   useNagivate hook을 사용하는 상위 컴포넌트 (현재의 상위 컴포넌트는 App)는 <BrowserRouter> 컴포넌트로 감싸 있어야 한다. (index.js 확인)
         //   navigate('/user'); 
         //   setMode('user');
+ 
+  
+      
  
         }else{
           alert('로그인 실패');
@@ -360,6 +421,7 @@ function App() {
       setMode('login');
     }}></FindId>
   }else if(mode.startsWith('user')){
+       
     header = <UserHeader chatUnread={chatUnread} logout={()=>{
       // 로그 아웃시 access token 초기화 처리.
       // 해주지 않는다면 로그아웃 이후에도 해당 브라우저는 access token을 가지고 있어서 서버에 요청가능해짐.
@@ -374,7 +436,8 @@ function App() {
         client.deactivate();
       }
       console.log('deactivate sockjs 이후 client', client);      // -- 웹소켓 연결확인용
-      
+      tokenWorker.terminate();
+      setTokenWorker(null);
       setClient(null);
       setList(null);
       setChatRoomUnread(null);
@@ -457,12 +520,13 @@ function App() {
               if(list === "C403"){
                 navigate('/');
                 // access token 발급 사용자가 아님(서버 DB에 없는 경우)
-                alert('비정상적인 토큰으로 서버에 요청하므로 로그아웃 됩니다.');
+                alert('비정상적인 정보로 서버에 요청하므로 로그아웃 됩니다.');
                 if(client !== null){
                   //console.log('로그아웃 요청시 sockjs client', client);      -- 웹소켓 연결확인용
                   client.deactivate();
                 }
-               
+                tokenWorker.terminate();
+                setTokenWorker(null);
                 setClient(null);
                 setList(null);
                 setChatRoomUnread(null);
@@ -471,32 +535,16 @@ function App() {
                 // 채팅 리스트가 없는경우
                 content = <UserNoChat></UserNoChat>
               }else{
-                // 채팅 리스트 존재
-                if(accTokenValid == true){
-
-                  console.log('토큰 검증 완료 accTokenValid : ', accTokenValid);
-
-                   var chatListPromiseResult = null;
-                   let chatListPromise = ChatList();
-                   chatListPromise.then(chatListPromiseResult =>{
-                     console.log('리스트 갱신 요청  : ', chatListPromiseResult.chat_list)
-                     setList(chatListPromiseResult.chat_list);
-                     setAccTokenValid(false);
-                    })
-                 }
 
                 content = <UserChat list={list} client={client} userId ={userId} chatRoomUnread={chatRoomUnread} chatListReload={()=>{
-                  // UserChatList -> UserChat에서 부터 거슬러 온 이벤트 
-                  checkToken(mode);
 
-                  // 20240114 checkToken안에서 setAccTokenValid하기 때문에 비동기 처리를 기다릴 필요없음.
-                  // console.log('chatListReload -> checkToken 호출', tokenCheckPromise);
-                  // tokenCheckPromise.then(PromiseResult=>{
-                  //   if(PromiseResult === 'success'){
-                  //     console.log('채팅 promiseResult 호출 점검', PromiseResult);
-                  //     setAccTokenValid(true);
-                  //   }
-                  // })
+                  var chatListPromiseResult = null;
+                  let chatListPromise = ChatList();
+                  chatListPromise.then(chatListPromiseResult =>{
+                    //console.log('신규 데이터 수신으로 인한 리스트 갱신 요청  : ', chatListPromiseResult.chat_list)
+                    setList(chatListPromiseResult.chat_list);
+                   })
+              
                 }}></UserChat>
               }
             }

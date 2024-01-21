@@ -1,9 +1,6 @@
 import axios from 'axios';
 
 
-
-
-
 async function AccessToken (errorCode){
     
     var result = null;

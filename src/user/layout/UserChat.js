@@ -66,7 +66,11 @@ function UserChat(props){
                 chatRoomKey : chatRoomKey 
             }}).then(function(response){
                 // console.log(response.data);
-                result = response.data;
+                if(response.data.flag === 'fail'){
+                    result = response.data.error_code;
+                }else{
+                    result = response.data;
+                }
             }).catch(function(error){
                 console.log(error);
                 
@@ -98,20 +102,30 @@ function UserChat(props){
                     // console.log('구독 취소 후 새로 구독');
                     client.subscribe('/topic/room/'+_chatRoomKey, chatRoomCallback, {id:_chatRoomKey});
                 }
+            }else{
+
+                // 로그아웃 처리
             }
                   
             // 여기서 기존 라인 DB 조회 이후 재랜더링
             const promise = getChatRoomLines(_chatRoomKey);
             
             promise.then(promisePromiseResult=>{
-                //console.log(promisePromiseResult.chatRoomLine);
-                //console.log(promisePromiseResult.nextLine);
-                setLineData(promisePromiseResult.chatRoomLine);
-                setNextLine(promisePromiseResult.nextLine);
-                setChatRoomSeq(chatRoomSeq);
-                setChatRoomTitle(chatRoomTitle);
-                setRoomKey(_chatRoomKey);
-                setChatRoomUsers(chatRoomUsers);
+
+                if(promisePromiseResult.error_code != null){
+                    console.log('로그아웃 처리예정');
+                }else{
+                    //console.log(promisePromiseResult.chatRoomLine);
+                    //console.log(promisePromiseResult.nextLine);
+                    setLineData(promisePromiseResult.chatRoomLine);
+                    setNextLine(promisePromiseResult.nextLine);
+                    setChatRoomSeq(chatRoomSeq);
+                    setChatRoomTitle(chatRoomTitle);
+                    setRoomKey(_chatRoomKey);
+                    setChatRoomUsers(chatRoomUsers);
+                }
+
+
             })
 
         }} chatListReload={()=>{

@@ -213,7 +213,7 @@ function UserChatContents(props){
 
                                    (line.userid === sender)
                                    ? 
-                                   (<tr align ='right'>
+                                   (<tr align ='right' key ={line.chatSeq}>
                                         <td className='chatRoomContentsTableTdETC'></td>
                                         <td className='chatRoomContentsTableTdETC'></td>
                                         <td className='chatRoomContentsTableTdETC'></td>
@@ -222,7 +222,7 @@ function UserChatContents(props){
                                         </td>
                                    </tr>)
                                    :
-                                    (<tr align ='left'>
+                                    (<tr align ='left' key ={line.chatSeq}>
                                         <td className='chatRoomContentsTableLTd' >
                                             {line.userid}님의 말 : {line.lineData}
                                         </td>
