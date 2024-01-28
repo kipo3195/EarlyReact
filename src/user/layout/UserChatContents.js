@@ -9,9 +9,12 @@ axios.defaults.withCredentials = true;
 function UserChatContents(props){
     
     // const [title, setTitle] = useState(null);
-    const [newContentLines, setNewContentLines] = useState();
-    const [contentLines, setContentLines] = useState();
+    const [contentLines, setContentLines] = useState([]); // []하지 않으면 최초 채팅시 contentLine is not iterable..
     const [nextLine, setNextLine] = useState();
+    //const [minLineKey, setMinLineKey] = useState();
+    
+    // 최초 수신한 채팅 라인
+    const [newRecvLine, setNewRecvLine] = useState(null);
     
     // false scroll 하단 위치 (최초, 채팅 입력) 
     // true scroll 상단으로 고정(더 불러오기)
@@ -25,27 +28,33 @@ function UserChatContents(props){
 
     var recvData = props.recvData;
     var lineDatas = props.lineData;
-
+    
     // 스크롤 감지 콜백함수 
     function onScrollCallBack(){
 
+        // console.log('onScrollCallBack top : ', scrollRef.current.scrollTop);
+        // console.log('onScrollCallBack Height : ',scrollRef.current.scrollHeight);
+
         if(scrollRef.current?.scrollTop === 0 && nextLine !== '0'){
             //nextLine 이 '0'인 경우 최초 호출시 서버에서 하나도 받은게 없음 -> 요청하지 않도록 처리
+            
+            // 채팅 라인 더 불러오기 
             const promise = getChatRoomLine();
             promise.then(PromiseResult=>{
-                // console.log(PromiseResult.chatRoomLine);
+                 //console.log(PromiseResult.chatRoomLine);
                 // console.log(PromiseResult.nextLine);
                 if(PromiseResult.chatRoomLine != null){
                     var json = JSON.parse(PromiseResult.chatRoomLine);
                     if(json != null){
-                        // 리액트에서 array를 합치는 방법(spread)
+                        // 리액트에서 array를 합치는 방법(spread) 더 불러온 라인을 기존 라인 위에 더하기
                         const newArr = [
                             ...json, // 더 불러온 라인
                             ...contentLines // 기존에 그려진 라인 
                         ]
                         // console.log(newArr);
-    
+                        
                        setContentLines(newArr);
+                       //setMinLineKey(json[0].chatLineKey);
                     }
                 }
                 setScrollFix(true);
@@ -80,17 +89,21 @@ function UserChatContents(props){
     // 수신시에는 스크롤의 변경없음. 
     const scrollRef = useRef();
     useEffect(()=>{
-    
+        
         // 가장마지막 랜더링 이후에 실행됨.
         // 스크롤 제일 하단에 위치 시키기
         // 스크롤의 최상단의 값을 스크롤의 높이로 처리함. 
+        
+      
         // console.log('스크롤 : ',scrollFix);
-        if(scrollRef.current?.scrollTop === 0 && !scrollFix){
+        if((scrollRef.current?.scrollTop === 0 || scrollRef.current?.scrollTop !== 0) && !scrollFix){
+            // scrollRef.current?.scrollTop === 0 -> 최초 입장
+            // scrollRef.current?.scrollTop !== 0 -> 채팅 발신 
+            // scrollFix 채팅 수신시에만 true
             scrollRef.current.scrollTop = scrollRef.current?.scrollHeight;
         }else if(scrollRef.current?.scrollTop === 0 && scrollFix){
             scrollRef.current.scrollTop = 10;
         }
-
 
     })
 
@@ -104,15 +117,14 @@ function UserChatContents(props){
         if(lineDatas != null){
             
             var lines = JSON.parse(lineDatas);
-
+    
             // 서버로 부터 받아온 라인들
             setContentLines(lines);
-
-            // 서버로 부터 받아온 라인 중 다음 라인조회 기준
+            // 서버로 부터 받아온 라인 중 다음 라인조회 기준 -> 라인 더 불러올때 
             setNextLine(props.nextLine);
+            // 서버로 부터 받아온 라인 중 가장 낮은 라인
+            // setMinLineKey(lines[0].chatLineKey)
 
-            // 채팅방 라인 조회시 신규 채팅 초기화
-            setNewContentLines([]);
         }
     }, [lineDatas])
     
@@ -125,19 +137,96 @@ function UserChatContents(props){
         // 리스트에 add 해주면 된다. 
         if(recvData !== null){
             var json = JSON.parse(props.recvData);
+            
+            console.log(json);
             let recvLine = {
-                userid : json.chatSender,
-                lineData : json.chatContents,
-                unreadCount : json.chatUnreadCount   
+                chatSender : json.chatSender,
+                chatContents : json.chatContents,
+                chatUnreadCount : json.chatUnreadCount,
+                chatLineKey : json.chatLineKey
             };
-            var copyContentLines = [...newContentLines];
+
+            // 기존라인에 더하기 (아래에 append)
+            var copyContentLines = [...contentLines];
             copyContentLines.push(recvLine);
-            setNewContentLines(copyContentLines);
+            setContentLines(copyContentLines);
+
+            // 20240127 기존 사용 로직 -> contentsLine과 newContentsLines을 분리하여 보여줌 
+            // var copyContentLines = [...newContentLines];
+            // copyContentLines.push(recvLine);
+            // setNewContentLines(copyContentLines);
             
             // 수신시에는 scrollTop이 0이 아니기 때문에 고정됨.
+            setScrollFix(true);
+
+            // 최초 수신한 라인
+            if(newRecvLine == null){
+                setNewRecvLine(json.chatLineKey);
+            }
 
         }
     }, [recvData]);
+
+
+    // 읽음처리 
+    async function read(){
+        var result = null;
+        //console.log(minLineKey, roomKey)
+        await axios({
+            method:'POST',
+            url:'http://localhost:8080/user/readLines',
+            data:{
+                chatRoomKey : roomKey,
+                recvLine : newRecvLine
+            }}).then(function(response){
+                //console.log(response.data);
+                result = response.data;
+            }).catch(function(error){
+                console.log(error);
+                result = 'error';
+            })
+
+            return result;
+    }
+
+    // 읽음처리 이벤트 감지
+    function readChatLines(){
+
+        if(newRecvLine !== null){
+            const readLinePromise = read();
+            readLinePromise.then(promiseResult=>{
+                
+                if(promiseResult !== 'error'){
+                    console.log(promiseResult);
+
+                    // 채팅방 & 전체 건수 refresh
+                    props.readLines();
+                    
+                    if(promiseResult.result !== '{}'){
+                        var unreadLineMap = JSON.parse(promiseResult.result);
+                        var copyContentLines = [...contentLines];
+                         for(let i = 0; i < copyContentLines.length; i++){
+                            // 미확인 건수 갱신
+                            if(unreadLineMap[copyContentLines[i].chatLineKey] !== undefined){
+                                console.log(copyContentLines[i]);
+                                copyContentLines[i].chatUnreadCount = unreadLineMap[copyContentLines[i].chatLineKey];
+                            }
+                         }
+                         setContentLines(copyContentLines);
+
+                    }else{
+                        console.log('갱신할 라인 없음');
+                    }
+
+                    // 모두읽음 -> 신규 수신한 라인 초기화
+                    setNewRecvLine(null);
+                }
+            })
+        }else{
+            console.log('신규 수신한 라인 없음');
+        }
+        
+    }
     
     const chatContentsInput 
         = <UserChatContentsInput client={props.client} chatRoomKey={roomKey} recevier={recevier} sender={sender}
@@ -148,13 +237,13 @@ function UserChatContents(props){
                 // spread 문법. 기존 contentsLines를 얕은 복사 
                 // 사용하지 않는다면 copyContentsLines를 참조할 뿐이다. 
                 // 참조하는 값으로 useState를 사용해 봤자 리액트는 다시 랜더링 하지 않는다. 
-                var copyContentLines = [...newContentLines];
-                copyContentLines.push(line);
-                setNewContentLines(copyContentLines);
 
-                // 가장 마지막 랜더링시 처리를위해 top을 0으로변경
-                scrollRef.current.scrollTop = 0;
-                setScrollFix(false);
+                // 신규 채팅은 아래로 더함
+                var copyContentLines = [...contentLines];
+                copyContentLines.push(line);
+                setContentLines(copyContentLines);
+                
+
             }}></UserChatContentsInput>
     
     return (
@@ -168,6 +257,7 @@ function UserChatContents(props){
                     <tbody>
                         <tr>
                             <th id='chatRoomTitleTh'>{title}</th>
+                            <input type ='button' value ='읽음처리' onClick={readChatLines}></input>
                         </tr>
                     </tbody>
                 </table>     
@@ -186,7 +276,7 @@ function UserChatContents(props){
                                 contentLines && contentLines.map((line) => (
                                     (line.chatSender === sender)
                                     ?
-                                    (<tr align ='right' key ={line.chatSeq}>
+                                    (<tr align ='right' key ={line.chatLineKey}>
                                         <td className='chatRoomContentsTableTdETC'></td>
                                         <td className='chatRoomContentsTableTdETC'></td>
                                         <td className='chatRoomContentsTableTdETC'></td>
@@ -195,43 +285,23 @@ function UserChatContents(props){
                                         </td>
                                     </tr>)
                                     :
-                                    (<tr align ='left' key ={line.chatSeq}>
+                                    (<tr align ='left' key ={line.chatLineKey}>
                                         <td className='chatRoomContentsTableLTd' >
                                             {line.chatSender}님의 말 : {line.chatContents}
                                         </td>
-                                        <td id ='unreadCount'>{line.chatUnreadCount}</td>
+                                        <td id ='unreadCount'>
+                                            {
+                                            (line.chatUnreadCount === '0')
+                                            ?
+                                            ''
+                                            :
+                                            line.chatUnreadCount
+                                            }
+                                            </td>
                                         <td className='chatRoomContentsTableTdETC'></td>
                                         <td className='chatRoomContentsTableTdETC'></td>
                                     </tr>)
                                 ))
-                            }
-
-
-                            {/* 이하 신규 채팅*/}
-                            {
-                                newContentLines && newContentLines.map((line) =>(
-
-                                   (line.userid === sender)
-                                   ? 
-                                   (<tr align ='right' key ={line.chatSeq}>
-                                        <td className='chatRoomContentsTableTdETC'></td>
-                                        <td className='chatRoomContentsTableTdETC'></td>
-                                        <td className='chatRoomContentsTableTdETC'></td>
-                                        <td className='chatRoomContentsTableRTd'>
-                                            {line.lineData}
-                                        </td>
-                                   </tr>)
-                                   :
-                                    (<tr align ='left' key ={line.chatSeq}>
-                                        <td className='chatRoomContentsTableLTd' >
-                                            {line.userid}님의 말 : {line.lineData}
-                                        </td>
-                                        <td id ='unreadCount'>{line.unreadCount}</td>
-                                        <td className='chatRoomContentsTableTdETC'></td>
-                                        <td className='chatRoomContentsTableTdETC'></td>
-                                    </tr>)
-                                ))
-
                             }
                         </tbody>
                     </table>

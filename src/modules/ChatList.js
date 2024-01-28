@@ -12,9 +12,9 @@ async function ChatList(){
         url:'http://localhost:8080/user/chatList'
     }).then(function(response){
 
-        console.log(response);
+        // console.log(response);
         returnData = response.data;
-        console.log(returnData);
+        // console.log(returnData);
 
     }).catch(function(error){
 

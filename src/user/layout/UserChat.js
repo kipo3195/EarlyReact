@@ -44,7 +44,7 @@ function UserChat(props){
     // 입장한 채팅방의 대화 callback 함수 
     function chatRoomCallback(message){
         if (message.body) {
-            console.log('body : ', message.body);
+            //console.log('body : ', message.body);
             var recvJson = JSON.parse(message.body);
             var chatSender = recvJson.chatSender;
             if(sender !== chatSender){
@@ -79,13 +79,11 @@ function UserChat(props){
             return result;
     }
 
-    // 방 입장  
+    
     if(jsonData !== null){
         userChatList = <UserChatList chatRoomUnread={chatRoomUnread} jsonData={jsonData} enterChatRoom={(chatRoomSeq, chatRoomTitle, _chatRoomKey, chatRoomUsers)=>{
             
-            // 토큰 검증 
-
-
+            // 방 입장  
             if(client !== null){
                 if(chatRoomKey === null){
             
@@ -103,11 +101,10 @@ function UserChat(props){
                     client.subscribe('/topic/room/'+_chatRoomKey, chatRoomCallback, {id:_chatRoomKey});
                 }
             }else{
-
-                // 로그아웃 처리
+                // 로그아웃 처리 TODO
             }
                   
-            // 여기서 기존 라인 DB 조회 이후 재랜더링
+            // 여기서 기존 라인 DB 조회 이후 재랜더링 + 20240122 해당 요청시 읽음처리 추가
             const promise = getChatRoomLines(_chatRoomKey);
             
             promise.then(promisePromiseResult=>{
@@ -123,9 +120,10 @@ function UserChat(props){
                     setChatRoomTitle(chatRoomTitle);
                     setRoomKey(_chatRoomKey);
                     setChatRoomUsers(chatRoomUsers);
+
+                    // 최초 방입장시 읽음처리 + 입장 한 방 갱신용
+                    props.chatListReload();
                 }
-
-
             })
 
         }} chatListReload={()=>{
@@ -141,7 +139,11 @@ function UserChat(props){
         = <UserChatContents 
             sender={sender} client={client} 
             chatRoomTitle={chatRoomTitle} chatRoomKey={chatRoomKey} 
-            chatRoomUsers={chatRoomUsers} recvData={recvData} lineData={lineData} nextLine={nextLine}></UserChatContents>
+            chatRoomUsers={chatRoomUsers} recvData={recvData} lineData={lineData} nextLine={nextLine}
+            readLines={()=>{
+                // 채팅방 입장 이후 이벤트 감지 읽음 처리
+                props.chatListReload();
+            }}></UserChatContents>
       
     }
 

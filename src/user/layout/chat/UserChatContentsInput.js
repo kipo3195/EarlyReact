@@ -29,8 +29,6 @@ function UserChatContentsInput(props){
                 if(contents !== '\n'){
                     // 대화내용 없이 엔터는 \n -> 채팅 전송 안함.
                     sendMessage(contents, true);
-
-                    
                 }
                 
             }
@@ -40,43 +38,79 @@ function UserChatContentsInput(props){
       // 전송버튼 클릭시 
     function sendMessage(message, enterFlag){
         
+
         if(message === null || message === ''){
             return;
         }
-        if(enterFlag){
-            // 엔터로 전송시 개행처리 \n 제거 
-            message = message.substr(0, message.length-1);
-        }
 
-        // 웹소켓 채팅 발신
-        client.publish({
-            // 데이터를 보내는 경로 /app + 서버(UserChatController)의 @MessageMapping(/test/message)
-            // chatType 동적 처리하기 TODO
-            destination:"/app/user/chat",
-            body:JSON.stringify({
-                chatRoomKey : roomKey,
-                chatContents : message,
-                chatReceiver : recevier,
-                chatSender : sender,
-                chatType : "C"
-            })
-        });
+        // 라인키 발급 로직 
+        const lineKeyPromise = getLineKey();
+        
+        lineKeyPromise.then(promisePromiseResult=>{
+            if(promisePromiseResult !== 'error'){
+                var lineKey = promisePromiseResult;                
+                if(enterFlag){
+                    // 엔터로 전송시 개행처리 \n 제거 
+                    message = message.substr(0, message.length-1);
+                }
+                // 웹소켓 채팅 발신
+                client.publish({
+                    // 데이터를 보내는 경로 /app + 서버(UserChatController)의 @MessageMapping(/test/message)
+                    // chatType 동적 처리하기 TODO
+                    destination:"/app/user/chat",
+                    body:JSON.stringify({
+                        chatRoomKey : roomKey,
+                        chatContents : message,
+                        chatReceiver : recevier,
+                        chatSender : sender,
+                        chatType : "C",
+                        chatLineKey : lineKey
+                    })
+                });
 
-        // 라인 데이터 보여주기 
+                // 라인 데이터 보여주기 
+                let line ={
+                    chatRoomKey : roomKey,
+                        chatContents : message,
+                        chatReceiver : recevier,
+                        chatSender : sender,
+                        chatType : "C",
+                        chatLineKey : lineKey
+                }
 
-        let line ={
-            userid :sender,
-            lineData : message
-        }
+                //상위 컴포넌트에 알려줌
+                props.addLine(line);  
 
-        //상위 컴포넌트에 알려줌
-        props.addLine(line);  
+                // textarea 초기화용
+                setContents('');
 
-        // textarea 초기화용
-        setContents('');
+            }else{
+                console.log('채팅 전송 실패');
+            }
+        })
     }
 
-    // 채팅데이터 입력시 
+    // 라인키 발급 API 호출
+    async function getLineKey(){
+        
+        var result = null;
+
+        await axios({
+            method:'get',
+            url:'http://localhost:8080/user/getLineKey',
+
+        }).then(function(response){
+            //console.log(response);
+            result = response.data.lineKey;
+        }).catch(function(error){
+            console.log('getLineKey error : ', error);
+            result = "error";
+        })
+
+        return result;
+    }
+
+    // 채팅데이터 입력 감지
     function changeText(e){
 
         setContents(e.target.value);
