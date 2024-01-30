@@ -535,14 +535,15 @@ function App() {
                 // 채팅 리스트가 없는경우
                 content = <UserNoChat></UserNoChat>
               }else{
-
-                content = <UserChat list={list} client={client} userId ={userId} chatRoomUnread={chatRoomUnread} chatListReload={()=>{
-              
+                //console.log('APP.js list : ',list);
+                content = <UserChat list={list} client={client} userId ={userId} chatRoomUnread={chatRoomUnread} chatListReload={(chat)=>{
+                  
                   var chatListPromiseResult = null;
                   let chatListPromise = ChatList();
                   chatListPromise.then(chatListPromiseResult =>{
                     //console.log('신규 데이터 수신으로 인한 리스트 갱신 요청  : ', chatListPromiseResult.chat_list)
                     setList(chatListPromiseResult.chat_list);
+                    setChatUnread(parseInt(chat));
                    })
               
                 }}></UserChat>

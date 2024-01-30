@@ -27,7 +27,7 @@ self.addEventListener('message', e =>{
         
         if(flag === 'success'){
         
-            console.log('엑세스 토큰 갱신시 여기 호출');
+            //console.log('엑세스 토큰 갱신시 여기 호출');
             _accesstoken  = response.data.token;
 
         }else if(flag === 'fail'){

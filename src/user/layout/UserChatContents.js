@@ -28,6 +28,10 @@ function UserChatContents(props){
 
     var recvData = props.recvData;
     var lineDatas = props.lineData;
+
+    var readLines = props.readLines;
+
+    var reloadLines = props.reloadLines;
     
     // 스크롤 감지 콜백함수 
     function onScrollCallBack(){
@@ -158,9 +162,10 @@ function UserChatContents(props){
             
             // 수신시에는 scrollTop이 0이 아니기 때문에 고정됨.
             setScrollFix(true);
-
+            console.log(json.chatLineKey, newRecvLine)
             // 최초 수신한 라인
             if(newRecvLine == null){
+                
                 setNewRecvLine(json.chatLineKey);
             }
 
@@ -169,6 +174,16 @@ function UserChatContents(props){
 
 
     // 읽음처리 
+    // 읽음 처리 설계 20240130 기준
+    // 서버의 user/readLines API를 호출
+    // recvLine의 이후 라인키를 모두 조회 
+    // 요청 사용자(myUnreadLine)의 모든 미확인 건수 삭제 + 해당 라인의 미확인 사용자(unreadLineUsers) 삭제
+    // 라인 별 미확인 사용자 (unreadLineUsers)의 count 계산 sCard
+    // 라인을 key로 건수를 value 저장
+    // 모든 라인키 처리 후 요청 사용자의 해당 채팅방 미확인 건수 0으로 만듦
+    // 나의 전체 채팅방의 미확인 건수를 다 더함
+    // /user/readLines의 response를 통해 채팅 전체건수, 해당 채팅방의 건수를 전달 받고
+    // 웹소켓을 통해 해당 채팅방을 구독하는 모든 사용자에게 읽음 처리된 라인을 라인:건수의 형식으로 publish 하여 처리.
     async function read(){
         var result = null;
         //console.log(minLineKey, roomKey)
@@ -179,7 +194,7 @@ function UserChatContents(props){
                 chatRoomKey : roomKey,
                 recvLine : newRecvLine
             }}).then(function(response){
-                //console.log(response.data);
+                //console.log('readLines : ', response.data);
                 result = response.data;
             }).catch(function(error){
                 console.log(error);
@@ -189,7 +204,7 @@ function UserChatContents(props){
             return result;
     }
 
-    // 읽음처리 이벤트 감지
+    // 읽음처리 이벤트 감지 - 나의 해당 채팅방 & 전체 건수 refresh
     function readChatLines(){
 
         if(newRecvLine !== null){
@@ -197,29 +212,8 @@ function UserChatContents(props){
             readLinePromise.then(promiseResult=>{
                 
                 if(promiseResult !== 'error'){
-                    console.log(promiseResult);
-
-                    // 채팅방 & 전체 건수 refresh
-                    props.readLines();
-                    
-                    if(promiseResult.result !== '{}'){
-                        var unreadLineMap = JSON.parse(promiseResult.result);
-                        var copyContentLines = [...contentLines];
-                         for(let i = 0; i < copyContentLines.length; i++){
-                            // 미확인 건수 갱신
-                            if(unreadLineMap[copyContentLines[i].chatLineKey] !== undefined){
-                                console.log(copyContentLines[i]);
-                                copyContentLines[i].chatUnreadCount = unreadLineMap[copyContentLines[i].chatLineKey];
-                            }
-                         }
-                         setContentLines(copyContentLines);
-
-                    }else{
-                        console.log('갱신할 라인 없음');
-                    }
-
-                    // 모두읽음 -> 신규 수신한 라인 초기화
-                    setNewRecvLine(null);
+                     console.log(promiseResult);
+                    props.readLines(promiseResult.chat);
                 }
             })
         }else{
@@ -227,7 +221,29 @@ function UserChatContents(props){
         }
         
     }
-    
+
+    // 내가 속한 채팅방의 라인의 미확인 사용자 건수 갱신
+    useEffect(()=>{
+
+        //console.log('읽은 라인 건수 갱신 reloadLines : ', reloadLines);
+        
+        var unreadLineMap = reloadLines;
+        var copyContentLines = [...contentLines];
+            for(let i = 0; i < copyContentLines.length; i++){
+            // 미확인 건수 갱신
+            // 현재 내가 보고 있는 라인들 = contentLines을 복사한 copyContentLines을 반복하면서 갱신된 라인 reloadLines의 키(라인키)에 따른 
+            // value(건수) 갱신 후 setContentLines
+            if(unreadLineMap[copyContentLines[i].chatLineKey] !== undefined){
+                console.log(copyContentLines[i]);
+                copyContentLines[i].chatUnreadCount = unreadLineMap[copyContentLines[i].chatLineKey];
+            }
+            }
+            setContentLines(copyContentLines);
+            // 모두읽음 -> 신규 수신한 라인 초기화
+            setNewRecvLine(null);
+
+    }, [reloadLines]);
+
     const chatContentsInput 
         = <UserChatContentsInput client={props.client} chatRoomKey={roomKey} recevier={recevier} sender={sender}
               addLine={(line)=>{
@@ -237,7 +253,7 @@ function UserChatContents(props){
                 // spread 문법. 기존 contentsLines를 얕은 복사 
                 // 사용하지 않는다면 copyContentsLines를 참조할 뿐이다. 
                 // 참조하는 값으로 useState를 사용해 봤자 리액트는 다시 랜더링 하지 않는다. 
-
+                
                 // 신규 채팅은 아래로 더함
                 var copyContentLines = [...contentLines];
                 copyContentLines.push(line);
@@ -249,7 +265,7 @@ function UserChatContents(props){
     return (
 
         //채팅창
-        <div id ='contentDiv'>
+        <div id ='contentDiv' onClick={readChatLines}>
 
             {/* 채팅방 제목 */}
             <div id ='chatRoomTitle'>
@@ -257,7 +273,6 @@ function UserChatContents(props){
                     <tbody>
                         <tr>
                             <th id='chatRoomTitleTh'>{title}</th>
-                            <input type ='button' value ='읽음처리' onClick={readChatLines}></input>
                         </tr>
                     </tbody>
                 </table>     
@@ -271,7 +286,6 @@ function UserChatContents(props){
                     <table id='chatRoomContentsTable'>
                         <tbody>
                             {/* 이하 조회한 채팅*/}
-                            
                             {
                                 contentLines && contentLines.map((line) => (
                                     (line.chatSender === sender)
@@ -279,7 +293,15 @@ function UserChatContents(props){
                                     (<tr align ='right' key ={line.chatLineKey}>
                                         <td className='chatRoomContentsTableTdETC'></td>
                                         <td className='chatRoomContentsTableTdETC'></td>
-                                        <td className='chatRoomContentsTableTdETC'></td>
+                                        <td id ='unreadCount'>
+                                            {
+                                            (line.chatUnreadCount === '0')
+                                            ?
+                                            ''
+                                            :
+                                            line.chatUnreadCount
+                                            }
+                                            </td>
                                         <td className='chatRoomContentsTableRTd'>
                                             {line.chatContents}
                                         </td>

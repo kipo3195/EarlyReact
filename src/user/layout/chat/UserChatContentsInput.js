@@ -75,7 +75,8 @@ function UserChatContentsInput(props){
                         chatReceiver : recevier,
                         chatSender : sender,
                         chatType : "C",
-                        chatLineKey : lineKey
+                        chatLineKey : lineKey,
+                        chatUnreadCount : (recevier.split('|')).length-1 // 발신자에게 보여줄 미확인 건수
                 }
 
                 //상위 컴포넌트에 알려줌

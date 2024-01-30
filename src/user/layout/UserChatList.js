@@ -6,6 +6,7 @@ axios.defaults.withCredentials = true;
 function UserChatList(props){
 
     const jsonData = props.jsonData;
+    //console.log('UserChatList.js : ', jsonData);
 
     const chatRoomUnread = props.chatRoomUnread;
 
