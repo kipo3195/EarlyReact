@@ -80,7 +80,7 @@ function UserChat(props){
             data:{
                 chatRoomKey : chatRoomKey 
             }}).then(function(response){
-                // console.log(response.data);
+                console.log('UserChat의 라인 조회 데이터 : ', response.data);
                 if(response.data.flag === 'fail'){
                     result = response.data.error_code;
                 }else{

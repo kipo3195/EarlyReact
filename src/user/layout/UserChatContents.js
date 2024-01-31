@@ -1,3 +1,4 @@
+
 import '../css/UserChat.css';
 import axios from 'axios';
 import { useEffect, useState, useRef } from 'react';
@@ -35,9 +36,6 @@ function UserChatContents(props){
     
     // 스크롤 감지 콜백함수 
     function onScrollCallBack(){
-
-        // console.log('onScrollCallBack top : ', scrollRef.current.scrollTop);
-        // console.log('onScrollCallBack Height : ',scrollRef.current.scrollHeight);
 
         if(scrollRef.current?.scrollTop === 0 && nextLine !== '0'){
             //nextLine 이 '0'인 경우 최초 호출시 서버에서 하나도 받은게 없음 -> 요청하지 않도록 처리
@@ -87,33 +85,33 @@ function UserChatContents(props){
 
         return result;
     }
-    
-    // 스크롤 
-    // 최초입장, 발신시에는 스크롤이 가장 하단.
-    // 수신시에는 스크롤의 변경없음. 
-    const scrollRef = useRef();
+
+    // 내가 속한 채팅방의 라인의 미확인 사용자 건수 갱신          --------------------  1
     useEffect(()=>{
         
-        // 가장마지막 랜더링 이후에 실행됨.
-        // 스크롤 제일 하단에 위치 시키기
-        // 스크롤의 최상단의 값을 스크롤의 높이로 처리함. 
-        
-      
-        // console.log('스크롤 : ',scrollFix);
-        if((scrollRef.current?.scrollTop === 0 || scrollRef.current?.scrollTop !== 0) && !scrollFix){
-            // scrollRef.current?.scrollTop === 0 -> 최초 입장
-            // scrollRef.current?.scrollTop !== 0 -> 채팅 발신 
-            // scrollFix 채팅 수신시에만 true
-            scrollRef.current.scrollTop = scrollRef.current?.scrollHeight;
-        }else if(scrollRef.current?.scrollTop === 0 && scrollFix){
-            scrollRef.current.scrollTop = 10;
+        if(reloadLines !== undefined){
+            var unreadLineMap = reloadLines;
+            var copyContentLines = [...contentLines];
+                for(let i = 0; i < copyContentLines.length; i++){
+                // 미확인 건수 갱신
+                // 현재 내가 보고 있는 라인들 = contentLines을 복사한 copyContentLines을 반복하면서 갱신된 라인 reloadLines의 키(라인키)에 따른 
+                // value(건수) 갱신 후 setContentLines
+                if(unreadLineMap[copyContentLines[i].chatLineKey] !== undefined){
+                    // console.log(copyContentLines[i]);
+                    copyContentLines[i].chatUnreadCount = unreadLineMap[copyContentLines[i].chatLineKey];
+                }
+                } 
+              
+                setContentLines(copyContentLines);
+                // 모두읽음 -> 신규 수신한 라인 초기화
+                setNewRecvLine(null);
         }
 
-    })
+    }, [reloadLines]);
+   
 
-    // 최초 입장시 채팅 라인 그리기
+    // 최초 입장시 채팅 라인 그리기         ------------------------    2
     useEffect(()=>{
-        
         // === 는 값 & 자료형
         // == 는 값
         // undefined는 null과 같은 '값'
@@ -131,8 +129,28 @@ function UserChatContents(props){
 
         }
     }, [lineDatas])
+
+    // 스크롤 
+    // 최초입장, 발신시에는 스크롤이 가장 하단.
+    // 수신시에는 스크롤의 변경없음.                 ------------------------    3
+    const scrollRef = useRef();
+    useEffect(()=>{
+        // 가장마지막 랜더링 이후에 실행됨.
+        // 스크롤 제일 하단에 위치 시키기
+        // 스크롤의 최상단의 값을 스크롤의 높이로 처리함.   
+        if((scrollRef.current?.scrollTop === 0 || scrollRef.current?.scrollTop !== 0) && !scrollFix){
+            // scrollRef.current?.scrollTop === 0 -> 최초 입장
+            // scrollRef.current?.scrollTop !== 0 -> 채팅 발신 
+            // scrollFix 채팅 수신시에만 true
+
+            scrollRef.current.scrollTop = scrollRef.current?.scrollHeight;
+        }else if(scrollRef.current?.scrollTop === 0 && scrollFix){
+            scrollRef.current.scrollTop = 10;
+        }
+
+    })
     
-    // 채팅 수신시 
+    // 채팅 수신시                               ------------------------    4
     useEffect(()=>{
         // props로 전달 받은 recvData를 수신시에만 contentLines에 넣어줄 필요가 있다.
         // useState를 사용하자니, 데이터가 잘 바뀌지 않는 문제가 있었고, 수신/발신을 구분 짓기 어려웠다.
@@ -142,7 +160,7 @@ function UserChatContents(props){
         if(recvData !== null){
             var json = JSON.parse(props.recvData);
             
-            console.log(json);
+            // console.log(json);
             let recvLine = {
                 chatSender : json.chatSender,
                 chatContents : json.chatContents,
@@ -162,7 +180,7 @@ function UserChatContents(props){
             
             // 수신시에는 scrollTop이 0이 아니기 때문에 고정됨.
             setScrollFix(true);
-            console.log(json.chatLineKey, newRecvLine)
+            // console.log(json.chatLineKey, newRecvLine)
             // 최초 수신한 라인
             if(newRecvLine == null){
                 
@@ -171,7 +189,6 @@ function UserChatContents(props){
 
         }
     }, [recvData]);
-
 
     // 읽음처리 
     // 읽음 처리 설계 20240130 기준
@@ -222,28 +239,6 @@ function UserChatContents(props){
         
     }
 
-    // 내가 속한 채팅방의 라인의 미확인 사용자 건수 갱신
-    useEffect(()=>{
-
-        //console.log('읽은 라인 건수 갱신 reloadLines : ', reloadLines);
-        
-        var unreadLineMap = reloadLines;
-        var copyContentLines = [...contentLines];
-            for(let i = 0; i < copyContentLines.length; i++){
-            // 미확인 건수 갱신
-            // 현재 내가 보고 있는 라인들 = contentLines을 복사한 copyContentLines을 반복하면서 갱신된 라인 reloadLines의 키(라인키)에 따른 
-            // value(건수) 갱신 후 setContentLines
-            if(unreadLineMap[copyContentLines[i].chatLineKey] !== undefined){
-                console.log(copyContentLines[i]);
-                copyContentLines[i].chatUnreadCount = unreadLineMap[copyContentLines[i].chatLineKey];
-            }
-            }
-            setContentLines(copyContentLines);
-            // 모두읽음 -> 신규 수신한 라인 초기화
-            setNewRecvLine(null);
-
-    }, [reloadLines]);
-
     const chatContentsInput 
         = <UserChatContentsInput client={props.client} chatRoomKey={roomKey} recevier={recevier} sender={sender}
               addLine={(line)=>{
@@ -258,8 +253,10 @@ function UserChatContents(props){
                 var copyContentLines = [...contentLines];
                 copyContentLines.push(line);
                 setContentLines(copyContentLines);
+               
+                // 채팅 발신시 스크롤 제일 하단으로 이동함. 
+                scrollRef.current.scrollTop = scrollRef.current?.scrollHeight;
                 
-
             }}></UserChatContentsInput>
     
     return (
