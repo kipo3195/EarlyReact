@@ -169,7 +169,7 @@
 	border-spacing: 0 4px;
 }
 
-
+/* 내 채팅 라인*/
 .chatRoomContentsTableRTd{
     border-radius: 5px;
     background-color: rgb(249, 249, 216);
@@ -183,6 +183,17 @@
     white-space:pre-wrap;
     
 }
+/*라인에 마우스올렸을때*/
+.chatRoomContentsTableRTd:hover + .chatRoomContentsTableRTdE {
+    display: block;
+}
+.chatRoomContentsTableRTdE{
+    display: none;
+}
+
+
+
+/* 상대방 채팅 라인*/
 .chatRoomContentsTableLTd{
     border-radius: 5px;
     background-color: rgb(193, 233, 247);
@@ -192,6 +203,15 @@
 
     /* \n(개행처리) 인식*/
     white-space:pre-wrap;
+}
+
+/*라인에 마우스올렸을때*/
+.chatRoomContentsTableLTd:hover + .chatRoomContentsTableLTdE{
+
+    display: block;
+}
+.chatRoomContentsTableLTdE{
+    display: none;
 }
 
 #unreadCount{

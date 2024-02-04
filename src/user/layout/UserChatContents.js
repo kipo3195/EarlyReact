@@ -299,6 +299,7 @@ function UserChatContents(props){
                                             line.chatUnreadCount
                                             }
                                             </td>
+                                        <td className='chatRoomContentsTableRTdE'>aaaaa</td> {/* 내 채팅 라인 공감*/}
                                         <td className='chatRoomContentsTableRTd'>
                                             {line.chatContents}
                                         </td>
@@ -308,6 +309,7 @@ function UserChatContents(props){
                                         <td className='chatRoomContentsTableLTd' >
                                             {line.chatSender}님의 말 : {line.chatContents}
                                         </td>
+                                        <td className='chatRoomContentsTableLTdE'>bbbbb</td> {/*상대방 채팅 라인 공감*/}
                                         <td id ='unreadCount'>
                                             {
                                             (line.chatUnreadCount === '0')

@@ -507,7 +507,7 @@ function App() {
 
               console.log('리스트 최초 호출')
               var chatListPromiseResult = null;
-              let chatListPromise = ChatList();
+              let chatListPromise = ChatList(userId);
               chatListPromise.then(chatListPromiseResult =>{
                 
                 setList(chatListPromiseResult.chat_list);
@@ -537,14 +537,20 @@ function App() {
               }else{
                 //console.log('APP.js list : ',list);
                 content = <UserChat list={list} client={client} userId ={userId} chatRoomUnread={chatRoomUnread} chatListReload={(chat)=>{
-                  
+
                   var chatListPromiseResult = null;
-                  let chatListPromise = ChatList();
+                  let chatListPromise = ChatList(userId); 
                   chatListPromise.then(chatListPromiseResult =>{
+
                     //console.log('신규 데이터 수신으로 인한 리스트 갱신 요청  : ', chatListPromiseResult.chat_list)
-                    setList(chatListPromiseResult.chat_list);
-                    setChatUnread(parseInt(chat));
-                   })
+                    var reloadList = chatListPromiseResult.chat_list;
+                    if(reloadList !== undefined){
+                      setList(chatListPromiseResult.chat_list);
+                      setChatUnread(parseInt(chat));
+                    }else{
+                      alert('로그아웃 !');
+                    }
+                  })
               
                 }}></UserChat>
               }
