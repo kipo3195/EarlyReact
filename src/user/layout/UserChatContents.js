@@ -238,6 +238,38 @@ function UserChatContents(props){
         }
         
     }
+    // 버튼 이벤트에 동적 데이터 부여
+    const likeEvent = (lineKey, e, type) => {
+        e.preventDefault();
+        console.log(lineKey, type);
+         
+        const likeEventPromist = likeEventCall(lineKey,type);
+        likeEventPromist.then(promiseResult=>{
+            console.log(promiseResult);
+        })
+    }
+
+    // 버튼 이벤트 호출
+    async function likeEventCall(lineKey, type){
+        var result = null;
+        await axios ({
+            method : 'post',
+            url : 'http://localhost:8080/user/putChatLineEvent',
+            data : {
+                roomKey : roomKey,
+                lineKey : lineKey,
+                type :  type
+            }
+        }).then(function(response){
+            console.log(response);
+            result = response.data;
+        }).catch(function(error){
+            console.log('error! ', error);
+        })
+
+        return result;
+
+    }
 
     const chatContentsInput 
         = <UserChatContentsInput client={props.client} chatRoomKey={roomKey} recevier={recevier} sender={sender}
@@ -290,6 +322,15 @@ function UserChatContents(props){
                                     (<tr align ='right' key ={line.chatLineKey}>
                                         <td className='chatRoomContentsTableTdETC'></td>
                                         <td className='chatRoomContentsTableTdETC'></td>
+                                        <td className='chatRoomContentsTableRTdE'>
+                                        <input type='button' value='like' onClick={(e)=>{likeEvent(line.chatLineKey, e, 'like')}} ></input>
+                                            {" "}
+                                            <input type='button' value='check' onClick={(e)=>{likeEvent(line.chatLineKey, e, 'check')}} ></input>
+                                            {" "}
+                                            <input type='button' value='good'  onClick={(e)=>{likeEvent(line.chatLineKey, e, 'good')}} ></input>
+                                            {" "}
+                                            <input type='button' value='reply'></input>
+                                        </td> {/* 내 채팅 라인 공감*/}
                                         <td id ='unreadCount'>
                                             {
                                             (line.chatUnreadCount === '0')
@@ -299,17 +340,16 @@ function UserChatContents(props){
                                             line.chatUnreadCount
                                             }
                                             </td>
-                                        <td className='chatRoomContentsTableRTdE'>aaaaa</td> {/* 내 채팅 라인 공감*/}
                                         <td className='chatRoomContentsTableRTd'>
                                             {line.chatContents}
                                         </td>
-                                    </tr>)
+                                    </tr>
+                                    )
                                     :
                                     (<tr align ='left' key ={line.chatLineKey}>
                                         <td className='chatRoomContentsTableLTd' >
                                             {line.chatSender}님의 말 : {line.chatContents}
                                         </td>
-                                        <td className='chatRoomContentsTableLTdE'>bbbbb</td> {/*상대방 채팅 라인 공감*/}
                                         <td id ='unreadCount'>
                                             {
                                             (line.chatUnreadCount === '0')
@@ -319,6 +359,15 @@ function UserChatContents(props){
                                             line.chatUnreadCount
                                             }
                                             </td>
+                                        <td className='chatRoomContentsTableLTdE'>
+                                            <input type='button' value='like' onClick={(e)=>{likeEvent(line.chatLineKey, e, 'like')}} ></input>
+                                            {" "}
+                                            <input type='button' value='check' onClick={(e)=>{likeEvent(line.chatLineKey, e, 'check')}} ></input>
+                                            {" "}
+                                            <input type='button' value='good'  onClick={(e)=>{likeEvent(line.chatLineKey, e, 'good')}} ></input>
+                                            {" "}
+                                            <input type='button' value='reply'></input>
+                                        </td> 
                                         <td className='chatRoomContentsTableTdETC'></td>
                                         <td className='chatRoomContentsTableTdETC'></td>
                                     </tr>)

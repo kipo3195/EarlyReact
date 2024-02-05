@@ -183,13 +183,7 @@
     white-space:pre-wrap;
     
 }
-/*라인에 마우스올렸을때*/
-.chatRoomContentsTableRTd:hover + .chatRoomContentsTableRTdE {
-    display: block;
-}
-.chatRoomContentsTableRTdE{
-    display: none;
-}
+
 
 
 
@@ -205,14 +199,8 @@
     white-space:pre-wrap;
 }
 
-/*라인에 마우스올렸을때*/
-.chatRoomContentsTableLTd:hover + .chatRoomContentsTableLTdE{
 
-    display: block;
-}
-.chatRoomContentsTableLTdE{
-    display: none;
-}
+
 
 #unreadCount{
     font-size: 10px;
