@@ -44,10 +44,14 @@ function UserChat(props){
     // 갱신된 라인 
     const [reloadLines, setReloadLines] = useState();
 
+    // 갱신된 라인의 이벤트 check, good, like
+    const [reloadLineEvent, setReloadLineEvent] = useState();
+
     // 입장한 채팅방의 대화 callback 함수 
     function chatRoomCallback(message){
+    
         if (message.body) {
-            //console.log('chatRoomCallback : ', message.body);
+            console.log('chatRoomCallback : ', message.body);
             var recvJson = JSON.parse(message.body);
             var type = recvJson.type;
             
@@ -64,7 +68,15 @@ function UserChat(props){
             }else if(type ==='readLines'){
                 
                 setReloadLines(recvJson.result);
+                
+            // 채팅방 라인의 좋아요, 굿, 체크
+            // {"lineKey":"20240204151128490","like":"0","check":"1","roomKey":"R_231212224649930","type":"lineEvent"}
+            }else if(type ==='lineEvent'){
+                
+                setReloadLineEvent(recvJson);
+
             }
+
           } else {
             
           }
@@ -155,6 +167,7 @@ function UserChat(props){
             sender={sender} client={client} 
             chatRoomTitle={chatRoomTitle} chatRoomKey={chatRoomKey} 
             chatRoomUsers={chatRoomUsers} recvData={recvData} lineData={lineData} nextLine={nextLine} reloadLines={reloadLines}
+            reloadLineEvent={reloadLineEvent}
             readLines={(chat)=>{
                 // 채팅방 입장 이후 이벤트 감지 읽음 처리
                 props.chatListReload(chat);

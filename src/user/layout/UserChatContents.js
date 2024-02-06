@@ -2,6 +2,9 @@
 import '../css/UserChat.css';
 import axios from 'axios';
 import { useEffect, useState, useRef } from 'react';
+import chatLineHeart from '../../etc/img/chatLineHeart.png'
+import chatLineCheck from '../../etc/img/chatLineCheck.png'
+import chatLineGood from '../../etc/img/chatLineGood.png'
 
 import UserChatContentsInput from './chat/UserChatContentsInput';
 
@@ -33,6 +36,8 @@ function UserChatContents(props){
     var readLines = props.readLines;
 
     var reloadLines = props.reloadLines;
+
+    var reloadLineEvent = props.reloadLineEvent;
     
     // 스크롤 감지 콜백함수 
     function onScrollCallBack(){
@@ -108,7 +113,7 @@ function UserChatContents(props){
         }
 
     }, [reloadLines]);
-   
+
 
     // 최초 입장시 채팅 라인 그리기         ------------------------    2
     useEffect(()=>{
@@ -249,6 +254,29 @@ function UserChatContents(props){
         })
     }
 
+    // 속해있는 채팅방의 라인 이벤트 갱신 - 어떤 이벤트가 변경되었는지에 따라 처리함. 
+    useEffect(()=>{
+        console.log('라인이벤트 변동 감지', reloadLineEvent);
+        if(reloadLineEvent !== undefined){
+            
+            var copyContentLines = [...contentLines];
+            for(let i = 0; i < copyContentLines.length; i++){
+                if(copyContentLines[i].chatLineKey === reloadLineEvent.lineKey){
+                    if(reloadLineEvent.good !== undefined){
+                        copyContentLines[i].chatGoodCnt = reloadLineEvent.good;
+                    }else if(reloadLineEvent.like !== undefined){
+                        copyContentLines[i].chatLikeCnt = reloadLineEvent.like;
+                    }else if(reloadLineEvent.check !== undefined){
+                        copyContentLines[i].chatCheckCnt = reloadLineEvent.check;
+                    }
+                }
+            } 
+            setContentLines(copyContentLines);
+
+        }
+
+    }, [reloadLineEvent]);
+
     // 버튼 이벤트 호출
     async function likeEventCall(lineKey, type){
         var result = null;
@@ -323,12 +351,31 @@ function UserChatContents(props){
                                         <td className='chatRoomContentsTableTdETC'></td>
                                         <td className='chatRoomContentsTableTdETC'></td>
                                         <td className='chatRoomContentsTableRTdE'>
-                                        <input type='button' value='like' onClick={(e)=>{likeEvent(line.chatLineKey, e, 'like')}} ></input>
+                                            
+                                            <img className='chatLineImg' src={chatLineHeart} width='20' alt='heart' 
+                                                onClick={(e)=>{likeEvent(line.chatLineKey, e, 'like')}}>
+                                            </img>
+                                            {(line.chatLikeCnt === null || line.chatLikeCnt === '0')
+                                            ?
+                                            (""):(line.chatLikeCnt)}
                                             {" "}
-                                            <input type='button' value='check' onClick={(e)=>{likeEvent(line.chatLineKey, e, 'check')}} ></input>
+
+                                            <img className='chatLineImg' src={chatLineCheck} width='20' alt='heart' 
+                                                onClick={(e)=>{likeEvent(line.chatLineKey, e, 'check')}}>
+                                            </img>
+                                            {(line.chatCheckCnt === null || line.chatCheckCnt ==='0')
+                                            ?
+                                            (""):(line.chatCheckCnt)}
                                             {" "}
-                                            <input type='button' value='good'  onClick={(e)=>{likeEvent(line.chatLineKey, e, 'good')}} ></input>
+
+                                            <img className='chatLineImg' src={chatLineGood} width='20' alt='heart' 
+                                                onClick={(e)=>{likeEvent(line.chatLineKey, e, 'good')}}>
+                                            </img>
+                                            {(line.chatGoodCnt === null || line.chatGoodCnt ==='0')
+                                            ?
+                                            (""):(line.chatGoodCnt)}
                                             {" "}
+
                                             <input type='button' value='reply'></input>
                                         </td> {/* 내 채팅 라인 공감*/}
                                         <td id ='unreadCount'>
@@ -360,12 +407,31 @@ function UserChatContents(props){
                                             }
                                             </td>
                                         <td className='chatRoomContentsTableLTdE'>
-                                            <input type='button' value='like' onClick={(e)=>{likeEvent(line.chatLineKey, e, 'like')}} ></input>
+
+                                             <img className='chatLineImg' src={chatLineHeart} width='20' alt='heart' 
+                                                onClick={(e)=>{likeEvent(line.chatLineKey, e, 'like')}}>
+                                            </img>
+                                            {(line.chatLikeCnt === null || line.chatLikeCnt === '0')
+                                            ?
+                                            (""):(line.chatLikeCnt)}
                                             {" "}
-                                            <input type='button' value='check' onClick={(e)=>{likeEvent(line.chatLineKey, e, 'check')}} ></input>
+
+                                            <img className='chatLineImg' src={chatLineCheck} width='20' alt='heart' 
+                                                onClick={(e)=>{likeEvent(line.chatLineKey, e, 'check')}}>
+                                            </img>
+                                            {(line.chatCheckCnt === null || line.chatCheckCnt ==='0')
+                                            ?
+                                            (""):(line.chatCheckCnt)}
                                             {" "}
-                                            <input type='button' value='good'  onClick={(e)=>{likeEvent(line.chatLineKey, e, 'good')}} ></input>
+
+                                            <img className='chatLineImg' src={chatLineGood} width='20' alt='heart' 
+                                                onClick={(e)=>{likeEvent(line.chatLineKey, e, 'good')}}>
+                                            </img>
+                                            {(line.chatGoodCnt === null || line.chatGoodCnt ==='0')
+                                            ?
+                                            (""):(line.chatGoodCnt)}
                                             {" "}
+
                                             <input type='button' value='reply'></input>
                                         </td> 
                                         <td className='chatRoomContentsTableTdETC'></td>

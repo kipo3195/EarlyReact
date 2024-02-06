@@ -199,7 +199,12 @@
     white-space:pre-wrap;
 }
 
-
+.chatLineImg{
+    vertical-align: bottom;
+}
+.chatLineImg:hover{
+    cursor: pointer;
+}
 
 
 #unreadCount{
