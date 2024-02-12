@@ -347,10 +347,15 @@ function UserChatContents(props){
                                 contentLines && contentLines.map((line) => (
                                     (line.chatSender === sender)
                                     ?
-                                    (<tr align ='right' key ={line.chatLineKey}>
+                                    // 나의 채팅 라인
+                                    (<tr align ='right' key ={line.chatLineKey} className='myChatLineTR'>
+                                        {/* 말풍선 크기 제어*/}
                                         <td className='chatRoomContentsTableTdETC'></td>
-                                        <td className='chatRoomContentsTableTdETC'></td>
-                                        <td className='chatRoomContentsTableRTdE'>
+
+                                        <td className='chatRoomContentsTableTdReadOnly'></td>
+
+                                        {/* 채팅 라인 공감 */}
+                                        <td className='chatRoomContentsTableTdE'>
                                             
                                             <img className='chatLineImg' src={chatLineHeart} width='20' alt='heart' 
                                                 onClick={(e)=>{likeEvent(line.chatLineKey, e, 'like')}}>
@@ -377,8 +382,9 @@ function UserChatContents(props){
                                             {" "}
 
                                             <input type='button' value='reply'></input>
-                                        </td> {/* 내 채팅 라인 공감*/}
-                                        <td id ='unreadCount'>
+                                        </td>
+                                        {/* 미확인 건수 */}
+                                        <td className ='unreadCount'>
                                             {
                                             (line.chatUnreadCount === '0')
                                             ?
@@ -386,18 +392,22 @@ function UserChatContents(props){
                                             :
                                             line.chatUnreadCount
                                             }
-                                            </td>
+                                        </td>
+                                        {/* 채팅 라인 */} 
                                         <td className='chatRoomContentsTableRTd'>
                                             {line.chatContents}
                                         </td>
                                     </tr>
                                     )
                                     :
-                                    (<tr align ='left' key ={line.chatLineKey}>
+                                    // 상대방의 채팅 라인
+                                    (<tr align ='left' key ={line.chatLineKey} className='othersChatLineTR'>
+                                        {/* 채팅 라인 */} 
                                         <td className='chatRoomContentsTableLTd' >
                                             {line.chatSender}님의 말 : {line.chatContents}
                                         </td>
-                                        <td id ='unreadCount'>
+                                        {/* 미확인 건수 */}
+                                        <td className ='unreadCount'>
                                             {
                                             (line.chatUnreadCount === '0')
                                             ?
@@ -406,7 +416,8 @@ function UserChatContents(props){
                                             line.chatUnreadCount
                                             }
                                             </td>
-                                        <td className='chatRoomContentsTableLTdE'>
+                                        {/* 채팅 라인 공감 */}
+                                        <td className='chatRoomContentsTableTdE'>
 
                                              <img className='chatLineImg' src={chatLineHeart} width='20' alt='heart' 
                                                 onClick={(e)=>{likeEvent(line.chatLineKey, e, 'like')}}>
@@ -434,7 +445,8 @@ function UserChatContents(props){
 
                                             <input type='button' value='reply'></input>
                                         </td> 
-                                        <td className='chatRoomContentsTableTdETC'></td>
+                                        <td className='chatRoomContentsTableTdReadOnly'></td>
+                                        {/* 말풍선 크기 제어*/}
                                         <td className='chatRoomContentsTableTdETC'></td>
                                     </tr>)
                                 ))

@@ -1,6 +1,6 @@
 
 
-
+/*채팅 리스트*/
 #chatListDiv{
     
     float: left;
@@ -21,7 +21,7 @@
     float: left;
     border: 2px solid blue;
     height: 720px;
-    width: 60%;
+    width: 50%;
 }
 
 .chatListTr{
@@ -91,6 +91,7 @@
     font-family: buri;
 }
 
+/*채팅방의 방제목*/
 #chatRoomTitle{
     border: 1px solid grey;
     height: 10%;
@@ -155,11 +156,14 @@
 }
 
 
+
+/* 채팅 라인 전체 테이블 */
 #chatRoomContentsTable{
     width: 100%;
 
      /* td글자가 많아져도 table 크기를 옆으로 늘리지 않음.*/
-    table-layout: fixed;
+    /* table-layout: fixed; */
+    
     font-family: buri;
     font-size: 14px;
     padding: 5px 3px 5px 3px;
@@ -177,12 +181,28 @@
     
     /*자동 줄바꿈*/
     word-break: break-all;
-    padding: 3px 6px 3px 6px;
+    padding: 3px;
     
     /* \n(개행처리) 인식*/
     white-space:pre-wrap;
     
 }
+
+.myChatLineTR{
+    /* background-color: aqua; */
+    float: right;
+    width: 51%;
+}
+.myChatLineTR:hover{ 
+    cursor: pointer;
+}
+.myChatLineTR:hover .chatRoomContentsTableTdE{
+    display: table-cell;
+}
+.myChatLineTR:hover .chatRoomContentsTableTdReadOnly{
+    display: none;
+}
+
 
 
 
@@ -199,18 +219,59 @@
     white-space:pre-wrap;
 }
 
+.othersChatLineTR{
+    float: left;
+    width: 51%;
+    /* background-color: aquamarine; */
+}
+
+.othersChatLineTR:hover{
+    cursor: pointer;
+}
+
+.othersChatLineTR:hover > .chatRoomContentsTableTdE{
+    display: table-cell;
+}
+.othersChatLineTR:hover > .chatRoomContentsTableTdReadOnly{
+    display: none;
+}
+
+
+/* 채팅 라인 공감 */
 .chatLineImg{
     vertical-align: bottom;
 }
 .chatLineImg:hover{
     cursor: pointer;
 }
+/* 채팅 라인 공감 버튼*/
+.chatRoomContentsTableTdE{
+ width: 180px;
+ /* background-color: mediumaquamarine; */
+ display: none;
+}
+
+/* 채팅 라인 readOnly*/
+.chatRoomContentsTableTdReadOnly{
+    width: 180px;
+}
+
+/*나, 상대방의 채팅 말풍선의 최대 크기를 제어함*/
+.chatRoomContentsTableTdETC{
+    width: 5%;
+     /* background-color: floralwhite;  */
+}
 
 
-#unreadCount{
+/*미확인 건수 */
+.unreadCount{
     font-size: 10px;
     color:rgb(248, 185, 36);
-    padding-left : 4px;
+    padding-right: 2px;
     font-family: buriBord;
+    /* background-color: rgb(198, 198, 255); */
+    width: 20px;
+    
 }
+
 
