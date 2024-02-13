@@ -240,9 +240,15 @@
 /* 채팅 라인 공감 */
 .chatLineImg{
     vertical-align: bottom;
+    padding: 0px 2px;
+
 }
 .chatLineImg:hover{
     cursor: pointer;
+    background-color: rgb(232, 226, 226);
+    border-radius: 8px;
+    width: 21px;
+    height: 21px;
 }
 /* 채팅 라인 공감 버튼*/
 .chatRoomContentsTableTdE{
@@ -274,4 +280,10 @@
     
 }
 
+.lineEventModalDiv{
+    z-index: 999;
+    width: 200px;
+    height: 100px;
+    border: 2px solid black;
+}
 
