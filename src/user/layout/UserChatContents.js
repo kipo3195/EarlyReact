@@ -21,6 +21,14 @@ function UserChatContents(props){
     
     // 최초 수신한 채팅 라인
     const [newRecvLine, setNewRecvLine] = useState(null);
+
+    // 채팅 라인 이벤트 modal 
+    const [isLineModal, setLineModal] = useState(false);
+    // 채팅 라인 이벤트 사용자 
+    const [lineEventUser, setLineEventUser] = useState(null);
+    // 클릭시 좌표
+    const [clientX, setClientX] = useState(null);
+    const [clientY, setClientY] = useState(null);
     
     // false scroll 하단 위치 (최초, 채팅 입력) 
     // true scroll 상단으로 고정(더 불러오기)
@@ -305,11 +313,20 @@ function UserChatContents(props){
     function likeEventUser(lineKey, e){
 
         e.preventDefault();
-        console.log(lineKey);
+        console.log(e);
+        var x = e.clientX;
+        var y = e.clientY;
          
         const likeEventPromist = likeEventUserCall(lineKey);
         likeEventPromist.then(promiseResult=>{
-            console.log(promiseResult);
+            
+            if(promiseResult.result === 'true'){
+            
+                setLineEventUser(promiseResult.users);
+                setLineModal(true);
+                setClientX(x);
+                setClientY(y);
+            }
         })
         
     }
@@ -353,6 +370,15 @@ function UserChatContents(props){
                 scrollRef.current.scrollTop = scrollRef.current?.scrollHeight;
                 
             }}></UserChatContentsInput>
+
+    // 라인 이벤트 사용자 확인용 modal 호출
+    const chatLineEventModal
+            = <UserChatLineEventModal lineEventUser={lineEventUser} x={clientX} y={clientY}
+                closeModal={()=>{
+                    setLineModal(false);
+                }}>
+            </UserChatLineEventModal>
+
     
     return (
 
@@ -510,9 +536,13 @@ function UserChatContents(props){
                         </tbody>
                     </table>
                 </div>
+            {
+            
+            // 라인 이벤트 사용자 확인용 modal 호출
+            ((isLineModal) ? chatLineEventModal : '')}    
+           
             </div>
-
-
+            
             {/* 채팅 입력창*/}
             {chatContentsInput}
             

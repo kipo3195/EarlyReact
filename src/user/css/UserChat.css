@@ -103,6 +103,7 @@
     height: 65%;
     width: 100%;
     position: relative;
+
     
 }
 
@@ -280,10 +281,44 @@
     
 }
 
-.lineEventModalDiv{
-    z-index: 999;
-    width: 200px;
-    height: 100px;
+
+
+/* modal div*/
+#chatLineModal{
+    z-index: 5;
+    position: relative;
+    width: 250px;
+    height: 250px;
     border: 2px solid black;
+    background-color: white;
+    top : 40%
+    
 }
 
+#chatLineModalTable{
+    width: 100%;
+}
+
+#chatLineModalTr{
+    width: 100%;
+    
+}
+
+#chatLineModelComment{
+    font-family: buriBord;
+    padding: 5px;
+
+}
+
+#chatLineModalEventTr{
+    float: left;
+    padding: 0px 5px;
+}
+
+.chatLineModalImg:hover{
+    cursor: pointer;
+    background-color: rgb(232, 226, 226);
+    border-radius: 8px;
+    width: 21px;
+    height: 21px;
+}
