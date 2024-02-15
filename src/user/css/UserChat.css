@@ -110,9 +110,11 @@
 /*채팅방 line 자식 div*/ 
 /*
     채팅방 line 아래 부터 정렬 방법
-    부모 div position:relative
+    부모 div position: relative
     자식 div position: absolute
              bottom : 0
+    부모 - relative, 자식 absolute면 자식은 부모를 기준으로 정렬함. bottom 0은 부모의 가장 아래쪽이 위치시키기 위함.
+    부모 - relative, 자식 relative면 자식은 부모 다음으로 위치함. 
     */ 
 #chatRoomContentsChild{
     position: absolute;
@@ -281,8 +283,6 @@
     
 }
 
-
-
 /* modal div*/
 #chatLineModal{
     z-index: 5;
@@ -303,22 +303,32 @@
     width: 100%;
     
 }
-
+/* 공감한 사람 */
 #chatLineModelComment{
     font-family: buriBord;
     padding: 5px;
 
 }
 
+/* 모달창 내 공감 이미지tr*/
 #chatLineModalEventTr{
     float: left;
-    padding: 0px 5px;
+    padding: 2px 5px;
+    
 }
 
+/* 모달창 공감 이미지*/
 .chatLineModalImg:hover{
     cursor: pointer;
     background-color: rgb(232, 226, 226);
     border-radius: 8px;
     width: 21px;
     height: 21px;
+}
+
+/* 모달창 사용자 리스트*/
+.userListTr{
+    font-size: 10pt;
+    font-family: buri;
+
 }

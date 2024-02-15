@@ -376,6 +376,7 @@ function UserChatContents(props){
             = <UserChatLineEventModal lineEventUser={lineEventUser} x={clientX} y={clientY}
                 closeModal={()=>{
                     setLineModal(false);
+                    setLineEventUser(null);
                 }}>
             </UserChatLineEventModal>
 
@@ -497,7 +498,8 @@ function UserChatContents(props){
                                                 (line.chatCheckCnt !== null && line.chatCheckCnt !=='0') ||
                                                     (line.chatGoodCnt !== null && line.chatGoodCnt !=='0'))
                                             ?
-                                             (<img className='chatLineImg' src={chatLineEventUser} width='20' alt='user'></img>)
+                                             (<img className='chatLineImg' src={chatLineEventUser} 
+                                             onClick={(e)=>{likeEventUser(line.chatLineKey, e)}} width='20' alt='user'></img>)
                                             :
                                              ("")}
 

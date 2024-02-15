@@ -1,28 +1,59 @@
+
+
+
+import { useEffect, useState } from 'react';
 import chatLineHeart from '../../../etc/img/chatLineHeart.png'
 import chatLineCheck from '../../../etc/img/chatLineCheck.png'
 import chatLineGood from '../../../etc/img/chatLineGood.png'
-import { Client } from '@stomp/stompjs';
 
 function UserChatLineEventModal(props){
 
-    var users = props.lineEventUser;
-    var like = null;
-    var good = null;
-    var check = null;
     console.log(props.x, props.y);
-    var top = props.x/10;
-    var left = 50;
-    if(users != null){
-        like = users.like;
-        good = users.good;
-        check = users.check;
+    var _users = JSON.parse(props.lineEventUser);
+
+    //console.log(_users);
+    
+    const [likeUsers, setLikeUsers] = useState(null);
+    const [goodUsers, setGoodUsers] = useState(null);
+    const [checkUsers, setCheckUsers] = useState(null);
+
+    // 모달창 메인을 어떤 것으로 보여줄지 관리
+    const [mainView, setMainView] = useState(null);
+
+    useEffect(()=>{
+
+        // 변경되었음에도 state가 유지되는 것을 방지함.
+        setGoodUsers(null);
+        setCheckUsers(null);
+        setLikeUsers(null);
+
+        if(_users.good !== undefined){
+            setGoodUsers(_users.good);
+            setMainView('good');
+        }
+        if(_users.check !== undefined){
+            setCheckUsers(_users.check);
+            setMainView('check');
+        }
+        if(_users.like !== undefined){
+            setLikeUsers(_users.like);
+            setMainView('like');
+        }
+
+    }, [props.lineEventUser]);
+
+    // 모달창 img 선택 -> 이벤트에 따른 사용자 리스트 변경처리 
+    function viewMainChange(e, type){
+        setMainView(type);
+
     }
 
     return(
 
         <div id='chatLineModal' style={{
-            top : top,
-            left : left
+            top : (props.x) /9.5, 
+            left : props.y /1.45
+
         }}>
             <table id='chatLineModalTable'>
                 <tbody>
@@ -34,11 +65,25 @@ function UserChatLineEventModal(props){
                             </button>
                         </td>
                     </tr>
+                    {/* 이벤트 표시 */}
                     <tr id='chatLineModalEventTr'>
-                        <td><img className='chatLineModalImg' src={chatLineHeart} width='20' alt='heart'></img></td>
-                        <td><img className='chatLineModalImg' src={chatLineCheck} width='20' alt='heart'></img></td>
-                        <td><img className='chatLineModalImg' src={chatLineGood} width='20' alt='heart'></img></td>
+                        {((likeUsers !== null)?(<td><img className='chatLineModalImg' src={chatLineHeart} width='20' alt='heart' onClick={(e) => {viewMainChange(e, 'like')}}></img></td>):(''))}
+                        {((checkUsers !== null)?(<td><img className='chatLineModalImg' src={chatLineCheck} width='20' alt='heart'onClick={(e) => {viewMainChange(e, 'check')}}></img></td>):(''))}
+                        {((goodUsers !== null)?(<td><img className='chatLineModalImg' src={chatLineGood} width='20' alt='heart' onClick={(e) => {viewMainChange(e, 'good')}}></img></td>):(''))}
                     </tr>
+                    
+                    {/* 이벤트에 따른 사용자 리스트 */}
+                    {(mainView === 'like')?(likeUsers.map((like)=>(
+                        <tr className='userListTr'>{like}</tr>
+                    ))):''}
+                      {(mainView === 'good')?(goodUsers.map((good)=>(
+                        <tr className='userListTr'>{good}</tr>
+                    ))):''}
+                      {(mainView === 'check')?(checkUsers.map((check)=>(
+                        <tr className='userListTr'>{check}</tr>
+                    ))):''}
+                  
+                    
                 </tbody>
             </table>
         </div>
