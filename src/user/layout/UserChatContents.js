@@ -30,6 +30,7 @@ function UserChatContents(props){
     const [clientX, setClientX] = useState(null);
     const [clientY, setClientY] = useState(null);
     
+    
     // false scroll 하단 위치 (최초, 채팅 입력) 
     // true scroll 상단으로 고정(더 불러오기)
     const[scrollFix, setScrollFix] = useState(false);
@@ -308,24 +309,49 @@ function UserChatContents(props){
         return result;
 
     }
-
-    // 라인 이벤트 클릭 사용자 정보 조회 
-    function likeEventUser(lineKey, e){
-
+    // 라인 이벤트 클릭 사용자 정보 조회 type은 모달창을 어디서 띄울지에 대한 계산의 필요성 때문 
+    function likeEventUser(lineKey, e, type){
+        
         e.preventDefault();
-        console.log(e);
-        var x = e.clientX;
-        var y = e.clientY;
-         
-        const likeEventPromist = likeEventUserCall(lineKey);
+                
+        // 현재 채팅 라인의 div 
+        var element = document.getElementById("chatRoomContents");
+        var left = element.getBoundingClientRect().left; // x축
+        var top = element.getBoundingClientRect().top; // y축
+    
+        // 뷰포트 ? 현재 창에서 문서를 볼 수 있는 부분(전체화면이라면 화면 전체)
+
+        // 클릭한 이미지가 브라우저에서 얼만큼 이동 되었는지 (왼쪽) - chatRoomContents(element)가 뷰포트를 기준으로 얼만큼 떨어져 있는지 
+        // = div영역의 왼쪽에서 얼만큼 이동 시키면 되는지 
+        var x = e.clientX - left;
+
+        // 클릭한 이미지가 브라우저에서 얼만큼 이동 되었는지 (위) - chatRoomContents가 뷰포트를 기준으로 얼만큼 떨어져 있는지 
+        // = div영역의 위에서 얼만큼 이동 시키면 되는지 
+        var y = e.clientY - top;
+     
+        // 콜백함수 
+        const likeEventPromist = likeEventUserCall(lineKey);    
         likeEventPromist.then(promiseResult=>{
-            
+    
             if(promiseResult.result === 'true'){
             
                 setLineEventUser(promiseResult.users);
                 setLineModal(true);
+                
+                // 왼쪽인지 오른쪽인지 체크
+                if(type !== null){
+                    if(type ==='right'){
+                        // 모달창이 채팅라인 왼쪽으로 이동해야 하므로 모달창의 크기(250) 보다 작아야함 
+                        // 이미지 크기 만큼 더 이동(20)
+                        x = x - 270; 
+                    }else{
+                        x = x + 20; // 이미지 크기 만큼 더 이동(20)
+                    }
+                }
+
                 setClientX(x);
                 setClientY(y);
+                
             }
         })
         
@@ -423,8 +449,8 @@ function UserChatContents(props){
                                                 (line.chatCheckCnt !== null && line.chatCheckCnt !=='0') ||
                                                     (line.chatGoodCnt !== null && line.chatGoodCnt !=='0'))
                                             ?
-                                             (<img className='chatLineImg' src={chatLineEventUser} width='20' alt='user'
-                                                onClick={(e)=>{likeEventUser(line.chatLineKey, e)}}></img>)
+                                             (<img className='chatLineImg' src={chatLineEventUser} width='20' alt='user' id='mylineLikeUsers'
+                                                onClick={(e)=>{likeEventUser(line.chatLineKey, e, 'right')}}></img>)
                                             :
                                              ("")}
                                             
@@ -478,7 +504,7 @@ function UserChatContents(props){
                                     (<tr align ='left' key ={line.chatLineKey} className='othersChatLineTR'>
                                         {/* 채팅 라인 */} 
                                         <td className='chatRoomContentsTableLTd' >
-                                            {line.chatSender}님의 말 : {line.chatContents}
+                                            {line.chatSenderName} 님의 말 : {line.chatContents}
                                         </td>
                                         {/* 미확인 건수 */}
                                         <td className ='unreadCount'>
@@ -499,7 +525,7 @@ function UserChatContents(props){
                                                     (line.chatGoodCnt !== null && line.chatGoodCnt !=='0'))
                                             ?
                                              (<img className='chatLineImg' src={chatLineEventUser} 
-                                             onClick={(e)=>{likeEventUser(line.chatLineKey, e)}} width='20' alt='user'></img>)
+                                             onClick={(e)=>{likeEventUser(line.chatLineKey, e, 'left')}} width='20' alt='user'></img>)
                                             :
                                              ("")}
 

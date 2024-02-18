@@ -291,7 +291,9 @@
     height: 250px;
     border: 2px solid black;
     background-color: white;
-    top : 40%
+    top : 40%;
+
+    
     
 }
 
@@ -303,11 +305,16 @@
     width: 100%;
     
 }
-/* 공감한 사람 */
+/* 공감한 사람 comment*/
 #chatLineModelComment{
     font-family: buriBord;
     padding: 5px;
 
+}
+
+/* 공감한 사람들 페이징 처리용*/
+#chatLineModalUsers{
+    overflow-y: scroll;
 }
 
 /* 모달창 내 공감 이미지tr*/
