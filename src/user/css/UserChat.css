@@ -91,11 +91,27 @@
     font-family: buri;
 }
 
-/*채팅방의 방제목*/
+/*채팅방의 방제목 div*/
 #chatRoomTitle{
     border: 1px solid grey;
     height: 10%;
 }
+
+/*채팅방의 방제목 td*/
+#chatRoomTitleTd{
+    font-family: buriBord;
+    height: 10%;
+}
+
+/*채팅방의 방제목에 있는 참여자 img*/
+
+#chatRoomUsersTd:hover{
+    cursor: pointer;
+    background-color: rgb(232, 226, 226);
+    border-radius: 12px;
+
+}
+
 
 /*채팅방 line 부모 div*/ 
 #chatRoomContents{

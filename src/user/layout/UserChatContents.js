@@ -6,9 +6,11 @@ import chatLineHeart from '../../etc/img/chatLineHeart.png'
 import chatLineCheck from '../../etc/img/chatLineCheck.png'
 import chatLineGood from '../../etc/img/chatLineGood.png'
 import chatLineEventUser from '../../etc/img/chatLineEventUser.png'
+import chatRoomUsers from '../../etc/img/chatRoomUsers.png'
 
 import UserChatContentsInput from './chat/UserChatContentsInput';
 import UserChatLineEventModal from './chat/UserChatLineEventModal';
+import UserChatRoomUsersModal from './chat/UserChatRoomUsersModal';
 
 axios.defaults.withCredentials = true;
 
@@ -29,6 +31,10 @@ function UserChatContents(props){
     // 클릭시 좌표
     const [clientX, setClientX] = useState(null);
     const [clientY, setClientY] = useState(null);
+
+    // 채팅방 참여자 리스트
+    const [chatRoomUserList, setChatRoomUserList] = useState(null);
+    const [isChatRoomUserModal, setChatRoomUserModal] = useState(false);
     
     
     // false scroll 하단 위치 (최초, 채팅 입력) 
@@ -406,6 +412,43 @@ function UserChatContents(props){
                 }}>
             </UserChatLineEventModal>
 
+    // 채팅방 참여자 확인용 modal 호출
+    const userChatRoomUsers
+            =<UserChatRoomUsersModal chatRoomUserList={chatRoomUserList} ></UserChatRoomUsersModal>
+
+    // 채팅방 참여자 조회 API
+    function getChatRoomUsers(){
+
+        const getChatRoomUsersPromise = getChatRoomUsersCall();
+        getChatRoomUsersPromise.then(promiseResult=>{
+            console.log(promiseResult);
+            setChatRoomUserList(promiseResult.result);
+            setChatRoomUserModal(true);
+        })
+
+    }
+
+    async function getChatRoomUsersCall(){
+
+        var result = null;
+
+        await axios({
+            method:'POST',
+            url:'http://localhost:8080/user/getChatRoomUsers',
+            data:{
+                chatRoomKey : roomKey
+            }}).then(function(response){
+                //console.log(response.data);
+                result = response.data;
+            }).catch(function(error){
+                console.log(error);
+                
+            })
+
+        return result;
+
+    }
+
     
     return (
 
@@ -417,7 +460,8 @@ function UserChatContents(props){
                 <table>
                     <tbody>
                         <tr>
-                            <th id='chatRoomTitleTh'>{title}</th>
+                            <td id='chatRoomTitleTd'>{title}</td>
+                            <td id='chatRoomUsersTd'><img src={chatRoomUsers} alt='chatRoomusers' onClick={(e)=>{getChatRoomUsers()}}></img></td>
                         </tr>
                     </tbody>
                 </table>     
@@ -564,10 +608,11 @@ function UserChatContents(props){
                         </tbody>
                     </table>
                 </div>
-            {
-            
-            // 라인 이벤트 사용자 확인용 modal 호출
-            ((isLineModal) ? chatLineEventModal : '')}    
+            {// 라인 이벤트 사용자 확인용 modal 호출
+            ((isLineModal) ? chatLineEventModal : '')}
+
+            {// 채팅방 참여자 확인용 modal 호출
+            ((isChatRoomUserModal) ? userChatRoomUsers : '')}    
            
             </div>
             
