@@ -32,10 +32,10 @@ function UserChatContents(props){
     const [clientX, setClientX] = useState(null);
     const [clientY, setClientY] = useState(null);
 
+    // 채팅방 참여자 이벤트 modal
+    const [isChatRoomUserModal, setChatRoomUserModal] = useState(false);
     // 채팅방 참여자 리스트
     const [chatRoomUserList, setChatRoomUserList] = useState(null);
-    const [isChatRoomUserModal, setChatRoomUserModal] = useState(false);
-    
     
     // false scroll 하단 위치 (최초, 채팅 입력) 
     // true scroll 상단으로 고정(더 불러오기)
@@ -273,7 +273,7 @@ function UserChatContents(props){
 
     // 속해있는 채팅방의 라인 이벤트 갱신 - 어떤 이벤트가 변경되었는지에 따라 처리함. 
     useEffect(()=>{
-        console.log('라인이벤트 변동 감지', reloadLineEvent);
+        //console.log('라인이벤트 변동 감지', reloadLineEvent);
         if(reloadLineEvent !== undefined){
             
             var copyContentLines = [...contentLines];
@@ -315,6 +315,7 @@ function UserChatContents(props){
         return result;
 
     }
+
     // 라인 이벤트 클릭 사용자 정보 조회 type은 모달창을 어디서 띄울지에 대한 계산의 필요성 때문 
     function likeEventUser(lineKey, e, type){
         
@@ -354,15 +355,21 @@ function UserChatContents(props){
                         x = x + 20; // 이미지 크기 만큼 더 이동(20)
                     }
                 }
-
                 setClientX(x);
                 setClientY(y);
+
+                // 공감모달 -> 참여자 모달 닫기
+                if(isChatRoomUserModal || chatRoomUserList !== null){
+                    setChatRoomUserModal(false);
+                    setChatRoomUserList(null);
+                }
+
                 
             }
         })
         
     }
-    // 라인 이벤트 클릭 사용자 호출
+    // 라인 이벤트 클릭 사용자 API 호출 
     async function likeEventUserCall(lineKey){
         var result = null;
         await axios ({
@@ -379,6 +386,55 @@ function UserChatContents(props){
             console.log('error! ', error);
         })
         return result;
+    }
+
+    
+    // 채팅방 참여자 조회 API
+    function getChatRoomUsers(e){
+
+        var x = e.clientX; 
+        // 라인 이벤트 모달은 chatRoomContents안에서 위치를 구했었다면,
+        // 채팅방 참여자 모달은 채팅타이틀을 포함한 contentDiv에서 위치를 구해야 한다. 
+        // 그렇기 때문에 클릭한 이미지가 브라우저에서 얼만큼 이동 되었는지 (왼쪽) 좌표인 clientX를 사용하여 좌표를 구하여 사용했다. 
+        var y = e.clientY;
+        const getChatRoomUsersPromise = getChatRoomUsersCall();
+        getChatRoomUsersPromise.then(promiseResult=>{
+            //console.log(promiseResult);
+            setChatRoomUserList(promiseResult.result);
+            setChatRoomUserModal(true);
+
+            // 참여자 모달 -> 공감 모달 닫기
+            if(isLineModal || lineEventUser !== null){
+                setLineModal(false);
+                setLineEventUser(null);
+            }
+            setClientX(x);
+            setClientY(y);
+
+        })
+
+    }
+    // 채팅방 참여자 조회 API 호출
+    async function getChatRoomUsersCall(){
+
+        var result = null;
+
+        await axios({
+            method:'POST',
+            url:'http://localhost:8080/user/getChatRoomUsers',
+            data:{
+                chatRoomKey : roomKey,
+                limitCnt : 0 // 동적 처리 필요 
+            }}).then(function(response){
+                //console.log(response.data);
+                result = response.data;
+            }).catch(function(error){
+                console.log(error);
+                
+            })
+
+        return result;
+
     }
 
 
@@ -406,7 +462,8 @@ function UserChatContents(props){
     // 라인 이벤트 사용자 확인용 modal 호출
     const chatLineEventModal
             = <UserChatLineEventModal lineEventUser={lineEventUser} x={clientX} y={clientY}
-                closeModal={()=>{
+            //닫기
+            closeModal={()=>{
                     setLineModal(false);
                     setLineEventUser(null);
                 }}>
@@ -414,46 +471,22 @@ function UserChatContents(props){
 
     // 채팅방 참여자 확인용 modal 호출
     const userChatRoomUsers
-            =<UserChatRoomUsersModal chatRoomUserList={chatRoomUserList} ></UserChatRoomUsersModal>
+            =<UserChatRoomUsersModal chatRoomUserList={chatRoomUserList} x={clientX} y={clientY}
+            
+            //닫기
+            closeModal={()=>{
+                setChatRoomUserModal(false);
+                setChatRoomUserList(null);
+            }}></UserChatRoomUsersModal>
 
-    // 채팅방 참여자 조회 API
-    function getChatRoomUsers(){
-
-        const getChatRoomUsersPromise = getChatRoomUsersCall();
-        getChatRoomUsersPromise.then(promiseResult=>{
-            console.log(promiseResult);
-            setChatRoomUserList(promiseResult.result);
-            setChatRoomUserModal(true);
-        })
-
-    }
-
-    async function getChatRoomUsersCall(){
-
-        var result = null;
-
-        await axios({
-            method:'POST',
-            url:'http://localhost:8080/user/getChatRoomUsers',
-            data:{
-                chatRoomKey : roomKey
-            }}).then(function(response){
-                //console.log(response.data);
-                result = response.data;
-            }).catch(function(error){
-                console.log(error);
-                
-            })
-
-        return result;
-
-    }
 
     
     return (
 
         //채팅창
         <div id ='contentDiv' onClick={readChatLines}>
+            {// 채팅방 참여자 확인용 modal 호출
+            ((isChatRoomUserModal) ? userChatRoomUsers : '')}    
 
             {/* 채팅방 제목 */}
             <div id ='chatRoomTitle'>
@@ -461,13 +494,11 @@ function UserChatContents(props){
                     <tbody>
                         <tr>
                             <td id='chatRoomTitleTd'>{title}</td>
-                            <td id='chatRoomUsersTd'><img src={chatRoomUsers} alt='chatRoomusers' onClick={(e)=>{getChatRoomUsers()}}></img></td>
+                            <td id='chatRoomUsersTd'><img src={chatRoomUsers} alt='chatRoomusers' onClick={(e)=>{getChatRoomUsers(e)}}></img></td>
                         </tr>
                     </tbody>
                 </table>     
             </div>
-
-
 
             {/* 채팅방 라인 */}
             <div id ='chatRoomContents'>
@@ -611,8 +642,7 @@ function UserChatContents(props){
             {// 라인 이벤트 사용자 확인용 modal 호출
             ((isLineModal) ? chatLineEventModal : '')}
 
-            {// 채팅방 참여자 확인용 modal 호출
-            ((isChatRoomUserModal) ? userChatRoomUsers : '')}    
+
            
             </div>
             

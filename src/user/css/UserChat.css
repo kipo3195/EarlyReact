@@ -299,7 +299,7 @@
     
 }
 
-/* modal div*/
+/* 공감 modal div*/
 #chatLineModal{
     z-index: 5;
     position: relative;
@@ -308,9 +308,6 @@
     border: 2px solid black;
     background-color: white;
     top : 40%;
-
-    
-    
 }
 
 #chatLineModalTable{
@@ -321,6 +318,7 @@
     width: 100%;
     
 }
+
 /* 공감한 사람 comment*/
 #chatLineModelComment{
     font-family: buriBord;
@@ -333,7 +331,7 @@
     overflow-y: scroll;
 }
 
-/* 모달창 내 공감 이미지tr*/
+/* 공감 모달창 내 공감 이미지tr*/
 #chatLineModalEventTr{
     float: left;
     padding: 2px 5px;
@@ -349,9 +347,82 @@
     height: 21px;
 }
 
-/* 모달창 사용자 리스트*/
+/* 공감 모달창 사용자 리스트*/
 .userListTr{
     font-size: 10pt;
     font-family: buri;
 
+}
+
+
+
+
+/* 채팅방 참여자 모달 */
+#chatRoomUserModal{
+    z-index: 20;
+    position: absolute; /*contentDiv의 위로 올라서기 위한 조건 */
+    width: 230px;
+    height: 270px;
+    border: 2px solid rgba(154, 154, 154, 0.5);
+    background-color: white;
+}
+
+/* 채팅방 참여자 모달 table*/
+#chatRoomUserModalTable{
+    width: 95%;
+    
+}
+
+/* 채팅방 참여자 모달 타이틀*/
+#chatRoomUserModalTitleTr{
+    width: 95%;
+}
+
+/* 채팅방 참여자 모달 '참여자' */
+#chatRoomUserModalComment{
+    font-family: buriBord;
+    
+}
+
+/* 채팅방 참여자 모달 닫기*/
+#chatRoomUserModalClose{
+    text-align: right;
+    
+}
+
+
+/* 채팅방 참여자 모달 사용자 tr*/
+#chatRoomUserModalUserTr{
+    width: 90%;
+    
+}
+
+/* 채팅방 참여자 모달 사용자 이미지 td*/
+.chatRoomUserModalUserProfile{
+    height: 40px;
+    width: 25%;
+    border-radius: 10px;
+    background-color: blanchedalmond;
+    text-align: center;
+    font-family: buriBord;
+
+}
+
+/* 채팅방 참여자 모달 사용자 이름 td*/
+.chatRoomUserModalUser{
+    font-family: buri;
+    font-size: 10pt;
+    padding-left: 3px;
+}
+
+
+/* 채팅방 참여자 초대하기 div*/
+#chatRoomUserInvite{
+    position: absolute; /* 가장 하단에 보내기 위함 */
+    bottom: 0;
+}
+
+/* 채팅방 참여자 초대하기 버튼*/
+#chatRoomUserInviteBtn{
+    z-index: 12;
 }

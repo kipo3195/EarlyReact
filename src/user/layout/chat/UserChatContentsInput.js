@@ -114,7 +114,14 @@ function UserChatContentsInput(props){
     // 채팅데이터 입력 감지
     function changeText(e){
 
-        setContents(e.target.value);
+        console.log(e.target.value);
+
+        var word = e.target.value;
+        if(word.endsWith('@')){
+            console.log('지명대상자 조회!');
+        };
+
+        setContents(e.target.value);    
      
     }
 
