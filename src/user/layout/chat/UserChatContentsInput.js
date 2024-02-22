@@ -1,10 +1,16 @@
 import '../../css/UserChat.css';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import UserChatMentionModal from './UserChatMentionModal';
 
 function UserChatContentsInput(props){
 
     const [contents, setContents] = useState('');
+
+    // 지명채팅 모달 Flag
+    const [isMentionModal, setMentionModal] = useState(false);
+    // 참여자 = 지명대상
+    const [chatRoomUserList, setChatRoomUserList] = useState(null);
 
     var client = props.client;
     var roomKey = props.chatRoomKey;
@@ -111,23 +117,58 @@ function UserChatContentsInput(props){
         return result;
     }
 
+        // 채팅방 참여자 조회 API 호출
+        async function getChatRoomUsersCall(){
+
+            var result = null;
+    
+            await axios({
+                method:'POST',
+                url:'http://localhost:8080/user/getChatRoomUsers',
+                data:{
+                    chatRoomKey : roomKey,
+                    limitCnt : 0 // 동적 처리 필요 
+                }}).then(function(response){
+                    //console.log(response.data);
+                    result = response.data;
+                }).catch(function(error){
+                    console.log(error);
+                    
+                })
+    
+            return result;
+    
+        }
+
+
     // 채팅데이터 입력 감지
     function changeText(e){
 
-        console.log(e.target.value);
-
         var word = e.target.value;
         if(word.endsWith('@')){
-            console.log('지명대상자 조회!');
+            
+            // 지명대상 참여자 조회
+            const getChatRoomUsersPromise = getChatRoomUsersCall();
+            getChatRoomUsersPromise.then(promiseResult=>{
+                
+                setChatRoomUserList(promiseResult.result);
+                setMentionModal(true);
+
+            })
+
         };
 
         setContents(e.target.value);    
      
     }
 
+    const chatMentionModal = <UserChatMentionModal chatRoomUserList={chatRoomUserList} closeModal={()=>{
+        setMentionModal(false);
+    }}></UserChatMentionModal>
+
     return (
     
-        <div id ='chatRoomText'>
+    <div id ='chatRoomText'>
         <form onSubmit={event=>{
             event.preventDefault();
             // stomp pub
@@ -157,6 +198,9 @@ function UserChatContentsInput(props){
                 </tfoot>
             </table>
         </form>
+
+        {/* 지명 채팅 대상자 리스트 모달*/}
+        {isMentionModal ? chatMentionModal : ''}
     </div>
                  
     )

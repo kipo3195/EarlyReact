@@ -426,3 +426,45 @@
 #chatRoomUserInviteBtn{
     z-index: 12;
 }
+
+
+
+
+
+
+
+/* 지명 modal div*/
+#chatMentionModal{
+    z-index: 5;
+    position: absolute;
+    width: 250px;
+    height: 170px;
+    border: 2px solid black;
+    background-color: white;
+    top : 40%;
+}
+
+/* 지명 참여자 모달 사용자 tr chatRoomUserModalUserTr*/
+#chatMentionModalUserTr{
+    width: 90%;
+    
+}
+
+/* 지명 참여자 모달 사용자 이미지 td chatRoomUserModalUserProfile*/
+.chatMentionModalUserProfile{
+    height: 40px;
+    width: 25%;
+    border-radius: 10px;
+    background-color: blanchedalmond;
+    text-align: center;
+    font-family: buriBord;
+
+}
+
+/* 지명 참여자 모달 사용자 이름 td chatRoomUserModalUser*/
+.chatMentionModalUser{
+    font-family: buri;
+    font-size: 10pt;
+    padding-left: 3px;
+}
+
