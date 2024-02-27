@@ -144,24 +144,38 @@ function UserChatContentsInput(props){
     // 채팅데이터 입력 감지
     function changeText(e){
 
+        console.log(e.keyCode);
         var word = e.target.value;
-        if(word.endsWith('@')){
-            
-            // 지명대상 참여자 조회
-            const getChatRoomUsersPromise = getChatRoomUsersCall();
-            getChatRoomUsersPromise.then(promiseResult=>{
-                
-                setChatRoomUserList(promiseResult.result);
-                setMentionModal(true);
-
-            })
+        
+        if(word.startsWith('@')){
+            // 띄어쓰기를 했을때 모달창을 닫음
+            if(word.includes(' ')){
+                setMentionModal(false);
+            }else{
+                // 지명대상 참여자 조회
+                const getChatRoomUsersPromise = getChatRoomUsersCall();
+                getChatRoomUsersPromise.then(promiseResult=>{
+                    
+                    setChatRoomUserList(promiseResult.result);
+                    setMentionModal(true);
+                })
+            }
 
         };
 
         setContents(e.target.value);    
      
     }
-
+    // 채팅 데이터 esc 감지 -> 지명 모달 닫기 처리
+    function escKeyDown(e){
+        console.log(e.currentTarget);
+        
+        if(e.code === 'Escape'){
+            if(isMentionModal){
+                setMentionModal(false);
+            }
+        }
+    }
     const chatMentionModal = <UserChatMentionModal chatRoomUserList={chatRoomUserList} closeModal={()=>{
         setMentionModal(false);
     }}></UserChatMentionModal>
@@ -183,6 +197,7 @@ function UserChatContentsInput(props){
                          onKeyUp={e=> enterSend(e)}
                          onChange={e=> changeText(e)}
                          value ={contents}
+                         onKeyDown={e=> escKeyDown(e)}
                          ></textarea></td>
                     </tr>
                 </tbody>
