@@ -2,12 +2,17 @@
 
 function UserChatMentionModal(props) {
 
-    var userList = [props.chatRoomUserList];
-    var users = JSON.parse(userList);
+    // console.log(props.chatRoomUserList);
+    // var userList = [props.chatRoomUserList];
+    // var users = JSON.parse(userList);
 
+    var users = props.chatRoomUserList;
     return(
-
-        <div id ='chatMentionModal'>
+        // 지명 모달창 표시 
+        <div id ='chatMentionModal' style={{
+            top : 470,
+            left : 750    
+        }}>
             <table>
                 <tbody>
                     <tr>

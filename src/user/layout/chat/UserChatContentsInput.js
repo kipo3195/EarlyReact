@@ -9,8 +9,10 @@ function UserChatContentsInput(props){
 
     // 지명채팅 모달 Flag
     const [isMentionModal, setMentionModal] = useState(false);
-    // 참여자 = 지명대상
+    // 참여자 = 지명대상 = 서버로 부터 받아온
     const [chatRoomUserList, setChatRoomUserList] = useState(null);
+    // 검색용 참여자
+    const [chatRoomSearchUserList, setChatRoomSearchUserList] = useState(null);
 
     var client = props.client;
     var roomKey = props.chatRoomKey;
@@ -144,21 +146,59 @@ function UserChatContentsInput(props){
     // 채팅데이터 입력 감지
     function changeText(e){
 
-        console.log(e.keyCode);
+        // 입력데이터
         var word = e.target.value;
-        
+
+        // 입력데이터 줄바꿈
+        var wordArr = word.split('\n');
+
+        // 줄바꿈 후 마지막 열
+        word = wordArr[wordArr.length-1];
+
+        //console.log(word);
+        // 줄바꿈 후 마지막 열의 지명 체크
         if(word.startsWith('@')){
+
             // 띄어쓰기를 했을때 모달창을 닫음
             if(word.includes(' ')){
                 setMentionModal(false);
             }else{
-                // 지명대상 참여자 조회
-                const getChatRoomUsersPromise = getChatRoomUsersCall();
-                getChatRoomUsersPromise.then(promiseResult=>{
+                if(isMentionModal){
+                    // 모달창이 떠있다 = 참여자 리스트를 가져왔다.
+                    var tempChatRoomUserList = [];
                     
-                    setChatRoomUserList(promiseResult.result);
-                    setMentionModal(true);
-                })
+                    word = word.substr(1, word.length); // @ 제거 - 검색 데이터
+                    
+                    // 서버에서 가져온 chatRoomUserList
+                    for(var i = 0 ; i < chatRoomUserList.length; i++){
+                        var username = chatRoomUserList[i].name;
+                        if(username.includes(word)){
+                            tempChatRoomUserList.push(chatRoomUserList[i]);
+                            // console.log('검색된 대상 : ', chatRoomUserList[i]);
+                        }
+                    }
+                    
+                    setChatRoomSearchUserList(tempChatRoomUserList);
+
+                }else{
+                    // 지명대상 참여자 조회
+                    const getChatRoomUsersPromise = getChatRoomUsersCall();
+                    getChatRoomUsersPromise.then(promiseResult=>{
+                        console.log(promiseResult.result);
+                        if(promiseResult.result !== null){
+                            var list = [promiseResult.result];
+                            var json = JSON.parse(list);
+                            if(json !== null){
+                                setChatRoomUserList(json);
+                                setChatRoomSearchUserList(json);        
+                                setMentionModal(true);
+                            }
+                        }
+                        // 기존은 문자열 그대로 컴포넌트로 넘겼음. 
+                        // setChatRoomUserList(promiseResult.result);
+                        // setMentionModal(true);
+                    })
+                }
             }
 
         };
@@ -168,7 +208,7 @@ function UserChatContentsInput(props){
     }
     // 채팅 데이터 esc 감지 -> 지명 모달 닫기 처리
     function escKeyDown(e){
-        console.log(e.currentTarget);
+        //console.log(e.currentTarget);
         
         if(e.code === 'Escape'){
             if(isMentionModal){
@@ -176,7 +216,7 @@ function UserChatContentsInput(props){
             }
         }
     }
-    const chatMentionModal = <UserChatMentionModal chatRoomUserList={chatRoomUserList} closeModal={()=>{
+    const chatMentionModal = <UserChatMentionModal chatRoomUserList={chatRoomSearchUserList} closeModal={()=>{
         setMentionModal(false);
     }}></UserChatMentionModal>
 
