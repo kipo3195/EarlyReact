@@ -34,8 +34,10 @@ function UserChatContents(props){
 
     // 채팅방 참여자 이벤트 modal
     const [isChatRoomUserModal, setChatRoomUserModal] = useState(false);
+    
     // 채팅방 참여자 리스트
     const [chatRoomUserList, setChatRoomUserList] = useState(null);
+
     
     // false scroll 하단 위치 (최초, 채팅 입력) 
     // true scroll 상단으로 고정(더 불러오기)
@@ -127,12 +129,14 @@ function UserChatContents(props){
                 setContentLines(copyContentLines);
                 // 모두읽음 -> 신규 수신한 라인 초기화
                 setNewRecvLine(null);
+
+             console.log('호출 순서 1');
         }
 
     }, [reloadLines]);
 
 
-    // 최초 입장시 채팅 라인 그리기         ------------------------    2
+    // 최초 입장시 채팅 라인 그리기         ------------------------    2 
     useEffect(()=>{
         // === 는 값 & 자료형
         // == 는 값
@@ -148,9 +152,17 @@ function UserChatContents(props){
             setNextLine(props.nextLine);
             // 서버로 부터 받아온 라인 중 가장 낮은 라인
             // setMinLineKey(lines[0].chatLineKey)
+            
+        }
 
+        return() =>{
+            // 해당 컴포넌트(UserChatContents) 가 unMount 될때 처리함. 
+            // 방을 입장할때마다 UserChatContents 해당 방에 해당하는 UserChatContents 컴포넌트가 호출 되므로 
+            // 현재 UserChatContents컴포넌트가 unMount 된다. 해당 컴포넌트에 해당하는 modal을 닫기 위하여 작성하였다. 
+            setChatRoomUserModal(false);
         }
     }, [lineDatas])
+
 
     // 스크롤 
     // 최초입장, 발신시에는 스크롤이 가장 하단.
@@ -169,6 +181,9 @@ function UserChatContents(props){
         }else if(scrollRef.current?.scrollTop === 0 && scrollFix){
             scrollRef.current.scrollTop = 10;
         }
+
+        
+        
 
     })
     
@@ -256,7 +271,7 @@ function UserChatContents(props){
                 }
             })
         }else{
-            console.log('신규 수신한 라인 없음');
+            //console.log('신규 수신한 라인 없음');
         }
         
     }

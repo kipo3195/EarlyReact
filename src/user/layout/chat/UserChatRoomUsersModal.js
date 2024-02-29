@@ -4,7 +4,7 @@ function UserChatRoomUsersModal(props){
     var userList = [props.chatRoomUserList];
     var users = JSON.parse(userList);
     //console.log(props.y );
-
+    
     return(
 
         <div id ='chatRoomUserModal' style={{

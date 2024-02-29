@@ -19,6 +19,18 @@ function UserChatContentsInput(props){
     var recevier = props.recevier;
     var sender = props.sender;  
     
+
+    useEffect(() =>{
+
+        // 해당 useEffect는 roomKey가 변경될때마다 실행됨.
+
+        return()=>{
+            // 지명 채팅 모달을 닫기 위해 실행. 
+            // 해당 컴포넌트가 unMount 될때 실행됨.
+            setMentionModal(false);
+        }
+    }, [roomKey])
+
     // textarea에서 엔터 클릭시 일단 
     function enterSend(e){
          e.preventDefault(); //onkeyUp의 기본이벤트를 차단하지 않으면 2번 호출됨. 
@@ -184,7 +196,7 @@ function UserChatContentsInput(props){
                     // 지명대상 참여자 조회
                     const getChatRoomUsersPromise = getChatRoomUsersCall();
                     getChatRoomUsersPromise.then(promiseResult=>{
-                        console.log(promiseResult.result);
+                        //console.log(promiseResult.result);
                         if(promiseResult.result !== null){
                             var list = [promiseResult.result];
                             var json = JSON.parse(list);

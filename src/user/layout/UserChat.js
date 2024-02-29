@@ -92,7 +92,7 @@ function UserChat(props){
             data:{
                 chatRoomKey : chatRoomKey 
             }}).then(function(response){
-                console.log('UserChat의 라인 조회 데이터 : ', response.data);
+                //console.log('UserChat의 라인 조회 데이터 : ', response.data);
                 if(response.data.flag === 'fail'){
                     result = response.data.error_code;
                 }else{
@@ -139,8 +139,9 @@ function UserChat(props){
                 if(promisePromiseResult.error_code != null){
                     console.log('로그아웃 처리예정');
                 }else{
-                    //console.log(promisePromiseResult.chatRoomLine);
+                    //console.log('라인 데이터 확인 : ', promisePromiseResult.chatRoomLine);
                     //console.log(promisePromiseResult.nextLine);
+                
                     setLineData(promisePromiseResult.chatRoomLine);
                     setNextLine(promisePromiseResult.nextLine);
                     setChatRoomSeq(chatRoomSeq);
