@@ -443,15 +443,24 @@
     top : 40%;
 }
 
+#chatMentionMoalTable{
+    width: 100%;
+}
+
 /* 지명 참여자 모달 사용자 tr chatRoomUserModalUserTr*/
-#chatMentionModalUserTr{
+.chatMentionModalUserTr{
     width: 90%
+}
+/* 지명 참여자 모달 사용자 리스트 hover*/
+.chatMentionModalUserTr:hover{
+    cursor: pointer;
+    background-color: rgb(240, 205, 201);
 }
 
 /* 지명 참여자 모달 사용자 이미지 td chatRoomUserModalUserProfile*/
 .chatMentionModalUserProfile{
     height: 40px;
-    width: 25%;
+    width: 20%;
     border-radius: 10px;
     background-color: blanchedalmond;
     text-align: center;
@@ -466,3 +475,9 @@
     padding-left: 3px;
 }
 
+
+/* 채팅 말풍선에 지명 참여자 포함시 p태그의 위, 아래 간격을 줄임*/
+.chatContentsP{
+    margin-bottom: 0em;
+    margin-top: 0em;
+}

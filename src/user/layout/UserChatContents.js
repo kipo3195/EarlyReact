@@ -11,6 +11,7 @@ import chatRoomUsers from '../../etc/img/chatRoomUsers.png'
 import UserChatContentsInput from './chat/UserChatContentsInput';
 import UserChatLineEventModal from './chat/UserChatLineEventModal';
 import UserChatRoomUsersModal from './chat/UserChatRoomUsersModal';
+import MentionCheck from '../../modules/MentionCheck';
 
 axios.defaults.withCredentials = true;
 
@@ -145,7 +146,7 @@ function UserChatContents(props){
         if(lineDatas != null){
             
             var lines = JSON.parse(lineDatas);
-    
+            
             // 서버로 부터 받아온 라인들
             setContentLines(lines);
             // 서버로 부터 받아온 라인 중 다음 라인조회 기준 -> 라인 더 불러올때 
@@ -153,6 +154,9 @@ function UserChatContents(props){
             // 서버로 부터 받아온 라인 중 가장 낮은 라인
             // setMinLineKey(lines[0].chatLineKey)
             
+        }else{
+            // 서버로 부터 받아온 채팅이 없을때  lineDatas = undefined
+            setContentLines(lineDatas);
         }
 
         return() =>{
@@ -452,6 +456,15 @@ function UserChatContents(props){
 
     }
 
+    // 지명채팅 키워드가 있을때 
+    function mentionCheck(chatLine){
+        var result = '';
+
+        result = <MentionCheck checkLine={chatLine}></MentionCheck>
+
+        return result;
+    }
+
 
 
     const chatContentsInput 
@@ -522,135 +535,152 @@ function UserChatContents(props){
                         <tbody>
                             {/* 이하 조회한 채팅*/}
                             {
-                                contentLines && contentLines.map((line) => (
-                                    (line.chatSender === sender)
-                                    ?
-                                    // 나의 채팅 라인
-                                    (<tr align ='right' key ={line.chatLineKey} className='myChatLineTR'>
-                                        {/* 말풍선 크기 제어*/}
-                                        <td className='chatRoomContentsTableTdETC'></td>
+                                (contentLines === undefined) ? ('') : ( 
+                                    contentLines && contentLines.map((line) => (
+                                        (line.chatSender === sender)
+                                        ?
+                                        // 나의 채팅 라인
+                                        (<tr align ='right' key ={line.chatLineKey} className='myChatLineTR'>
+                                            {/* 말풍선 크기 제어*/}
+                                            <td className='chatRoomContentsTableTdETC'></td>
 
-                                        <td className='chatRoomContentsTableTdReadOnly'></td>
+                                            <td className='chatRoomContentsTableTdReadOnly'></td>
 
-                                        {/* 채팅 라인 공감 */}
-                                        <td className='chatRoomContentsTableTdE'>
-                                            {/* 누가 눌렸는지 확인*/}
-                                            {((line.chatLikeCnt !== null && line.chatLikeCnt !== '0') ||
-                                                (line.chatCheckCnt !== null && line.chatCheckCnt !=='0') ||
-                                                    (line.chatGoodCnt !== null && line.chatGoodCnt !=='0'))
-                                            ?
-                                             (<img className='chatLineImg' src={chatLineEventUser} width='20' alt='user' id='mylineLikeUsers'
-                                                onClick={(e)=>{likeEventUser(line.chatLineKey, e, 'right')}}></img>)
-                                            :
-                                             ("")}
-                                            
-                                            {/* 좋아요 */}
-                                            <img className='chatLineImg' src={chatLineHeart} width='20' alt='heart' 
-                                                onClick={(e)=>{likeEvent(line.chatLineKey, e, 'like')}}>
-                                            </img>
-                                            {(line.chatLikeCnt === null || line.chatLikeCnt === '0')
-                                            ?
-                                            (""):(line.chatLikeCnt)}
-                                            {" "}
+                                            {/* 채팅 라인 공감 */}
+                                            <td className='chatRoomContentsTableTdE'>
+                                                {/* 누가 눌렸는지 확인*/}
+                                                {((line.chatLikeCnt !== null && line.chatLikeCnt !== '0') ||
+                                                    (line.chatCheckCnt !== null && line.chatCheckCnt !=='0') ||
+                                                        (line.chatGoodCnt !== null && line.chatGoodCnt !=='0'))
+                                                ?
+                                                (<img className='chatLineImg' src={chatLineEventUser} width='20' alt='user' id='mylineLikeUsers'
+                                                    onClick={(e)=>{likeEventUser(line.chatLineKey, e, 'right')}}></img>)
+                                                :
+                                                ("")}
+                                                
+                                                {/* 좋아요 */}
+                                                <img className='chatLineImg' src={chatLineHeart} width='20' alt='heart' 
+                                                    onClick={(e)=>{likeEvent(line.chatLineKey, e, 'like')}}>
+                                                </img>
+                                                {(line.chatLikeCnt === null || line.chatLikeCnt === '0')
+                                                ?
+                                                (""):(line.chatLikeCnt)}
+                                                {" "}
 
-                                            {/* 체크 */}
-                                            <img className='chatLineImg' src={chatLineCheck} width='20' alt='heart' 
-                                                onClick={(e)=>{likeEvent(line.chatLineKey, e, 'check')}}>
-                                            </img>
-                                            {(line.chatCheckCnt === null || line.chatCheckCnt ==='0')
-                                            ?
-                                            (""):(line.chatCheckCnt)}
-                                            {" "}
+                                                {/* 체크 */}
+                                                <img className='chatLineImg' src={chatLineCheck} width='20' alt='heart' 
+                                                    onClick={(e)=>{likeEvent(line.chatLineKey, e, 'check')}}>
+                                                </img>
+                                                {(line.chatCheckCnt === null || line.chatCheckCnt ==='0')
+                                                ?
+                                                (""):(line.chatCheckCnt)}
+                                                {" "}
 
-                                            {/* 굿 */}
-                                            <img className='chatLineImg' src={chatLineGood} width='20' alt='heart' 
-                                                onClick={(e)=>{likeEvent(line.chatLineKey, e, 'good')}}>
-                                            </img>
-                                            {(line.chatGoodCnt === null || line.chatGoodCnt ==='0')
-                                            ?
-                                            (""):(line.chatGoodCnt)}
-                                            {" "}
+                                                {/* 굿 */}
+                                                <img className='chatLineImg' src={chatLineGood} width='20' alt='heart' 
+                                                    onClick={(e)=>{likeEvent(line.chatLineKey, e, 'good')}}>
+                                                </img>
+                                                {(line.chatGoodCnt === null || line.chatGoodCnt ==='0')
+                                                ?
+                                                (""):(line.chatGoodCnt)}
+                                                {" "}
 
-                                            <input type='button' value='reply'></input>
-                                        </td>
-                                        {/* 미확인 건수 */}
-                                        <td className ='unreadCount'>
-                                            {
-                                            (line.chatUnreadCount === '0')
-                                            ?
-                                            ''
-                                            :
-                                            line.chatUnreadCount
-                                            }
-                                        </td>
-                                        {/* 채팅 라인 */} 
-                                        <td className='chatRoomContentsTableRTd'>
-                                            {line.chatContents}
-                                        </td>
-                                    </tr>
-                                    )
-                                    :
-                                    // 상대방의 채팅 라인
-                                    (<tr align ='left' key ={line.chatLineKey} className='othersChatLineTR'>
-                                        {/* 채팅 라인 */} 
-                                        <td className='chatRoomContentsTableLTd' >
-                                            {line.chatSenderName} 님의 말 : {line.chatContents}
-                                        </td>
-                                        {/* 미확인 건수 */}
-                                        <td className ='unreadCount'>
-                                            {
-                                            (line.chatUnreadCount === '0')
-                                            ?
-                                            ''
-                                            :
-                                            line.chatUnreadCount
-                                            }
+                                                <input type='button' value='reply'></input>
                                             </td>
-                                        {/* 채팅 라인 공감 */}
-                                        <td className='chatRoomContentsTableTdE'>
+                                            {/* 미확인 건수 */}
+                                            <td className ='unreadCount'>
+                                                {
+                                                (line.chatUnreadCount === '0')
+                                                ?
+                                                ''
+                                                :
+                                                line.chatUnreadCount
+                                                }
+                                            </td>
+                                            {/* 채팅 라인 */} 
+                                            <td className='chatRoomContentsTableRTd'>
+                                                
+                                                {/*지명채팅인지 정규식으로 체크*/}          
+                                                {line.chatContents.includes('@mt') ? 
+                                                
+                                                mentionCheck(line.chatContents)
 
-                                            {/* 누가 눌렸는지 확인*/}
-                                            {((line.chatLikeCnt !== null && line.chatLikeCnt !== '0') ||
-                                                (line.chatCheckCnt !== null && line.chatCheckCnt !=='0') ||
-                                                    (line.chatGoodCnt !== null && line.chatGoodCnt !=='0'))
-                                            ?
-                                             (<img className='chatLineImg' src={chatLineEventUser} 
-                                             onClick={(e)=>{likeEventUser(line.chatLineKey, e, 'left')}} width='20' alt='user'></img>)
-                                            :
-                                             ("")}
+                                                : line.chatContents}
 
-                                             <img className='chatLineImg' src={chatLineHeart} width='20' alt='heart' 
-                                                onClick={(e)=>{likeEvent(line.chatLineKey, e, 'like')}}>
-                                            </img>
-                                            {(line.chatLikeCnt === null || line.chatLikeCnt === '0')
-                                            ?
-                                            (""):(line.chatLikeCnt)}
-                                            {" "}
+                                            </td>
+                                        </tr>
+                                        )
+                                        :
+                                        // 상대방의 채팅 라인
+                                        (<tr align ='left' key ={line.chatLineKey} className='othersChatLineTR'>
+                                            {/* 채팅 라인 */} 
+                                            <td className='chatRoomContentsTableLTd' >
+                                                {line.chatSenderName} 님의 말 : 
+                                                
+                                                {/*지명채팅인지 정규식으로 체크*/}          
+                                                {line.chatContents.includes('@mt') ? 
+                                                
+                                                mentionCheck(line.chatContents)
 
-                                            <img className='chatLineImg' src={chatLineCheck} width='20' alt='heart' 
-                                                onClick={(e)=>{likeEvent(line.chatLineKey, e, 'check')}}>
-                                            </img>
-                                            {(line.chatCheckCnt === null || line.chatCheckCnt ==='0')
-                                            ?
-                                            (""):(line.chatCheckCnt)}
-                                            {" "}
+                                                : line.chatContents}
+                                            </td>
+                                            {/* 미확인 건수 */}
+                                            <td className ='unreadCount'>
+                                                {
+                                                (line.chatUnreadCount === '0')
+                                                ?
+                                                ''
+                                                :
+                                                line.chatUnreadCount
+                                                }
+                                                </td>
+                                            {/* 채팅 라인 공감 */}
+                                            <td className='chatRoomContentsTableTdE'>
 
-                                            <img className='chatLineImg' src={chatLineGood} width='20' alt='heart' 
-                                                onClick={(e)=>{likeEvent(line.chatLineKey, e, 'good')}}>
-                                            </img>
-                                            {(line.chatGoodCnt === null || line.chatGoodCnt ==='0')
-                                            ?
-                                            (""):(line.chatGoodCnt)}
-                                            {" "}
+                                                {/* 누가 눌렸는지 확인*/}
+                                                {((line.chatLikeCnt !== null && line.chatLikeCnt !== '0') ||
+                                                    (line.chatCheckCnt !== null && line.chatCheckCnt !=='0') ||
+                                                        (line.chatGoodCnt !== null && line.chatGoodCnt !=='0'))
+                                                ?
+                                                (<img className='chatLineImg' src={chatLineEventUser} 
+                                                onClick={(e)=>{likeEventUser(line.chatLineKey, e, 'left')}} width='20' alt='user'></img>)
+                                                :
+                                                ("")}
 
-                                            <input type='button' value='reply'></input>
-                                        </td> 
-                                        <td className='chatRoomContentsTableTdReadOnly'></td>
-                                        {/* 말풍선 크기 제어*/}
-                                        <td className='chatRoomContentsTableTdETC'></td>
-                                    </tr>)
-                                ))
+                                                <img className='chatLineImg' src={chatLineHeart} width='20' alt='heart' 
+                                                    onClick={(e)=>{likeEvent(line.chatLineKey, e, 'like')}}>
+                                                </img>
+                                                {(line.chatLikeCnt === null || line.chatLikeCnt === '0')
+                                                ?
+                                                (""):(line.chatLikeCnt)}
+                                                {" "}
+
+                                                <img className='chatLineImg' src={chatLineCheck} width='20' alt='heart' 
+                                                    onClick={(e)=>{likeEvent(line.chatLineKey, e, 'check')}}>
+                                                </img>
+                                                {(line.chatCheckCnt === null || line.chatCheckCnt ==='0')
+                                                ?
+                                                (""):(line.chatCheckCnt)}
+                                                {" "}
+
+                                                <img className='chatLineImg' src={chatLineGood} width='20' alt='heart' 
+                                                    onClick={(e)=>{likeEvent(line.chatLineKey, e, 'good')}}>
+                                                </img>
+                                                {(line.chatGoodCnt === null || line.chatGoodCnt ==='0')
+                                                ?
+                                                (""):(line.chatGoodCnt)}
+                                                {" "}
+
+                                                <input type='button' value='reply'></input>
+                                            </td> 
+                                            <td className='chatRoomContentsTableTdReadOnly'></td>
+                                            {/* 말풍선 크기 제어*/}
+                                            <td className='chatRoomContentsTableTdETC'></td>
+                                        </tr>)
+                                    ))
+                                )
                             }
+
                         </tbody>
                     </table>
                 </div>

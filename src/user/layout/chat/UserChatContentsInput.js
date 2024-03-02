@@ -13,11 +13,17 @@ function UserChatContentsInput(props){
     const [chatRoomUserList, setChatRoomUserList] = useState(null);
     // 검색용 참여자
     const [chatRoomSearchUserList, setChatRoomSearchUserList] = useState(null);
+    
+    // 채팅 라인 \n 배열관리 
+    const [wordArray, setWordArray] = useState(null);
+    // 변경이 일어난 배열의 index
+    const [wordArrayIdx, setWordArrayIdx] = useState(null);
 
     var client = props.client;
     var roomKey = props.chatRoomKey;
     var recevier = props.recevier;
     var sender = props.sender;  
+
     
 
     useEffect(() =>{
@@ -33,6 +39,7 @@ function UserChatContentsInput(props){
 
     // textarea에서 엔터 클릭시 일단 
     function enterSend(e){
+        //console.log('onKeyUp 이벤트 : ', e.target.value);
          e.preventDefault(); //onkeyUp의 기본이벤트를 차단하지 않으면 2번 호출됨. 
         
         if(contents === '\n'){
@@ -49,6 +56,7 @@ function UserChatContentsInput(props){
                 if(contents !== '\n'){
                     // 대화내용 없이 엔터는 \n -> 채팅 전송 안함.
                     sendMessage(contents, true);
+                    setMentionModal(false);
                 }
                 
             }
@@ -157,12 +165,18 @@ function UserChatContentsInput(props){
 
     // 채팅데이터 입력 감지
     function changeText(e){
-
+        // console.log('onChange시 이벤트 감지 : ', e.target.value);
         // 입력데이터
         var word = e.target.value;
 
         // 입력데이터 줄바꿈
         var wordArr = word.split('\n');
+        // console.log(wordArr);
+
+        // 줄바꿈을 기준으로 배열로 관리
+        setWordArray(wordArr);
+        // 변경이 일어난 배열 idx
+        setWordArrayIdx(wordArr.length-1);
 
         // 줄바꿈 후 마지막 열
         word = wordArr[wordArr.length-1];
@@ -188,10 +202,10 @@ function UserChatContentsInput(props){
                             tempChatRoomUserList.push(chatRoomUserList[i]);
                             // console.log('검색된 대상 : ', chatRoomUserList[i]);
                         }
-                    }
-                    
+                    }                    
                     setChatRoomSearchUserList(tempChatRoomUserList);
-
+                
+                    
                 }else{
                     // 지명대상 참여자 조회
                     const getChatRoomUsersPromise = getChatRoomUsersCall();
@@ -213,14 +227,13 @@ function UserChatContentsInput(props){
                 }
             }
 
-        };
-
+        }
         setContents(e.target.value);    
      
     }
     // 채팅 데이터 esc 감지 -> 지명 모달 닫기 처리
     function escKeyDown(e){
-        //console.log(e.currentTarget);
+        //console.log('onKeyDown 이벤트 감지 :', e.code);
         
         if(e.code === 'Escape'){
             if(isMentionModal){
@@ -228,9 +241,33 @@ function UserChatContentsInput(props){
             }
         }
     }
-    const chatMentionModal = <UserChatMentionModal chatRoomUserList={chatRoomSearchUserList} closeModal={()=>{
-        setMentionModal(false);
-    }}></UserChatMentionModal>
+    const chatMentionModal = <UserChatMentionModal chatRoomUserList={chatRoomSearchUserList} 
+        closeModal={()=>{
+            setMentionModal(false);
+        }} 
+        selectUser={(user)=>{
+    
+            // 지명 라인 
+            var temp = wordArray[wordArrayIdx];
+            // 지명 검색단어 -> 선택한 사용자로 replace
+            temp = '@' + temp.replace(temp, user.name) +'@mt';
+            wordArray[wordArrayIdx] = temp;
+            var tempContents = '';
+            // \n을 기준으로 split된 라인들을 합치는 과정
+            for(var i = 0; i < wordArray.length; i++){
+                
+                if(i == wordArray.length-1){
+                    tempContents += wordArray[i]
+                }else{
+                    tempContents += wordArray[i] + '\n';
+                }
+            }
+
+            setMentionModal(false);
+            setContents(tempContents);
+                        
+        }}>
+    </UserChatMentionModal>
 
     return (
     
@@ -245,13 +282,16 @@ function UserChatContentsInput(props){
             <table id ='chatTable'>
                 <tbody>
                     <tr>                                
-                        <td><textarea id='chatTextArea' rows="9" style={{width:"100%"}} placeholder='채팅을 입력해주세요... [줄바꿈 Shift + Enter]'
+                        <td>
+                            <textarea id='chatTextArea' rows="9" style={{width:"100%"}} placeholder='채팅을 입력해주세요... [줄바꿈 Shift + Enter]'
                          onKeyUp={e=> enterSend(e)}
                          onChange={e=> changeText(e)}
-                         value ={contents}
+                         value ={
+                            contents
+                        }
                          onKeyDown={e=> escKeyDown(e)}
-                         ></textarea></td>
-                    </tr>
+                         > </textarea></td>
+                    </tr>   
                 </tbody>
                 <tfoot id ='chatRoomButton'>
                     <tr>                    

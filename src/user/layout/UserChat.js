@@ -148,7 +148,6 @@ function UserChat(props){
                     setChatRoomTitle(chatRoomTitle);
                     setRoomKey(_chatRoomKey);
                     setChatRoomUsers(chatRoomUsers);
-
                     // 최초 방입장시 읽음처리 + 입장 한 방 갱신용
                     props.chatListReload();
                 }

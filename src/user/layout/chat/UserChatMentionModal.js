@@ -7,13 +7,20 @@ function UserChatMentionModal(props) {
     // var users = JSON.parse(userList);
 
     var users = props.chatRoomUserList;
+
+    function selectUser(e, user){
+
+        //console.log(user.username);
+        props.selectUser(user);
+
+    }
     return(
         // 지명 모달창 표시 
         <div id ='chatMentionModal' style={{
             top : 470,
             left : 750    
         }}>
-            <table>
+            <table id='chatMentionMoalTable'>
                 <tbody>
                     <tr>
                         <td>
@@ -23,7 +30,7 @@ function UserChatMentionModal(props) {
                         {
                             (users.map((user)=>
                             (
-                                <tr id='chatMentionModalUserTr'>
+                                <tr className='chatMentionModalUserTr' onClick={(e)=>{selectUser(e, user)}}>
                                     <td className="chatMentionModalUserProfile">early!</td> {/* 프로필 사진 TODO */}
                                     <td className="chatMentionModalUser">{user.name}</td>
                                 </tr>
