@@ -2,13 +2,16 @@ import '../css/UserChat.css';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
+import CreateChatRoomModal from './chat/CreateChatRoomModal';
+
 axios.defaults.withCredentials = true;
 function UserChatList(props){
 
     const jsonData = props.jsonData;
     //console.log('UserChatList.js : ', jsonData);
-
+    const sender = props.sender;
     const chatRoomUnread = props.chatRoomUnread;
+    const [isCreateChatModal, setCreateRoomModal] = useState(false);
 
     useEffect(()=>{
         // 신규 채팅 수신한 정보 chatRoomUnread = roomKey|count 
@@ -57,6 +60,16 @@ function UserChatList(props){
         return date;
     }
 
+    // 방 생성
+    function createChatRoom(e){
+        e.preventDefault();
+        setCreateRoomModal(true);
+    }
+    // 방 생성 컴포넌트
+    const createChatModal = <CreateChatRoomModal makeUserId={sender} closeModal={() => {
+        setCreateRoomModal(false);
+    }}></CreateChatRoomModal>
+    
 
     return (
             
@@ -99,6 +112,23 @@ function UserChatList(props){
                         )}            
                     </tbody>
                 </table>
+
+                {/* 채팅방 생성 버튼*/}
+                <div id ='chatCreateDiv'>
+                    <table>
+                        <tbody>
+                            <tr id='chatCreateTr'>
+                                <td>
+                                    <input type='button' value='방생성' id='chatCreateBtn' onClick={(e) => {createChatRoom(e)}}></input>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                {// 채팅방 생성 modal 호출
+                 ((isCreateChatModal) ? createChatModal : '')}
+
             </div>
         
             )

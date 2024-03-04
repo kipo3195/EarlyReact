@@ -108,7 +108,7 @@ function UserChat(props){
 
     //console.log('UserChat jsonData : ', jsonData)
     if(jsonData !== null){
-        userChatList = <UserChatList chatRoomUnread={chatRoomUnread} jsonData={jsonData} enterChatRoom={(chatRoomSeq, chatRoomTitle, _chatRoomKey, chatRoomUsers)=>{
+        userChatList = <UserChatList sender={sender} chatRoomUnread={chatRoomUnread} jsonData={jsonData} enterChatRoom={(chatRoomSeq, chatRoomTitle, _chatRoomKey, chatRoomUsers)=>{
             
             // 방 입장  
             if(client !== null){

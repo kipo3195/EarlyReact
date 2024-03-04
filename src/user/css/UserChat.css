@@ -2,13 +2,15 @@
 
 /*채팅 리스트*/
 #chatListDiv{
-    
     float: left;
     border: 2px solid black;
     width: 380px;
     height: 720px;
     padding : 0 5px;
     margin-right: 2px;
+
+    /*채팅 생성 div의 부모 노드 채팅 생성 버튼을 최하단에 위치시키기 위함*/
+    position: relative;
 }
 
 #chatListTable{
@@ -16,6 +18,113 @@
     padding-top: 3px;
 }
 
+/*채팅 생성 div*/
+#chatCreateDiv{
+    background-color: darkgrey;
+    bottom: 0;
+    width: 95%;
+    position: absolute;
+}
+
+/*채팅방 생성 모달 div*/
+#createChatRoomModal{
+    width: 400px;
+    height: 600px;
+    border: 3px solid rgba(12, 50, 84, 0.728);
+    z-index: 6;
+    position: absolute;
+    background-color: white;
+    left: 200px;
+    top: 150px;
+}
+
+#createChatRoomModalParent{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 5;
+}
+
+/*채팅방 생성 모달 table*/
+#createChatRoomTable{
+    width: 100%;
+}
+/*채팅방 생성 모달 title*/
+#createChatRoomTitle{
+    font-family: Buri;
+    font-size: 15pt;
+}
+.createChatRoomTitleTr{
+    width: 100%;
+}
+
+/*채팅방 생성 모달 user list 영역*/
+#createChatRoomUserList{
+    width: 100%;
+    height: 75%;
+    background-color: aqua;
+    overflow-y: scroll;
+}
+
+/*채팅방 생성 모달 사용자 검색 table*/
+#createChatRoomUserSearchTable{    
+    border-spacing: 0;
+    border: 1px solid black;
+    border-radius: 12px;
+    width: 80%;
+}
+
+/*채팅방 생성 사용자 검색창 input*/
+#createChatRoomSearch{
+    height: 30px;
+    width: 250px;
+    border:none;
+    font-size: 13pt;
+    
+}
+
+#createChatRoomSearch:focus{
+    outline: none;
+}
+
+.userSearchImg{
+    vertical-align: middle;
+}
+#userSearchCancle{
+    border-radius: 20px;
+}
+#userSearchCancle:hover{
+    cursor: pointer;
+    background-color: blanchedalmond;
+}
+
+/*채팅방 생성 버튼*/
+#createChatRoomBtnDiv{
+    width: 100%;
+    
+}
+/*채팅방 생성 확인/취소 버튼의 테이블*/
+#createChatRoomBtnTable{
+    width: 100%;
+}
+/*채팅방 생성 확인/취소 버튼의 tr*/
+#createChatRoomBtnTr{
+    width: 100%;
+    text-align: center;
+}
+/*채팅방 생성 확인/취소 버튼*/
+.createChatRoomBtn{
+    width:70px;
+    height:30px;
+    margin-right:30px;
+    margin-top:7px;
+}
 
 #contentDiv{
     float: left;
