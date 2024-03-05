@@ -7,8 +7,12 @@ function CreateChatRoomModal(props){
 
     const[searchContents, setSearchContents] = useState('');
     
+    
     var makeUserId = props.makeUserId;
-    console.log(makeUserId);
+    var userList = [props.userList];
+    console.log('chatRoomModal의 userList : ',userList);
+    // var users = JSON.parse(userList);
+
 
     function clearSearchValue(e){
         setSearchContents('');
@@ -41,7 +45,7 @@ function CreateChatRoomModal(props){
                 </table>
                 {/* 이하 사용자 검색창 */}
                 <table id ='createChatRoomUserSearchTable'>
-                    <tr id ='createChatRoomUserSearchTr'>
+                    <tr>
                         <td>
                             <img src={userSearch} className='userSearchImg'></img>
                         </td>
@@ -61,10 +65,17 @@ function CreateChatRoomModal(props){
                 <div id ='createChatRoomUserList'>
                     <table>
                         <tbody>
-                            <tr>
-
-                            </tr>
-                        
+                                {/*사용자 반복해서 나오게 처리 */}
+                                {
+                                    // (userList === undefined) ? ('') : (
+                                    //  userList.map((user)=>(
+                                    //     <tr>
+                                    //         <td>{user.name}</td>
+                                    //     </tr>
+                                    // ))
+                                    //  )
+                                }
+                            
                         </tbody>    
                     </table>
                 </div>

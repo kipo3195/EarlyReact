@@ -13,6 +13,9 @@ function UserChatList(props){
     const chatRoomUnread = props.chatRoomUnread;
     const [isCreateChatModal, setCreateRoomModal] = useState(false);
 
+    // 채팅방 생성시 사용자 리스트
+    const [createChatRoomUserList, setCreateChatRoomUserList] = useState(null);
+
     useEffect(()=>{
         // 신규 채팅 수신한 정보 chatRoomUnread = roomKey|count 
         // 신규 채팅을 수신한 방은 가장 상단에 적용되어야 한다.
@@ -63,13 +66,43 @@ function UserChatList(props){
     // 방 생성
     function createChatRoom(e){
         e.preventDefault();
+
+        // axios로 채팅방 생성시 사용자 조회 API 호출.
+        const userPromise  = getCreateChatRoomUsers(sender);
+        //console.log(userPromise);
+        userPromise.then(PromiseResult =>{
+            if(PromiseResult !== 'error'){
+                var userList = PromiseResult;
+                setCreateChatRoomUserList(userList);
+            }else{
+                // sender값이 없어서 서버에서 result에 error를 리턴한 경우 
+            }
+        })
+        
         setCreateRoomModal(true);
     }
     // 방 생성 컴포넌트
-    const createChatModal = <CreateChatRoomModal makeUserId={sender} closeModal={() => {
+    const createChatModal = <CreateChatRoomModal makeUserId={sender} userList={createChatRoomUserList} closeModal={() => {
         setCreateRoomModal(false);
     }}></CreateChatRoomModal>
     
+
+    async function getCreateChatRoomUsers(sender){
+
+        var result = null;
+        
+        await axios ({
+            method: 'post',
+            url :'http://localhost:8080/user/getCreateChatRoomUsers',
+            data : sender
+        }).then(function(response){
+            result = response.data.userList;
+        }).catch(function(error){
+            console.log('getCreateChatRoomUsers error : ', error);
+        })
+
+        return result;
+    }
 
     return (
             
