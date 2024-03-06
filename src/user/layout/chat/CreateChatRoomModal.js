@@ -6,12 +6,19 @@ import { useEffect, useState, useRef } from 'react';
 function CreateChatRoomModal(props){
 
     const[searchContents, setSearchContents] = useState('');
-    
+    const[searchUsers, setSearchUsers] = useState();    
     
     var makeUserId = props.makeUserId;
     var userList = [props.userList];
-    console.log('chatRoomModal의 userList : ',userList);
-    // var users = JSON.parse(userList);
+    // console.log('chatRoomModal의 userList : ',userList);
+    var users = JSON.parse(userList);
+
+    // 마지막에 랜더링
+    useEffect(()=>{
+
+        setSearchUsers(users);
+
+    }, [])
 
 
     function clearSearchValue(e){
@@ -20,7 +27,19 @@ function CreateChatRoomModal(props){
 
     function changeSearchText(e){
         var word = e.target.value;
+        var temp = [];        
+        for(let i = 0; i < users.length; i++){
+            var username = users[i].name;
+            if(username.includes(word)){
+                temp.push(users[i]);
+            }
+        }
+        setSearchUsers(temp);
         setSearchContents(word);
+    }
+
+    function isChecked(e){
+        console.log(e);
     }
 
     return(
@@ -63,17 +82,24 @@ function CreateChatRoomModal(props){
 
                 {/* 이하 사용자 리스트 */}
                 <div id ='createChatRoomUserList'>
-                    <table>
+                    <table  id ='createChatRoomUserListTable'>
                         <tbody>
+                                <tr id = 'createChatRoomSearchUserTitle'>
+                                    <td colSpan='3' style={{paddingLeft:10}} >
+                                        친구 {users.length}
+                                    </td>
+                                </tr>
                                 {/*사용자 반복해서 나오게 처리 */}
                                 {
-                                    // (userList === undefined) ? ('') : (
-                                    //  userList.map((user)=>(
-                                    //     <tr>
-                                    //         <td>{user.name}</td>
-                                    //     </tr>
-                                    // ))
-                                    //  )
+                                    (searchUsers === undefined) ? ('') : (
+                                        searchUsers.map((user)=>(
+                                        <tr className='createChatRoomSearchUserTr'>
+                                            <td className="createChatRoomSearchUserProfile">early!</td> {/* 프로필 사진 TODO */}
+                                            <td className="createChatRoomSearchUserName">{user.name}</td>
+                                            <td><input type='checkbox' onChange={e=>{isChecked(user)}}></input></td>
+                                        </tr>
+                                    ))
+                                     )
                                 }
                             
                         </tbody>    

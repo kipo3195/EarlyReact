@@ -74,13 +74,17 @@ function UserChatList(props){
             if(PromiseResult !== 'error'){
                 var userList = PromiseResult;
                 setCreateChatRoomUserList(userList);
+
+                // CreateChatRoomModal 컴포넌트의 userList가 null인 이유? 
+                // setCreateRoomModal(true);가 promise의 결과(비동기) 밖에 있었기 때문에 set을 2번하는 상황이 생김.
+                // PromiseResult를 받아오기 전에 setCreateRoomModal(true); 해버려서 List가 null 이었음. 
+                setCreateRoomModal(true);
             }else{
                 // sender값이 없어서 서버에서 result에 error를 리턴한 경우 
             }
         })
-        
-        setCreateRoomModal(true);
     }
+    
     // 방 생성 컴포넌트
     const createChatModal = <CreateChatRoomModal makeUserId={sender} userList={createChatRoomUserList} closeModal={() => {
         setCreateRoomModal(false);
