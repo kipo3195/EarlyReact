@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 
 import UserChatList from './UserChatList';
 import UserChatContents from './UserChatContents';
+import EmptyRoomContents from '../layout/chat/EmptyRoomContents';
 
 axios.defaults.withCredentials = true;
 
@@ -13,6 +14,10 @@ function UserChat(props){
     // 화면 컴포넌트 
     var userChatList = null;
     var userChatContents = null;
+
+    // 방생성 시 설정
+    const [emptyRoomFlag, setEmptyRoomFlag] = useState(false);
+    const [emptyRoomUsers, setEmptyRoomUsers] = useState(null);
 
     const [chatRoomSeq, setChatRoomSeq] = useState(null);
     const [chatRoomTitle, setChatRoomTitle] = useState(null);
@@ -148,6 +153,8 @@ function UserChat(props){
                     setChatRoomTitle(chatRoomTitle);
                     setRoomKey(_chatRoomKey);
                     setChatRoomUsers(chatRoomUsers);
+                    setEmptyRoomFlag(false); // 방 생성시와 구분
+                    setEmptyRoomUsers(null); // 방 생성시와 구분
                     // 최초 방입장시 읽음처리 + 입장 한 방 갱신용
                     props.chatListReload();
                 }
@@ -156,23 +163,37 @@ function UserChat(props){
         }} chatListReload={()=>{
             // 더 상위 컴포넌트로 이동
             props.chatListReload();
-        }}></UserChatList>
+        }}
+         createEmptyRoom={(selectUsers)=>{
+            // 방 생성 (빈 방) 
+            // 방에 해당 하는 소켓 가입시기는 언제?
+            // 더 상위 컴포넌트로 가야되나? 
+            // 채팅이 입력되자마자 방생성 + 가입이었으면 좋겠음. 
+            // 채팅 입력안되면 방생성 안되는 것..
+            setEmptyRoomFlag(true);
+            setEmptyRoomUsers(selectUsers);
+         }}
+        ></UserChatList>
     }
 
-    // 방 입장 및 채팅 라인 수신 recvData
-    if(chatRoomSeq !== null && chatRoomKey !== null) {
-        
-        userChatContents 
-        = <UserChatContents 
-            sender={sender} client={client} 
-            chatRoomTitle={chatRoomTitle} chatRoomKey={chatRoomKey} 
-            chatRoomUsers={chatRoomUsers} recvData={recvData} lineData={lineData} nextLine={nextLine} reloadLines={reloadLines}
-            reloadLineEvent={reloadLineEvent}
-            readLines={(chat)=>{
-                // 채팅방 입장 이후 이벤트 감지 읽음 처리
-                props.chatListReload(chat);
-            }}></UserChatContents>
-      
+    if(emptyRoomFlag){
+        userChatContents = <EmptyRoomContents sender={sender} users={emptyRoomUsers}></EmptyRoomContents>
+    }else{
+        // 방 입장 및 채팅 라인 수신 recvData
+        if(chatRoomSeq !== null && chatRoomKey !== null) {
+            
+            userChatContents 
+            = <UserChatContents 
+                sender={sender} client={client} 
+                chatRoomTitle={chatRoomTitle} chatRoomKey={chatRoomKey} 
+                chatRoomUsers={chatRoomUsers} recvData={recvData} lineData={lineData} nextLine={nextLine} reloadLines={reloadLines}
+                reloadLineEvent={reloadLineEvent}
+                readLines={(chat)=>{
+                    // 채팅방 입장 이후 이벤트 감지 읽음 처리
+                    props.chatListReload(chat);
+                }}></UserChatContents>
+          
+        } 
     }
 
     return(

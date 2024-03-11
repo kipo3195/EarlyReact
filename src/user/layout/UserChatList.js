@@ -86,8 +86,11 @@ function UserChatList(props){
     }
     
     // 방 생성 컴포넌트
-    const createChatModal = <CreateChatRoomModal makeUserId={sender} userList={createChatRoomUserList} closeModal={() => {
+    const createChatModal = <CreateChatRoomModal makeUserId={sender} userList={createChatRoomUserList} closeModal={()=> {
         setCreateRoomModal(false);
+    }} createEmptyRoom={(selectUsers)=> {
+        setCreateRoomModal(false);
+        props.createEmptyRoom(selectUsers);
     }}></CreateChatRoomModal>
     
 

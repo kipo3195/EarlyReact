@@ -32,13 +32,14 @@ const Join = (props) => {
                 "username":username
               }
         }).then(function(response){        
-            const result = response.data+"";
-            if(result ==='true'){
+            const result = response.data.result;
+            console.log(response);
+            if(result === 'true'){
                 alert("중복된 계정이 존재합니다. 다시 입력하세요");
                 setDupFlag(null);
             }else{
                 alert("가입 가능한 계정입니다.");
-                setDupFlag(response.data+"");
+                setDupFlag('false');
                 // 문자열로 만듦
             }
             

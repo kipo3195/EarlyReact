@@ -335,7 +335,7 @@ function App() {
       }).then(function(response){
         const flag = response.data.flag;
         const accesstoken  = response.data.token;
-
+        console.log('로그인시 결과 : ', response)
         // 채팅 미확인 건수
         const chat = response.data.chat;
         if(flag === 'success' && accesstoken !== null){

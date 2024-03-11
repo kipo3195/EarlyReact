@@ -1,4 +1,5 @@
 
+import { select } from 'react-cookies';
 import userSearch from '../../../etc/img/userSearch.png';
 import userSearchCancle from '../../../etc/img/userSearchCancle.png';
 import { useEffect, useState, useRef } from 'react';
@@ -10,7 +11,7 @@ function CreateChatRoomModal(props){
     const[searchUsersCount, setSearchUsersCount] = useState();    
     const[chatRoomTitleProcess, setChatRoomTitleProcess] = useState(false);
 
-    const[selectUsers, setSelectUsers] = useState();
+    const[selectUsers, setSelectUsers] = useState([]);
     
     var makeUserId = props.makeUserId;
     var userList = [props.userList];
@@ -53,10 +54,32 @@ function CreateChatRoomModal(props){
         setSearchUsersCount(temp.length);
     }
 
-    // 사용자 선택
+    // 사용자 선택 리스트에서 반복하면서 비교 TODO KEY로 접근 할 수 있는 객체?
     function isChecked(e, user){
-        console.log('이벤트 ', e);
-        console.log('선택된 사용자', user);
+        // 매번 새로운 []를 만들어서 update 함
+        var temp = [...selectUsers];
+        var tempMap = [];
+
+        if(temp.length === 0 ){
+            tempMap.push(user);
+        }else{
+            var flag = false;
+            for(let i = 0; i < temp.length; i++){
+                if(temp[i].username !== user.username){
+                    tempMap.push(temp[i]);
+                }else{
+                    flag = true;
+                }
+            }
+            // 동일한 사용자가 없는 경우로 판단하고 현재 선택된 사람 추가 
+            if(!flag){
+                tempMap.push(user);
+            }
+        }
+
+        //console.log('result : ' , tempMap );
+        
+        setSelectUsers(tempMap);
     }
 
     // 사용자 선택 후 확인버튼
@@ -71,7 +94,10 @@ function CreateChatRoomModal(props){
 
     // 채팅방 이름 입력 후 생성버튼
     function createRoom(e){
+        console.log('선택된 사용자 : ', selectUsers);
 
+        setSelectUsers([]);
+        props.createEmptyRoom(selectUsers);
     }
 
     return(
@@ -103,7 +129,11 @@ function CreateChatRoomModal(props){
                     <div id ='chatRoomTitleDiv'>
                         <table id='chatRoomTitleTable'>
                             <thead id='chatRoomTitleHead'>
-                                사용자 이미지 표시공간
+                                <tr>
+                                    <td>
+                                        선택된 사용자의 이미지 표시 영역
+                                    </td>
+                                </tr>
                             </thead>
                             <tbody id='chatRoomTitleInputBody'>
                                 <tr>
