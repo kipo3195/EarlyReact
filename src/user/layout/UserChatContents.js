@@ -39,10 +39,13 @@ function UserChatContents(props){
     // 채팅방 참여자 리스트
     const [chatRoomUserList, setChatRoomUserList] = useState(null);
 
-    
     // false scroll 하단 위치 (최초, 채팅 입력) 
     // true scroll 상단으로 고정(더 불러오기)
     const[scrollFix, setScrollFix] = useState(false);
+
+    // 방 생성시에만 요청되는 flag
+    var emptyRoomFlag = props.emptyRoomFlag;
+    var createRoomDate = props.createRoomDate;
 
     var title = props.chatRoomTitle;
     var roomKey = props.chatRoomKey;
@@ -79,7 +82,7 @@ function UserChatContents(props){
                             ...contentLines // 기존에 그려진 라인 
                         ]
                         // console.log(newArr);
-                        
+                        console.log('1');
                        setContentLines(newArr);
                        //setMinLineKey(json[0].chatLineKey);
                     }
@@ -126,7 +129,7 @@ function UserChatContents(props){
                     copyContentLines[i].chatUnreadCount = unreadLineMap[copyContentLines[i].chatLineKey];
                 }
                 } 
-              
+                console.log('2');
                 setContentLines(copyContentLines);
                 // 모두읽음 -> 신규 수신한 라인 초기화
                 setNewRecvLine(null);
@@ -139,6 +142,14 @@ function UserChatContents(props){
 
     // 최초 입장시 채팅 라인 그리기         ------------------------    2 
     useEffect(()=>{
+
+        if(emptyRoomFlag){
+            // 방 생성 입장시에는 라인이 없기때문에 파싱처리 하지 않는다.
+            setContentLines([]);
+        
+        }else{
+        // 방 생성 입장이 아닌 경우에만 파싱 하기 
+        
         // === 는 값 & 자료형
         // == 는 값
         // undefined는 null과 같은 '값'
@@ -158,13 +169,14 @@ function UserChatContents(props){
             // 서버로 부터 받아온 채팅이 없을때  lineDatas = undefined
             setContentLines(lineDatas);
         }
-
+    }
         return() =>{
             // 해당 컴포넌트(UserChatContents) 가 unMount 될때 처리함. 
             // 방을 입장할때마다 UserChatContents 해당 방에 해당하는 UserChatContents 컴포넌트가 호출 되므로 
             // 현재 UserChatContents컴포넌트가 unMount 된다. 해당 컴포넌트에 해당하는 modal을 닫기 위하여 작성하였다. 
             setChatRoomUserModal(false);
         }
+    
     }, [lineDatas])
 
 
@@ -466,9 +478,9 @@ function UserChatContents(props){
     }
 
 
-
     const chatContentsInput 
-        = <UserChatContentsInput client={props.client} chatRoomKey={roomKey} recevier={recevier} sender={sender}
+        = <UserChatContentsInput client={props.client} chatRoomKey={roomKey} recevier={recevier} sender={sender} emptyRoomFlag={emptyRoomFlag}
+              title={title} createRoomDate ={createRoomDate}
               addLine={(line)=>{
                 // 채팅 발신시
                 // 여기서 props로 받아오는 값을 set 하더라도 props의 값이 빠지지는 않는다.  

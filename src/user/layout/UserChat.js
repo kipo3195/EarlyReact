@@ -22,6 +22,7 @@ function UserChat(props){
     const [chatRoomSeq, setChatRoomSeq] = useState(null);
     const [chatRoomTitle, setChatRoomTitle] = useState(null);
     const [chatRoomKey, setRoomKey] = useState(null);
+    const [createRoomDate, setCreateRoomDate] = useState(null);
     const [chatRoomUsers, setChatRoomUsers] = useState([null]);
     // 채팅 수신 데이터
     const [recvData, setRecvData] = useState(null);
@@ -113,8 +114,9 @@ function UserChat(props){
 
     //console.log('UserChat jsonData : ', jsonData)
     if(jsonData !== null){
-        userChatList = <UserChatList sender={sender} chatRoomUnread={chatRoomUnread} jsonData={jsonData} enterChatRoom={(chatRoomSeq, chatRoomTitle, _chatRoomKey, chatRoomUsers)=>{
-            
+        userChatList = <UserChatList sender={sender} chatRoomUnread={chatRoomUnread} jsonData={jsonData} 
+        enterChatRoom={(chatRoomSeq, chatRoomTitle, _chatRoomKey, chatRoomUsers)=>{
+
             // 방 입장  
             if(client !== null){
                 if(chatRoomKey === null){
@@ -146,7 +148,7 @@ function UserChat(props){
                 }else{
                     //console.log('라인 데이터 확인 : ', promisePromiseResult.chatRoomLine);
                     //console.log(promisePromiseResult.nextLine);
-                
+
                     setLineData(promisePromiseResult.chatRoomLine);
                     setNextLine(promisePromiseResult.nextLine);
                     setChatRoomSeq(chatRoomSeq);
@@ -163,38 +165,61 @@ function UserChat(props){
         }} chatListReload={()=>{
             // 더 상위 컴포넌트로 이동
             props.chatListReload();
-        }}
-         createEmptyRoom={(selectUsers)=>{
-            // 방 생성 (빈 방) 
-            // 방에 해당 하는 소켓 가입시기는 언제?
-            // 더 상위 컴포넌트로 가야되나? 
-            // 채팅이 입력되자마자 방생성 + 가입이었으면 좋겠음. 
-            // 채팅 입력안되면 방생성 안되는 것..
+
+        }}createEmptyRoom={(recevier, roomTitle)=>{
+            // 방 입장시와 동일한 로직 태우기 
+
+            const today = new Date();
+            const formattedDate = `${today.getFullYear()}${today.getMonth() + 1}${today.getDate()}${today.getSeconds()}${today.getMilliseconds()}`;
+            var roomKey = sender+'_'+formattedDate;
+            
+            if(client !== null){
+                if(chatRoomKey === null){
+                    
+                    // 방 최초 입장시 구독
+                    // id 값은 subscribe의 key와 같다. 
+                    // roomkey 생성 규칙은 생성자_시간
+                    client.subscribe('/topic/room/'+roomKey, chatRoomCallback, {id:roomKey});
+                    // console.log('신규구독 추가 url chatRoomSeq : ', _chatRoomKey);
+    
+                }
+            }else{
+                // 로그아웃 처리 TODO
+                console.log('방 생성시 문제가 있음.');
+            }
+            
             setEmptyRoomFlag(true);
-            setEmptyRoomUsers(selectUsers);
+            setEmptyRoomUsers(recevier);
+            setRoomKey(roomKey);
+            setCreateRoomDate(formattedDate);
+            var temp = {};
+            var json = JSON.stringify([temp]); // 채팅방 입장시 라인을 그리기 위한 데이터 형식으로 맞춤
+            setLineData(json);
+            setNextLine('0');
+            setChatRoomSeq('');
+            setChatRoomTitle(roomTitle);
+            setChatRoomUsers(recevier);
+                
          }}
         ></UserChatList>
     }
 
-    if(emptyRoomFlag){
-        userChatContents = <EmptyRoomContents sender={sender} users={emptyRoomUsers}></EmptyRoomContents>
-    }else{
-        // 방 입장 및 채팅 라인 수신 recvData
-        if(chatRoomSeq !== null && chatRoomKey !== null) {
-            
-            userChatContents 
-            = <UserChatContents 
-                sender={sender} client={client} 
-                chatRoomTitle={chatRoomTitle} chatRoomKey={chatRoomKey} 
-                chatRoomUsers={chatRoomUsers} recvData={recvData} lineData={lineData} nextLine={nextLine} reloadLines={reloadLines}
-                reloadLineEvent={reloadLineEvent}
-                readLines={(chat)=>{
-                    // 채팅방 입장 이후 이벤트 감지 읽음 처리
-                    props.chatListReload(chat);
-                }}></UserChatContents>
-          
-        } 
-    }
+    // 방 입장 및 채팅 라인 수신 recvData
+    if(chatRoomSeq !== null && chatRoomKey !== null) {
+        
+        userChatContents 
+        = <UserChatContents 
+            sender={sender} client={client} 
+            chatRoomTitle={chatRoomTitle} chatRoomKey={chatRoomKey} createRoomDate={createRoomDate}
+            chatRoomUsers={chatRoomUsers} recvData={recvData} lineData={lineData} nextLine={nextLine} reloadLines={reloadLines}
+            reloadLineEvent={reloadLineEvent} emptyRoomFlag ={emptyRoomFlag}
+            readLines={(chat)=>{
+                // 채팅방 입장 이후 이벤트 감지 읽음 처리
+                props.chatListReload(chat);
+            }}></UserChatContents>
+        
+    } 
+    
 
     return(
         <div>

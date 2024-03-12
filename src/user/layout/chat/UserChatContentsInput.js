@@ -23,17 +23,25 @@ function UserChatContentsInput(props){
     var roomKey = props.chatRoomKey;
     var recevier = props.recevier;
     var sender = props.sender;  
-
+    var title = props.title;
+    var createRoomDate = props.createRoomDate;
     
+    // 방 최초입장시에만 값 존재 
+    var _emptyRoomFlag = props.emptyRoomFlag;
+
+    const [emptyRoomFlag, setEmptyRoomFlag] = useState(false);
+
 
     useEffect(() =>{
+        // 신규 생성한 방이면 true;
+        setEmptyRoomFlag(_emptyRoomFlag);
 
         // 해당 useEffect는 roomKey가 변경될때마다 실행됨.
-
         return()=>{
             // 지명 채팅 모달을 닫기 위해 실행. 
             // 해당 컴포넌트가 unMount 될때 실행됨.
             setMentionModal(false);
+
         }
     }, [roomKey])
 
@@ -55,12 +63,61 @@ function UserChatContentsInput(props){
             }else{
                 if(contents !== '\n'){
                     // 대화내용 없이 엔터는 \n -> 채팅 전송 안함.
-                    sendMessage(contents, true);
-                    setMentionModal(false);
+
+                    if(emptyRoomFlag){
+
+                        // 비동기로 방생성 API 호출 이후에 채팅 라인 전달 처리
+                        // 생성자, 룸키, 참여자, 방제목
+                        const roomKeyPromise = putRoomKey(sender, roomKey, sender+"|"+recevier, title);
+                        roomKeyPromise.then(roomKeyPromiseResult=>{
+                            console.log(roomKeyPromiseResult);
+                            // 20240312 여기까지 확인함. 
+                        })
+                        // sendMessage(contents, true);
+                        // setMentionModal(false);
+
+                    }else{
+                        sendMessage(contents, true);
+                        setMentionModal(false);
+                    }
+
                 }
                 
             }
         }
+    }
+
+    async function putRoomKey(sender, roomKey, recevier, title){
+
+        var result = null;
+
+        console.log(sender, roomKey, recevier, title);
+
+        await axios({
+            method:'post',
+            url:'http://localhost:8080/user/putChatRoom',
+            data : {
+                sender : sender,
+                chatRoomKey : roomKey,
+                chatRoomUsers : recevier,
+                chatRoomTitle : title,
+                lastLineKey : '0',
+                createRoomDate : createRoomDate
+            }
+
+        }).then(function(response){
+            console.log(response);
+            if(response.data.flag ==='success'){
+                result = "success";
+            }else{
+                result = "false";    
+            }
+        }).catch(function(error){
+            result = "error";
+        })
+
+        return result;
+
     }
 
       // 전송버튼 클릭시 

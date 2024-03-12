@@ -11,6 +11,8 @@ function CreateChatRoomModal(props){
     const[searchUsersCount, setSearchUsersCount] = useState();    
     const[chatRoomTitleProcess, setChatRoomTitleProcess] = useState(false);
 
+    const[roomTitle, setRoomTitle] = useState('');
+
     const[selectUsers, setSelectUsers] = useState([]);
     
     var makeUserId = props.makeUserId;
@@ -93,11 +95,27 @@ function CreateChatRoomModal(props){
     }
 
     // 채팅방 이름 입력 후 생성버튼
-    function createRoom(e){
-        console.log('선택된 사용자 : ', selectUsers);
-
+    function createRoom(e, roomTitle){
+        e.preventDefault();
+        
+        var recevier = '';
+        for(var i = 0; i < selectUsers.length; i++){
+            
+            if(i === selectUsers.length-1){
+                recevier += selectUsers[i].username;
+            }else{
+                recevier += selectUsers[i].username+'|';
+            }
+        }
+        
+        props.createEmptyRoom(recevier, roomTitle);
         setSelectUsers([]);
-        props.createEmptyRoom(selectUsers);
+    }
+
+    // 채팅방 이름 입력 감지 
+    function enterRoomTitle(e){
+        e.preventDefault();
+        setRoomTitle(e.target.value);
     }
 
     return(
@@ -138,7 +156,7 @@ function CreateChatRoomModal(props){
                             <tbody id='chatRoomTitleInputBody'>
                                 <tr>
                                     <td>
-                                        <input type='text' id='chatRoomTitleInputTd' placeholder='채팅방 이름입력'></input>
+                                        <input type='text' id='chatRoomTitleInputTd' placeholder='채팅방 이름입력' onChange={e=>{enterRoomTitle(e)}}></input>
                                     </td>
                                 </tr>
                               
@@ -154,7 +172,7 @@ function CreateChatRoomModal(props){
                             <tbody>
                                 <tr id ='createChatRoomBtnTr'>
                                     <td colSpan='3'>
-                                        <input className='createChatRoomBtn' type='button' value='생성' onClick={e=>{createRoom(e)}}></input>
+                                        <input className='createChatRoomBtn' type='button' value='생성' onClick={e=>{createRoom(e, roomTitle)}}></input>
                                         <input className='createChatRoomBtn' type='button' value='뒤로가기'  onClick={e=>{chatRoomTitle(e, false)}}></input>
                                         <input className='createChatRoomBtn' type='button' value='취소'  onClick={props.closeModal}></input>
                                     </td>
@@ -222,11 +240,13 @@ function CreateChatRoomModal(props){
                                     {
                                         (searchUsers === undefined) ? ('') : (
                                             searchUsers.map((user)=>(
-                                            <tr className='createChatRoomSearchUserTr'>
+                                                ((user.username === makeUserId) ? (<></>) : 
+                                                <tr className='createChatRoomSearchUserTr'>
                                                 <td className="createChatRoomSearchUserProfile">early!</td> {/* 프로필 사진 TODO */}
                                                 <td className="createChatRoomSearchUserName">{user.name}</td>
                                                 <td><input type='checkbox' onChange={e=>{isChecked(e, user)}}></input></td>
-                                            </tr>
+                                                </tr>    
+                                                )                                        
                                         ))
                                         )
                                     }
