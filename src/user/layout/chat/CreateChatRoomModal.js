@@ -108,7 +108,8 @@ function CreateChatRoomModal(props){
             }
         }
         
-        props.createEmptyRoom(recevier, roomTitle);
+        // 만든사람 + 검색(혹은 선택)한 사람
+        props.createEmptyRoom(makeUserId+'|'+recevier, roomTitle);
         setSelectUsers([]);
     }
 

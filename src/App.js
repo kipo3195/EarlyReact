@@ -536,8 +536,29 @@ function App() {
                 content = <UserNoChat></UserNoChat>
               }else{
                 //console.log('APP.js list : ',list);
-                content = <UserChat list={list} client={client} userId ={userId} chatRoomUnread={chatRoomUnread} chatListReload={(chat)=>{
+                content = <UserChat list={list} client={client} userId ={userId} chatRoomUnread={chatRoomUnread} 
+                
+                chatListRefresh={()=>{
+                  // 신규 채팅방 생성시 리스트 갱신
 
+                  //console.log('chatListRefresh 호출');
+                  var chatListPromiseResult = null;
+                  let chatListPromise = ChatList(userId); 
+                  
+                  chatListPromise.then(chatListPromiseResult =>{
+
+                    //console.log('신규 데이터 수신으로 인한 리스트 갱신 요청  : ', chatListPromiseResult.chat_list)
+                    var reloadList = chatListPromiseResult.chat_list;
+                    if(reloadList !== undefined){
+                      setList(chatListPromiseResult.chat_list);
+                    }else{
+                      alert('로그아웃 !');
+                    }
+                  })
+                }}
+
+                chatListReload={(chat)=>{
+                  // 채팅 수신시 건수 갱신 + 리스트 갱신
                   var chatListPromiseResult = null;
                   let chatListPromise = ChatList(userId); 
                   chatListPromise.then(chatListPromiseResult =>{

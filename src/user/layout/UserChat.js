@@ -216,7 +216,13 @@ function UserChat(props){
             readLines={(chat)=>{
                 // 채팅방 입장 이후 이벤트 감지 읽음 처리
                 props.chatListReload(chat);
-            }}></UserChatContents>
+            }}
+            refreshList={()=>{
+                // 리스트 갱신용
+                // console.log('refreshList 호출');
+                props.chatListRefresh();
+            }}
+            ></UserChatContents>
         
     } 
     

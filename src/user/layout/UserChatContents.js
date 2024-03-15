@@ -494,6 +494,10 @@ function UserChatContents(props){
                 copyContentLines.push(line);
                 setContentLines(copyContentLines);
                
+                //console.log('add line 호출');
+                // 리스트 갱신용 
+                props.refreshList();
+
                 // 채팅 발신시 스크롤 제일 하단으로 이동함. 
                 scrollRef.current.scrollTop = scrollRef.current?.scrollHeight;
                 

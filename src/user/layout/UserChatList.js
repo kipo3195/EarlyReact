@@ -52,9 +52,9 @@ function UserChatList(props){
     function makeLastDate(t){
         var date ='';
 
-        for(var i = 0 ; i < 6; i++){
+        for(var i = 0 ; i < 8; i++){
             date += t[i];
-            if(i === 1 || i === 3){
+            if(i === 3 || i === 5){
                 date +='-';
             }
             

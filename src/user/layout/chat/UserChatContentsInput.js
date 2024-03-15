@@ -31,11 +31,18 @@ function UserChatContentsInput(props){
 
     const [emptyRoomFlag, setEmptyRoomFlag] = useState(false);
 
+    useEffect(()=>{
+
+        // 해당영역은 신규 생성(채팅X) -> 기존방 입장 혹은 기존방 입장 -> 신규생성시에만 호출된다. 
+        console.log('_emptyRoomFlag : ', _emptyRoomFlag);
+        setEmptyRoomFlag(_emptyRoomFlag);
+
+    }, [_emptyRoomFlag])
+
 
     useEffect(() =>{
         // 신규 생성한 방이면 true;
-        setEmptyRoomFlag(_emptyRoomFlag);
-
+        //setEmptyRoomFlag(_emptyRoomFlag);
         // 해당 useEffect는 roomKey가 변경될때마다 실행됨.
         return()=>{
             // 지명 채팅 모달을 닫기 위해 실행. 
@@ -64,21 +71,24 @@ function UserChatContentsInput(props){
                 if(contents !== '\n'){
                     // 대화내용 없이 엔터는 \n -> 채팅 전송 안함.
 
+                    console.log(emptyRoomFlag);
                     if(emptyRoomFlag){
-
+                    
                         // 비동기로 방생성 API 호출 이후에 채팅 라인 전달 처리
                         // 생성자, 룸키, 참여자, 방제목
-                        const roomKeyPromise = putRoomKey(sender, roomKey, sender+"|"+recevier, title);
+                        const roomKeyPromise = putRoomKey(sender, roomKey, recevier, title);
                         roomKeyPromise.then(roomKeyPromiseResult=>{
-                            console.log(roomKeyPromiseResult);
+                            // console.log(roomKeyPromiseResult);
                             // 20240312 여기까지 확인함. 
+
+                            sendMessage(contents, true);
+                            setMentionModal(false);
+                            setEmptyRoomFlag(false);
                         })
-                        // sendMessage(contents, true);
-                        // setMentionModal(false);
 
                     }else{
-                        sendMessage(contents, true);
-                        setMentionModal(false);
+                         sendMessage(contents, true);
+                         setMentionModal(false);
                     }
 
                 }
@@ -91,8 +101,8 @@ function UserChatContentsInput(props){
 
         var result = null;
 
-        console.log(sender, roomKey, recevier, title);
-
+        //console.log(sender, roomKey, recevier, title);
+        // 방 생성
         await axios({
             method:'post',
             url:'http://localhost:8080/user/putChatRoom',
@@ -164,6 +174,7 @@ function UserChatContentsInput(props){
                         chatUnreadCount : (recevier.split('|')).length-1 // 발신자에게 보여줄 미확인 건수
                 }
 
+                console.log('채팅 입력 !');
                 //상위 컴포넌트에 알려줌
                 props.addLine(line);  
 
