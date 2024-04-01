@@ -133,7 +133,6 @@ function UserChatContentsInput(props){
       // 전송버튼 클릭시 
     function sendMessage(message, enterFlag){
         
-
         if(message === null || message === ''){
             return;
         }
@@ -143,7 +142,8 @@ function UserChatContentsInput(props){
         
         lineKeyPromise.then(promisePromiseResult=>{
             if(promisePromiseResult !== 'error'){
-                var lineKey = promisePromiseResult;                
+                var lineKey = promisePromiseResult;       
+                console.log('채팅 발신');         
                 if(enterFlag){
                     // 엔터로 전송시 개행처리 \n 제거 
                     message = message.substr(0, message.length-1);
@@ -162,7 +162,7 @@ function UserChatContentsInput(props){
                         chatLineKey : lineKey
                     })
                 });
-
+            
                 // 라인 데이터 보여주기 
                 let line ={
                     chatRoomKey : roomKey,
@@ -174,7 +174,6 @@ function UserChatContentsInput(props){
                         chatUnreadCount : (recevier.split('|')).length-1 // 발신자에게 보여줄 미확인 건수
                 }
 
-                console.log('채팅 입력 !');
                 //상위 컴포넌트에 알려줌
                 props.addLine(line);  
 

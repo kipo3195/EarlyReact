@@ -174,11 +174,12 @@ function App() {
       var type = unreadJson.type;
 
       if(type === 'chat'){
-        // 신규 채팅 수신 -> 전체 건수 및 수신한 채팅 건수 동기화
+        // 신규 채팅 수신 -> 전체 건수 및 수신한 채팅 건수 동기화, 리스트 갱신
         var chat = unreadJson.chat;
         var room = unreadJson.room;
         setChatUnread(chat);
         setChatRoomUnread(room);
+
       }else if(type ==='msg'){
         console.log('recv msg unread');
       }else if(type ==='mail'){
@@ -396,6 +397,9 @@ function App() {
       setMode('findPw')
     }} findId={()=>{
       setMode('findId')
+    }} googleLogin={()=>{
+       console.log("구글로그인 시도!!");
+    
     }}></Login>
     footer = <Footer></Footer>
   }else if(mode === 'authenticationPage'){
@@ -539,15 +543,14 @@ function App() {
                 content = <UserChat list={list} client={client} userId ={userId} chatRoomUnread={chatRoomUnread} 
                 
                 chatListRefresh={()=>{
-                  // 신규 채팅방 생성시 리스트 갱신
+                  // 채팅 입력시 리스트 갱신 요청
 
-                  //console.log('chatListRefresh 호출');
+                  console.log('신규 채팅방 생성시 리스트 갱신 요청');
                   var chatListPromiseResult = null;
                   let chatListPromise = ChatList(userId); 
                   
                   chatListPromise.then(chatListPromiseResult =>{
-
-                    //console.log('신규 데이터 수신으로 인한 리스트 갱신 요청  : ', chatListPromiseResult.chat_list)
+                    
                     var reloadList = chatListPromiseResult.chat_list;
                     if(reloadList !== undefined){
                       setList(chatListPromiseResult.chat_list);

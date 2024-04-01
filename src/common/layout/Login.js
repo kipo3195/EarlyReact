@@ -2,6 +2,8 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import '../css/login.css';
+import { Route } from 'react-router-dom';
+import FindId from './FindId'; 
 
 // 로그인 요청 컴포넌트 
 // function LoginComponent(props){
@@ -23,8 +25,15 @@ import '../css/login.css';
 //     )
 //   }
 
+
+
 function Login(props){
 
+
+  useEffect(()=>{
+    
+  },[]);
+    
     return(
       // 최초 메인페이지는 login
         <div className='login'>
@@ -97,6 +106,46 @@ function Login(props){
               }}>회원가입</a>
                
             </div> 
+
+            <div>
+              <table>
+                <tbody>   
+                    <tr>
+                       <td>
+                          마크
+                      </td>
+                      <td>
+                          구글 계정으로 로그인
+                      </td>
+                    </tr>
+
+                </tbody>
+              </table>
+              <table>
+                <tbody>   
+                    <tr>
+                    <td>
+                      </td>
+                      <td>
+                         {/* <input type='button' value='구글로그인' onClick={e=>{props.googleLogin()}}></input>  */}
+                         <a href="http://localhost:8080/auth/google/web" >구글 아이디로 로그인</a>
+                      </td>
+                    </tr>
+                </tbody>
+              </table>
+              <table>
+                <tbody>   
+                    <tr>
+                    <td>
+                          마크
+                      </td>
+                      <td>
+                          카카오 계정으로 로그인
+                      </td>
+                    </tr>
+                </tbody>
+              </table>
+            </div>
        </div>
         
     )

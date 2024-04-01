@@ -218,7 +218,7 @@ function UserChat(props){
                 props.chatListReload(chat);
             }}
             refreshList={()=>{
-                // 리스트 갱신용
+                // 리스트 갱신용 20240318 사용하지 않음. 
                 // console.log('refreshList 호출');
                 props.chatListRefresh();
             }}
