@@ -5,6 +5,8 @@ import '../css/login.css';
 import { Route } from 'react-router-dom';
 import FindId from './FindId'; 
 
+import cookies from 'react-cookies';
+
 // 로그인 요청 컴포넌트 
 // function LoginComponent(props){
 //     return(
@@ -29,10 +31,17 @@ import FindId from './FindId';
 
 function Login(props){
 
+  const flagCookie = cookies.load('flag');
+  const userId = cookies.load('userId');
+  const temp = cookies.load('temp');
+  const provider = cookies.load('provider');
 
   useEffect(()=>{
-    
-  },[]);
+    console.log(flagCookie);
+    if(flagCookie !== undefined && flagCookie ==='success'){
+      props.loginRequest(userId, temp, provider);
+    }
+  },[flagCookie])
     
     return(
       // 최초 메인페이지는 login
@@ -56,7 +65,7 @@ function Login(props){
                   event.preventDefault();
                   const userId = event.target.username.value;
                   const password = event.target.password.value;
-                  props.loginRequest(userId, password);
+                  props.loginRequest(userId, password, "default");
 
                   // 계정정보가 틀렸을때 비밀번호 값 초기화
                   event.target.password.value = '';                   

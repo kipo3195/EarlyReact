@@ -2,7 +2,7 @@
 import './App.css';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import cookie from 'react-cookies';
+
 import { BrowserRouter as Router, Route, Routes, Link, useNavigate } from 'react-router-dom';
 import * as StompJs from "@stomp/stompjs";
 import * as SockJS from "sockjs-client";
@@ -33,6 +33,7 @@ import UserInfo from './user/layout/UserInfo';
 import UserNoChat from './user/layout/UserNoChat';
 
 import ChatList from './modules/ChatList';
+
 
 
 axios.defaults.url="http://localhost"
@@ -89,6 +90,7 @@ function TestAsync(){
 
 
 function App() {
+
 
   // 최초 진입시 'login' useState를 통해 set하면 App이 갱신
   const [mode, setMode] = useState('login');
@@ -325,13 +327,14 @@ function App() {
     axios.defaults.headers.common['Authorization'] = null;
     
     header = <Header></Header>
-    content = <Login loginRequest={(userId, password)=>{
+    content = <Login loginRequest={(userId, password, provider)=>{
       axios({
         method:'post',
         url : 'http://localhost:8080/login',
         data:{
           "username":userId,
-          "password":password
+          "password":password,
+          "provider":provider
         }
       }).then(function(response){
         const flag = response.data.flag;
@@ -375,9 +378,6 @@ function App() {
         //   navigate('/user'); 
         //   setMode('user');
  
-  
-      
- 
         }else{
           alert('로그인 실패');
         }
@@ -387,8 +387,8 @@ function App() {
         alert(' 아이디(로그인 전용 아이디) 또는 비밀번호를 잘못 입력했습니다. 입력하신 내용을 다시 확인해주세요.');
       })
       
-    }} authenticationPage={()=>{
-      
+    }} 
+    authenticationPage={()=>{
       setMode('authenticationPage');
     }} joinPage={()=>{
       navigate('/join');

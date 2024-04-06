@@ -1,6 +1,9 @@
 import '../css/find.css';
 
 const FindId = (props) => {
+
+
+
     return (
         <div className='findId'>
             <div>
