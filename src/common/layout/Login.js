@@ -5,6 +5,9 @@ import '../css/login.css';
 import { Route } from 'react-router-dom';
 import FindId from './FindId'; 
 
+import googleLoginBtn from '../../etc/img/googleLoginBtn.png';
+import naverLoginBtn from '../../etc/img/naverLoginBtn.png';
+import kakaoLoginBtn from '../../etc/img/kakaoLoginBtn.png';
 import cookies from 'react-cookies';
 
 // 로그인 요청 컴포넌트 
@@ -116,40 +119,37 @@ function Login(props){
                
             </div> 
 
-            <div>
-              <table>
+            <div id ='OAuthLoginDiv'>
+              <table className='OAuthLoginTable' align='center'>
                 <tbody>   
                     <tr>
-                       <td>
-                          마크
-                      </td>
                       <td>
-                          구글 계정으로 로그인
-                      </td>
-                    </tr>
-
-                </tbody>
-              </table>
-              <table>
-                <tbody>   
-                    <tr>
-                    <td>
-                      </td>
-                      <td>
-                         {/* <input type='button' value='구글로그인' onClick={e=>{props.googleLogin()}}></input>  */}
-                         <a href="http://localhost:8080/auth/google/web" >구글 아이디로 로그인</a>
+                        {/* <a href="http://localhost:8080/auth/google/web"> */}
+                          <img src={naverLoginBtn} width='180px' height='45px' alt='naverLogin'></img>  
+                        {/* </a> */}
                       </td>
                     </tr>
                 </tbody>
               </table>
-              <table>
+              <table className='OAuthLoginTable' align='center'>
                 <tbody>   
                     <tr>
-                    <td>
-                          마크
-                      </td>
                       <td>
-                          카카오 계정으로 로그인
+                        {/* 이미지에 링크 걸기*/}
+                        <a href="http://localhost:8080/auth/google/web">
+                          <img src={googleLoginBtn} width='180px' height='45px' alt='googleLogin'></img>  
+                        </a>
+                      </td>
+                    </tr>
+                </tbody>
+              </table>
+              <table className='OAuthLoginTable' align='center'>
+                <tbody>   
+                    <tr>
+                      <td>
+                        {/* <a href="http://localhost:8080/auth/google/web"> */}
+                             <img src={kakaoLoginBtn} width='180px' height='45px' alt='kakaoLogin'></img>  
+                        {/* </a> */}
                       </td>
                     </tr>
                 </tbody>
