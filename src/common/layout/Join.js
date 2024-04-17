@@ -4,6 +4,8 @@ import '../css/join.css'
 
 const Join = (props) => {
 
+    const serverUrl = process.env.REACT_APP_SERVER_JOIN_URL;
+    
     const [username, setUsername] = useState('');
     const [dupFlag, setDupFlag] = useState('');
     // react의 onChange는 상태가 변경될때마다 호출됨. 
@@ -27,13 +29,14 @@ const Join = (props) => {
 
         axios({
             method:'GET',
-            url : 'http://localhost:8080/idDupCheck',
+            //url : 'http://localhost:8080/idDupCheck',
+            url : serverUrl+'idDupCheck',
             params:{
                 "username":username
               }
         }).then(function(response){        
             const result = response.data.result;
-            console.log(response);
+            //console.log(response);
             if(result === 'true'){
                 alert("중복된 계정이 존재합니다. 다시 입력하세요");
                 setDupFlag(null);
@@ -85,7 +88,7 @@ const Join = (props) => {
                             if(name !== '' && phoneNumber !== '' ){
                                 axios({
                                     method:'POST',
-                                    url : 'http://localhost:8080/join',
+                                    url : serverUrl,
                                     // data를 json 형태로 보내기 때문에 서버쪽에서 requestBouy어노테이션 + 객체 형태로 받아야함.
                                     data:{
                                         username:userId,
@@ -96,6 +99,7 @@ const Join = (props) => {
                                     }
                                 }).then(function(response){
                                     const result = response.data.flag;
+                                    //console.log(response);
                                     if(result === "success"){
                                         alert("회원가입 완료!");
                                         // 최초 페이지로 이동

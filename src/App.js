@@ -6,7 +6,10 @@ import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link, useNavigate } from 'react-router-dom';
 import * as StompJs from "@stomp/stompjs";
 import * as SockJS from "sockjs-client";
+import cookie from 'react-cookies';
+
  import AccessToken from './modules/AccessToken';
+
 
 /* eslint import/no-webpack-loader-syntax: off */
 import Worker from 'worker-loader!./modules/accessTokenWorker';
@@ -91,6 +94,11 @@ function TestAsync(){
 
 function App() {
 
+  const serverUrl = process.env.REACT_APP_SERVER_A_URL;
+  const serverLoginUrl = process.env.REACT_APP_SERVER_LOGIN_URL;
+  const serverWsUrl = process.env.REACT_APP_SERVER_WS_URL;
+
+
 
   // 최초 진입시 'login' useState를 통해 set하면 App이 갱신
   const [mode, setMode] = useState('login');
@@ -164,6 +172,7 @@ function App() {
         // useNagivate hook을 사용하는 상위 컴포넌트 (현재의 상위 컴포넌트는 App)는 <BrowserRouter> 컴포넌트로 감싸 있어야 한다. (index.js 확인)
         navigate('/user'); 
         setMode('user');
+        
   }
 
   // 웹소켓 구독 url로 데이터 수신 
@@ -296,7 +305,7 @@ function App() {
     var result = null; 
     await axios({
         method:'GET',
-        url : 'http://localhost:8080/user/tokenVerification'
+        url : serverUrl+'/user/tokenVerification'
     }).then(function(response){
       
       tokenFlag = response.data.flag;
@@ -327,10 +336,10 @@ function App() {
     axios.defaults.headers.common['Authorization'] = null;
     
     header = <Header></Header>
-    content = <Login loginRequest={(userId, password, provider)=>{
+    content = <Login userId='' password='' provider ='' loginRequest={(userId, password, provider)=>{
       axios({
         method:'post',
-        url : 'http://localhost:8080/login',
+        url : serverLoginUrl,
         data:{
           "username":userId,
           "password":password,
@@ -350,11 +359,11 @@ function App() {
           // 웹소켓 구독 추가 
           stompClient = new StompJs.Client({
             //brokerURL : "ws://localhost:8080/earlyShake", // 직접접근인데..안됨
-            webSocketFactory: () => new SockJS("/earlyShake"),  //프록시로 접근-서버에서 지정한 endpoint
+            webSocketFactory: () => new SockJS(serverWsUrl),  //프록시로 접근-서버에서 지정한 endpoint
             debug : function(data) {
-                // console.log(data);
+                //console.log(data);
             }, 
-            // reconnectDelay: 5000, // 자동 재 연결
+            //reconnectDelay: 5000, // 자동 재 연결
             heartbeatIncoming: 4000,
             heartbeatOutgoing: 4000,
             onConnect:()=>{
@@ -432,20 +441,27 @@ function App() {
       // 쿠키영역에 있는 refresh 토큰은 삭제 되지 않는데 어차피 서버에서는 access token을 가장 먼저 체크하기도 하고 다시 로그인하면 
       // 쿠키영역 업데이트함. 
       // axios.defaults.headers.common['Authorization'] = null; -> 페이지가 로그인일때 처리해 주는 것으로 변경함. 
-      navigate('/');
       // mode를 변경하는 것 보다 list를 빼는 것을 먼저처리함으로 써 로그아웃시 리스트 데이터를 초기화시킴
 
       if(client !== null){
         console.log('로그아웃 요청시 sockjs client', client);     ///-- 웹소켓 연결확인용
         client.deactivate();
       }
+
       console.log('deactivate sockjs 이후 client', client);      // -- 웹소켓 연결확인용
+     
+      cookie.remove('userid', {path : '/'});
+
       tokenWorker.terminate();
       setTokenWorker(null);
       setClient(null);
       setList(null);
       setChatRoomUnread(null);
       setMode('login');
+      navigate('/');
+
+  
+
     }} cs={()=>{
 
       navigate('/user/cs');

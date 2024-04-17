@@ -8,7 +8,7 @@ import FindId from './FindId';
 import googleLoginBtn from '../../etc/img/googleLoginBtn.png';
 import naverLoginBtn from '../../etc/img/naverLoginBtn.png';
 import kakaoLoginBtn from '../../etc/img/kakaoLoginBtn.png';
-import cookies from 'react-cookies';
+import cookie from "react-cookies";
 
 // 로그인 요청 컴포넌트 
 // function LoginComponent(props){
@@ -34,17 +34,29 @@ import cookies from 'react-cookies';
 
 function Login(props){
 
-  const flagCookie = cookies.load('flag');
-  const userId = cookies.load('userId');
-  const temp = cookies.load('temp');
-  const provider = cookies.load('provider');
+  const serverUrl = process.env.REACT_APP_SERVER_A_URL;
+
+  var flag = cookie.load("flag");
+   var userId = props.userId;
+   var temp = props.temp;
+   var provider = props.provider;
 
   useEffect(()=>{
-    console.log(flagCookie);
-    if(flagCookie !== undefined && flagCookie ==='success'){
-      props.loginRequest(userId, temp, provider);
+  
+    if(flag ==='success'){
+      
+      userId = cookie.load("userId");
+      temp = cookie.load("temp");
+      provider = cookie.load("provider");
+
+      if(userId !== ''){
+
+        props.loginRequest(userId, temp, provider);
+      }
+
+
     }
-  },[flagCookie])
+  },[flag])
     
     return(
       // 최초 메인페이지는 login
@@ -136,7 +148,7 @@ function Login(props){
                     <tr>
                       <td>
                         {/* 이미지에 링크 걸기*/}
-                        <a href="http://localhost:8080/auth/google/web">
+                        <a href={serverUrl + "/auth/google/web"}>
                           <img src={googleLoginBtn} width='180px' height='45px' alt='googleLogin'></img>  
                         </a>
                       </td>
