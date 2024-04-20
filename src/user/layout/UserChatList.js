@@ -7,6 +7,7 @@ import CreateChatRoomModal from './chat/CreateChatRoomModal';
 axios.defaults.withCredentials = true;
 function UserChatList(props){
 
+    const serverUrl = process.env.REACT_APP_SERVER_A_URL;
     const jsonData = props.jsonData;
     //console.log('UserChatList.js : ', jsonData);
     const sender = props.sender;
@@ -100,7 +101,7 @@ function UserChatList(props){
         
         await axios ({
             method: 'post',
-            url :'http://localhost:8080/user/getCreateChatRoomUsers',
+            url : serverUrl + '/user/getCreateChatRoomUsers',
             data : sender
         }).then(function(response){
             result = response.data.userList;

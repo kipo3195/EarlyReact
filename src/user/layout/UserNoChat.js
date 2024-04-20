@@ -7,8 +7,6 @@ axios.defaults.withCredentials = true;
 
 function UserNoChat(props){
     
-
-    
     return(
         
         <div>

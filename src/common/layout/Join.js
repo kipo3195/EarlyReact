@@ -29,7 +29,6 @@ const Join = (props) => {
 
         axios({
             method:'GET',
-            //url : 'http://localhost:8080/idDupCheck',
             url : serverUrl+'idDupCheck',
             params:{
                 "username":username

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 
 async function AccessToken (errorCode){
-    
+    const serverUrl = process.env.REACT_APP_SERVER_A_URL;
     var result = null;
     console.log('AccessToken.js errorCode', errorCode)
     // access token 재발급 로직 
@@ -16,7 +16,7 @@ async function AccessToken (errorCode){
     if(errorCode === '400'){
         await axios({
             method:'POST',
-            url:'http://localhost:8080/user/accessToken'
+            url:serverUrl +'/user/accessToken'
         }).then(function(response){
             const flag = response.data.flag;
             

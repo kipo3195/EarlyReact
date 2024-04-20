@@ -5,6 +5,8 @@ import UserChatMentionModal from './UserChatMentionModal';
 
 function UserChatContentsInput(props){
 
+    const serverUrl = process.env.REACT_APP_SERVER_A_URL;
+
     const [contents, setContents] = useState('');
 
     // 지명채팅 모달 Flag
@@ -105,7 +107,7 @@ function UserChatContentsInput(props){
         // 방 생성
         await axios({
             method:'post',
-            url:'http://localhost:8080/user/putChatRoom',
+            url: serverUrl +'/user/putChatRoom',
             data : {
                 sender : sender,
                 chatRoomKey : roomKey,
@@ -193,7 +195,7 @@ function UserChatContentsInput(props){
 
         await axios({
             method:'get',
-            url:'http://localhost:8080/user/getLineKey',
+            url:serverUrl +'/user/getLineKey',
 
         }).then(function(response){
             //console.log(response);
@@ -213,7 +215,7 @@ function UserChatContentsInput(props){
     
             await axios({
                 method:'POST',
-                url:'http://localhost:8080/user/getChatRoomUsers',
+                url:serverUrl +'/user/getChatRoomUsers',
                 data:{
                     chatRoomKey : roomKey,
                     limitCnt : 0 // 동적 처리 필요 

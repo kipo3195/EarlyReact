@@ -11,6 +11,8 @@ axios.defaults.withCredentials = true;
 
 function UserChat(props){
 
+    const serverUrl = process.env.REACT_APP_SERVER_A_URL;
+
     // 화면 컴포넌트 
     var userChatList = null;
     var userChatContents = null;
@@ -94,7 +96,7 @@ function UserChat(props){
     
         await axios({
             method:'POST',
-            url:'http://localhost:8080/user/chatRoomLine',
+            url: serverUrl +'/user/chatRoomLine',
             data:{
                 chatRoomKey : chatRoomKey 
             }}).then(function(response){

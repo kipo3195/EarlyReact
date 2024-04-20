@@ -17,11 +17,15 @@ self.addEventListener('message', e =>{
   });
   
   function tokenVerificationken(user){
+
+    const serverUrl = process.env.REACT_APP_SERVER_A_URL;
+
+
     var _accesstoken = null;
 
     axios({
         method:'POST',
-        url:'http://localhost:8080/user/accessToken'
+        url: serverUrl+'/user/accessToken'
     }).then(function(response){
         const flag = response.data.flag;
         

@@ -16,6 +16,8 @@ import MentionCheck from '../../modules/MentionCheck';
 axios.defaults.withCredentials = true;
 
 function UserChatContents(props){
+
+    const serverUrl = process.env.REACT_APP_SERVER_A_URL;
     
     // const [title, setTitle] = useState(null);
     const [contentLines, setContentLines] = useState([]); // []하지 않으면 최초 채팅시 contentLine is not iterable..
@@ -99,7 +101,7 @@ function UserChatContents(props){
     
         await axios({
             method:'POST',
-            url:'http://localhost:8080/user/chatRoomLineAppend',
+            url: serverUrl + '/user/chatRoomLineAppend',
             data:{
                 chatRoomKey : roomKey,
                 lastLineKey : nextLine
@@ -259,7 +261,7 @@ function UserChatContents(props){
         //console.log(minLineKey, roomKey)
         await axios({
             method:'POST',
-            url:'http://localhost:8080/user/readLines',
+            url: serverUrl + '/user/readLines',
             data:{
                 chatRoomKey : roomKey,
                 recvLine : newRecvLine
@@ -330,7 +332,7 @@ function UserChatContents(props){
         var result = null;
         await axios ({
             method : 'post',
-            url : 'http://localhost:8080/user/putChatLineEvent',
+            url : serverUrl + '/user/putChatLineEvent',
             data : {
                 roomKey : roomKey,
                 lineKey : lineKey,
@@ -405,7 +407,7 @@ function UserChatContents(props){
         var result = null;
         await axios ({
             method : 'post',
-            url : 'http://localhost:8080/user/getChatLineEventUser',
+            url : serverUrl + '/user/getChatLineEventUser',
             data : {
                 roomKey : roomKey,
                 lineKey : lineKey
@@ -452,7 +454,7 @@ function UserChatContents(props){
 
         await axios({
             method:'POST',
-            url:'http://localhost:8080/user/getChatRoomUsers',
+            url:serverUrl + '/user/getChatRoomUsers',
             data:{
                 chatRoomKey : roomKey,
                 limitCnt : 0 // 동적 처리 필요 

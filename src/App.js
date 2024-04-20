@@ -105,6 +105,8 @@ function App() {
   const [list, setList] = useState(null);
   const [client, setClient] = useState(null);
   const [userId, setUserId] = useState(null);
+
+  
   
   // accesstoken 갱신 worker
   const [tokenWorker, setTokenWorker] = useState(null);
@@ -172,6 +174,7 @@ function App() {
         // useNagivate hook을 사용하는 상위 컴포넌트 (현재의 상위 컴포넌트는 App)는 <BrowserRouter> 컴포넌트로 감싸 있어야 한다. (index.js 확인)
         navigate('/user'); 
         setMode('user');
+
         
   }
 
@@ -205,9 +208,9 @@ function App() {
   async function checkToken(_mode){
 
     var nav = '/' + _mode;
-    console.log('checkToken 호출');
+    //console.log('checkToken 호출');
     const accessTokenPromise = checkAccessToken(_mode);
-    console.log('checkToken 호출 accessTokenPromise :', accessTokenPromise);
+    // console.log('checkToken 호출 accessTokenPromise :', accessTokenPromise);
     accessTokenPromise.then(promiseResult=>{
       
       if(promiseResult === 'success'){
@@ -234,6 +237,7 @@ function App() {
           setList(null);
           setChatRoomUnread(null);
           setMode('login');
+          console.log('promiseResult === 403 error : ', accessTokenPromise);
       }else if(promiseResult === '400'){
 
         // jwt 토큰 만료시
@@ -249,7 +253,7 @@ function App() {
         setList(null);
         setChatRoomUnread(null);
         setMode('login');
-
+        console.log('promiseResult === 400 error : ', accessTokenPromise);
 
         // 20240121 기존로직 - access 만료시 자동 갱신 처리를 위한 로직
         //   // access 토큰 만료 
@@ -297,7 +301,7 @@ function App() {
 
   // 이벤트 전 access 토큰 검증 
   async function checkAccessToken(_mode){
-    console.log('access 토큰 체크 시작');
+    // console.log('access 토큰 체크 시작');
     //  20240114 tokenFlag는 checkAccessToken 호출시return값. 단, 요청하는 mode가 다를때는 set해서 재랜더링 return값 사용불가 
     var tokenFlag = null; 
     var tokenErrorCode = null;
@@ -311,7 +315,7 @@ function App() {
       tokenFlag = response.data.flag;
       tokenErrorCode = response.data.error_code;
 
-      console.log('checkAccessToken', tokenFlag, tokenErrorCode);
+      //console.log('checkAccessToken', tokenFlag, tokenErrorCode);
 
       if(tokenFlag === 'success'){
         result = tokenFlag;
@@ -334,9 +338,9 @@ function App() {
   if(mode === 'login'){ 
     // 어떠한 상황에서 로그아웃 되더라도 다시 로그인 요청시에는 브라우저의accessToken을 전송하지 않도록 함
     axios.defaults.headers.common['Authorization'] = null;
-    
+
     header = <Header></Header>
-    content = <Login userId='' password='' provider ='' loginRequest={(userId, password, provider)=>{
+    content = <Login loginRequest={(userId, password, provider)=>{
       axios({
         method:'post',
         url : serverLoginUrl,
@@ -348,7 +352,7 @@ function App() {
       }).then(function(response){
         const flag = response.data.flag;
         const accesstoken  = response.data.token;
-        console.log('로그인시 결과 : ', response)
+        //console.log('로그인시 결과 : ', response)
         // 채팅 미확인 건수
         const chat = response.data.chat;
         if(flag === 'success' && accesstoken !== null){
@@ -450,8 +454,6 @@ function App() {
 
       console.log('deactivate sockjs 이후 client', client);      // -- 웹소켓 연결확인용
      
-      cookie.remove('userid', {path : '/'});
-
       tokenWorker.terminate();
       setTokenWorker(null);
       setClient(null);
@@ -459,7 +461,7 @@ function App() {
       setChatRoomUnread(null);
       setMode('login');
       navigate('/');
-
+  
   
 
     }} cs={()=>{
@@ -470,7 +472,7 @@ function App() {
     }} info={()=>{
       
       checkToken('user/info');
-      console.log('user/info 호출');
+
     }} address={()=>{
       
       checkToken('user/address');
@@ -504,7 +506,7 @@ function App() {
     }}
     ></UserHeader>
     var modes = mode.split("/");
-    console.log('user', mode);
+    console.log(mode);
     if(mode === 'user'){
       // console.log('login 이후 메인페이지의 sockjs Client ', client);      -- 웹소켓 연결확인용
       // 로그인 이후  메인 페이지 호출

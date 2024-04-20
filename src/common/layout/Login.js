@@ -36,25 +36,27 @@ function Login(props){
 
   const serverUrl = process.env.REACT_APP_SERVER_A_URL;
 
+
   var flag = cookie.load("flag");
-   var userId = props.userId;
-   var temp = props.temp;
-   var provider = props.provider;
 
   useEffect(()=>{
   
     if(flag ==='success'){
       
-      userId = cookie.load("userId");
-      temp = cookie.load("temp");
-      provider = cookie.load("provider");
+      var userId = cookie.load("userId");
+      var temp = cookie.load("temp");
+      var provider = cookie.load("provider");
 
-      if(userId !== ''){
-
+      if(userId !== undefined){
         props.loginRequest(userId, temp, provider);
       }
 
-
+      return () =>{
+         cookie.remove('flag');
+         cookie.remove('userId');
+         cookie.remove('temp');
+         cookie.remove('provider');
+      }
     }
   },[flag])
     
