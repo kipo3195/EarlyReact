@@ -215,7 +215,7 @@ function CreateChatRoomModal(props){
                             </td>
                             <td colSpan='2'>
                                 <input type='text' id='createChatRoomSearch' onChange={e=> changeSearchText(e, false)}
-                                value ={searchContents}></input>
+                                value ={searchContents} autoFocus></input>
                             </td>
                             <td>
                                 <img src={userSearchCancle} className='userSearchImg' id='userSearchCancle' onClick={e=>{

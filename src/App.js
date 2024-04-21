@@ -36,6 +36,7 @@ import UserInfo from './user/layout/UserInfo';
 import UserNoChat from './user/layout/UserNoChat';
 
 import ChatList from './modules/ChatList';
+import AddressList from './modules/AddressList';
 
 
 
@@ -219,6 +220,7 @@ function App() {
           if(mode !== _mode){
             navigate(nav);
             setMode(_mode);
+            setList(null); //다른 nav를 눌렸을때 해당 nav에 대한 list를 조회하기 위해서 
           }
           // else{
           //   setAccTokenValid(true);
@@ -519,7 +521,15 @@ function App() {
           var url = modes[i];
           //url 정의 
           if(url === 'address'){
-            content = <UserAddress></UserAddress>
+            if(list === null){
+              var addressListPromiseResult = null;
+              let addressListPromise = AddressList(userId);
+              addressListPromise.then(addressListPromiseResult =>{
+                setList(addressListPromiseResult.address_list);
+              })     
+            }else{
+              content = <UserAddress></UserAddress>
+            }
           }else if(url === 'chat'){
             if(list === null){
               // 채팅 리스트를 매번 호출 하는 것은 무리가 있다. 최초 한번 요청하고 이후에 
@@ -527,7 +537,8 @@ function App() {
               // 한번만 받아와서 실시간 패킷을 받았을때 리스트를 갱신 - 방정보를 알아야함.
               // 실시간 패킷 수신시 리스트 갱신 요청함. 
 
-              console.log('리스트 최초 호출')
+              // console.log('리스트 최초 호출')
+
               var chatListPromiseResult = null;
               let chatListPromise = ChatList(userId);
               chatListPromise.then(chatListPromiseResult =>{

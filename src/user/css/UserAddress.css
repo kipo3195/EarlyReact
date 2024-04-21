@@ -1,37 +1,91 @@
 #addressDiv{
     margin-left: 10px;
     width: 40%;
-    border: 1px solid black;
-    height: 720px;
+    height: 720px;    
 }
 
-/* 친구 추가 버튼 */
-#addressBtnDiv{
-
-
-}
+/**************************************************/
 
 /* 친구 타이틀 */
 #addressTitle{
     font-family: buri;
-    font-size: 16pt;
+    font-size: 14pt;
 }
 
 /* 친구 검색 */
 #addressSearch{
-    font-family: buri;
-    font-size: 16pt;
+    padding-top: 5px;
+    border-radius: 10px;
+    cursor: pointer;
+    
+}
+#addressSearch:hover{
+    background-color: beige;
 }
 
 /* 친구 추가 */
 #addressAdd{
-    font-family: buri;
-    font-size: 16pt;
+    padding-top: 5px;
+    border-radius: 10px;
+    cursor: pointer;
+    
+}
+
+#addressAdd:hover{
+    background-color: beige;
 }
 
 
-/*사용자 리스트*/
-#addressList{
+/**************************************************/
+/* 검색창 */
+#addressSearchDiv{
+    width: 100%;
+    height: 50px;
+    display: none;
+    align-content: center;
+}
 
+#addressSearchTable{
+    border: 1px solid black;
+    border-radius: 16px;
+    width: 95%;
+    height: 80%;
+    margin-left: 5px;
+}
+
+.addrSearch{
+    vertical-align: middle;
+    margin-left: 5px;
+}
+
+#addrSearchText{
+    border:none;
+    font-size: 14pt;
+}
+
+#addrSearchText:focus{
+    outline: none;
     
+}
+
+
+
+
+/**************************************************/
+/* 내 정보 */
+#myAddress{
+    width: 100%;
+    border: 1px solid rgb(34, 112, 25);
+    height: 80px;
+}
+
+
+/**************************************************/
+/* 친구 정보 */
+#addressList{
+    width: 100%;
+    border: 1px solid rgb(34, 112, 25);
+    height: 82%;
+    overflow-y: scroll;
+
 }
