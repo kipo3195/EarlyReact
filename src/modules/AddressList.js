@@ -11,11 +11,12 @@ async function AddressList(props){
         method:'post',
         url : serverUrl + '/address/list',
         data :{
-            "username" : userId,
+            "userId" : userId,
             "limit" : "0"
         }
     }).then(function(response){
-        console.log(response);
+        //console.log(response);
+        returnData = response.data;
     }).catch(function(error){
         console.log(error);
     })

@@ -525,10 +525,10 @@ function App() {
               var addressListPromiseResult = null;
               let addressListPromise = AddressList(userId);
               addressListPromise.then(addressListPromiseResult =>{
-                setList(addressListPromiseResult.address_list);
+                setList(addressListPromiseResult);
               })     
             }else{
-              content = <UserAddress></UserAddress>
+              content = <UserAddress list={list}></UserAddress>
             }
           }else if(url === 'chat'){
             if(list === null){

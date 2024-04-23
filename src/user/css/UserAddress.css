@@ -73,19 +73,85 @@
 
 /**************************************************/
 /* 내 정보 */
-#myAddress{
+#myInfoDiv{
     width: 100%;
     border: 1px solid rgb(34, 112, 25);
     height: 80px;
 }
 
+#myTable{
+    width: 100%;
+}
+
+/* 내 정보 */
+.myTr{
+    width: 100%;
+    height: 60px;
+}
+
+/* 내 프로필 */
+.myProfile{
+}
+
+/* 내 이름*/
+.myName{
+    padding-left: 10px;
+    width: 100px;
+}
+
+/*내\ 상태메시지*/
+.myStatusMsg{
+    
+}
+
 
 /**************************************************/
 /* 친구 정보 */
-#addressList{
+#friendDiv{
     width: 100%;
     border: 1px solid rgb(34, 112, 25);
     height: 82%;
     overflow-y: scroll;
 
 }
+
+#friendTable{
+    width: 100%;
+}
+
+/* 친구 정보 */
+.friendTr{
+    width: 100%;
+    height: 60px;
+}
+
+/*친구 프로필 */
+.friendProfile{
+    width: 75px;
+    text-align: center;
+}
+/* 프로필 사진이 없을때 */
+.friendNoprofile{
+    text-align: center;
+    background-color: rgba(161, 220, 240);
+    width: 55px;
+    height: 55px;
+    border-radius: 20px;
+    font-family: buri;
+    font-size: 16pt;
+    color: white;
+}
+
+
+/* 친구 이름*/
+.friendName{
+    width: 100px;
+    padding-left: 10px;
+
+}
+
+/* 상태메시지*/
+.friendStatusMsg{
+    
+}
+
