@@ -3,13 +3,17 @@
     width: 40%;
     height: 720px;    
 }
+#addressTable{
+    width: 100%;
+}
 
 /**************************************************/
 
 /* 친구 타이틀 */
 #addressTitle{
     font-family: buri;
-    font-size: 14pt;
+    font-size: 16pt;
+    width: 90%;
 }
 
 /* 친구 검색 */
@@ -17,6 +21,7 @@
     padding-top: 5px;
     border-radius: 10px;
     cursor: pointer;
+    text-align: center;
     
 }
 #addressSearch:hover{
@@ -28,7 +33,7 @@
     padding-top: 5px;
     border-radius: 10px;
     cursor: pointer;
-    
+    text-align: center;
 }
 
 #addressAdd:hover{
@@ -81,16 +86,20 @@
 
 #myTable{
     width: 100%;
+    height: 100%;
 }
 
 /* 내 정보 */
 .myTr{
     width: 100%;
-    height: 60px;
+    height: 100%;
 }
 
 /* 내 프로필 */
 .myProfile{
+    width: 80px;
+    text-align: center;
+    vertical-align: middle;
 }
 
 /* 내 이름*/
@@ -122,24 +131,25 @@
 /* 친구 정보 */
 .friendTr{
     width: 100%;
-    height: 60px;
+    height: 50px;
+    
 }
 
 /*친구 프로필 */
 .friendProfile{
-    width: 75px;
+    width: 50px;
     text-align: center;
 }
 /* 프로필 사진이 없을때 */
 .friendNoprofile{
     text-align: center;
     background-color: rgba(161, 220, 240);
-    width: 55px;
-    height: 55px;
     border-radius: 20px;
     font-family: buri;
-    font-size: 16pt;
+    font-size: 15pt;
     color: white;
+    width: 50px;
+    height: 50px;
 }
 
 
@@ -155,3 +165,9 @@
     
 }
 
+
+/*친구 숫자 */
+#friendCountDiv{
+    margin-top: 3px;
+    margin-bottom: 3px;
+}

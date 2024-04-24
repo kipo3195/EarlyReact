@@ -4,16 +4,25 @@ import searchBtn from '../../etc/img/addressSearchBtn.png';
 import addBtn from '../../etc/img/addressAddBtn.png';
 import userSearchCancle from '../../etc/img/userSearchCancle.png';
 import noProfile from '../../etc/img/noProfile.png';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 axios.defaults.withCredentials = true;
 
 function UserAddress(props){
+
+    const scrollRef = useRef();
     
     const friendList = props.list.friend_list;
     const myInfo = props.list.my_info;
-    console.log(myInfo);
+    const friendCount = props.list.friend_count;
+
     
+    function onScrollCallBack(){
+        if(scrollRef.current?.scrollTop === 210){
+            props.getAddressList(friendList.length);
+        }
+    }
+
     function searchUser(e){
         e.preventDefault();
         
@@ -39,10 +48,10 @@ function UserAddress(props){
         <div id='addressDiv'>
             {/* 친구 추가 버튼 */}
             <div id='addressBtnDiv'>
-                <table>
+                <table id='addressTable'>
                     <tbody>
                         <tr>
-                            <td id ='addressTitle'>친구</td>
+                            <td id ='addressTitle'>주소록</td>
                             <td id ='addressSearch'>
                                 <img src={searchBtn} alt={searchBtn} width='25px' onClick={(e)=>{
                                     searchUser(e);
@@ -80,12 +89,12 @@ function UserAddress(props){
 
             {/* 내 정보 */}
             <div id='myInfoDiv'>
-                <table id='myInTable'>
+                <table id='myTable'>
                     <tbody>
 
                         <tr key={myInfo.id} className='myTr'>
                             <td className='myProfile'>
-                                <img src={myInfo.userProfile} width='75' height='75' style={{borderRadius:'20px'}} alt={myInfo.username}></img>
+                                <img src={myInfo.userProfile} width='70' height='70' style={{borderRadius:'20px', verticalAlign:'middle'}} alt={myInfo.username}></img>
                             </td>
                             <td className='myName'>
                                 {myInfo.name}
@@ -100,20 +109,28 @@ function UserAddress(props){
                     </tbody>
                 </table>
             </div>
-            친구 총 인원수 구하기
+            <div id='friendCountDiv'>
+                <table>
+                    <tr>
+                        <td>
+                            친구 {friendCount}
+                        </td>
+                    </tr>
+                </table>
+            </div>
             {/* 사용자 리스트 */}
-            <div id='friendDiv'>
+            <div id='friendDiv' ref={scrollRef} onScroll={onScrollCallBack}>
                 <table id='friendTable'>
                     <tbody>
                         {friendList.map((friend)=>
                            <tr key={friend.id} className='friendTr'>
                              {(friend.userProfile === '') ?   
-                             <td className='friendNoprofile'>
+                             <td className='friendNoprofile' >
                               {friend.name[0]}
                              </td>
                              :
                              <td className='friendProfile'>
-                             <img src={friend.userProfile} width='65' height='65' style={{borderRadius:'20px'}} alt={friend.username}></img>
+                             <img src={friend.userProfile} width='50' height='50' style={{borderRadius:'20px', verticalAlign:'middle'}} alt={friend.username}></img>
                              </td>
                              }
                           

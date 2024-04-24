@@ -1,18 +1,20 @@
 import axios from 'axios';
 
 
-async function AddressList(props){
+async function AddressList(userId, limit){
 
     var serverUrl = process.env.REACT_APP_SERVER_A_URL;
     var returnData = null;
-    var userId = props;
+    var userId = userId;
+    var limit = limit;
+    console.log(limit);
 
     await axios({
         method:'post',
         url : serverUrl + '/address/list',
         data :{
             "userId" : userId,
-            "limit" : "0"
+            "limit" : limit
         }
     }).then(function(response){
         //console.log(response);
