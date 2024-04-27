@@ -4,7 +4,8 @@ import searchBtn from '../../etc/img/addressSearchBtn.png';
 import addBtn from '../../etc/img/addressAddBtn.png';
 import userSearchCancle from '../../etc/img/userSearchCancle.png';
 import noProfile from '../../etc/img/noProfile.png';
-import { useEffect, useRef } from 'react';
+import AddFriendModal from '../layout/address/AddFriendModal';
+import { useEffect, useRef, useState } from 'react';
 
 axios.defaults.withCredentials = true;
 
@@ -15,11 +16,19 @@ function UserAddress(props){
     const friendList = props.list.friend_list;
     const myInfo = props.list.my_info;
     const friendCount = props.list.friend_count;
+    const [isAddFriendModal , setAddFriendModal] = useState(false);
 
     
     function onScrollCallBack(){
-        if(scrollRef.current?.scrollTop === 210){
-            props.getAddressList(friendList.length);
+        //console.log("스크롤 전체 높이 : ", scrollRef.current?.scrollHeight); // 스크롤의 크기
+        //console.log('스크롤의 위치 : ', scrollRef.current?.scrollTop); // 스크롤 바 탑의 위치
+        //console.log("요소의 높이 : ", scrollRef.current?.clientHeight); // 스크롤 바의 크기 
+        if(scrollRef.current?.scrollHeight <= (scrollRef.current?.scrollTop + scrollRef.current?.clientHeight + 1)){
+            if(friendCount === friendList.length){
+                // 더 호출 할 거 없음
+            }else{
+                props.getAddressList(friendList.length);
+            }
         }
     }
 
@@ -28,7 +37,7 @@ function UserAddress(props){
         
         var addressSearchDiv = document.getElementById('addressSearchDiv');
 
-        console.log(addressSearchDiv.style.display);
+        // console.log(addressSearchDiv.style.display);
         // 최초 호출시 display가 빈 값.
         if (addressSearchDiv.style.display === 'none' || addressSearchDiv.style.display === '') {
             addressSearchDiv.style.display = 'block';
@@ -39,10 +48,17 @@ function UserAddress(props){
 
     }
 
-    function addUser(e){
+    function addFriend(e){
         e.preventDefault();
-        console.log('사용자 추가')
+        setAddFriendModal(true);
     }
+
+    const addFriendModal = <AddFriendModal myId={myInfo.username} addFriendModalClose={()=>{setAddFriendModal(false);}} 
+    addFriendSuccess={()=>{
+        setAddFriendModal(false);
+        props.addFriendSuccess();
+    }}
+    ></AddFriendModal>
 
     return(
         <div id='addressDiv'>
@@ -59,7 +75,7 @@ function UserAddress(props){
                             </td>
                             <td id ='addressAdd'>
                                 <img src={addBtn} alt={addBtn} width='30px' onClick={(e)=>{
-                                    addUser(e);
+                                    addFriend(e);
                                 }}></img>
                             </td>
                         </tr>
@@ -149,6 +165,9 @@ function UserAddress(props){
                 </table>
             </div>
 
+
+            {/*친구 추가 modal*/
+            ((isAddFriendModal) ? addFriendModal : '')}
         </div>
     )
 

@@ -525,18 +525,34 @@ function App() {
               var addressListPromiseResult = null;
               let addressListPromise = AddressList(userId, "0");
               addressListPromise.then(addressListPromiseResult =>{
-                setList(addressListPromiseResult);
+                var result = addressListPromiseResult.type.result;
+                if(result === 'success'){
+                  var data = addressListPromiseResult.data;
+                  setList(data);
+                }else{
+                  console.log(data);
+                }
               })     
             }else{
               content = <UserAddress list={list} getAddressList={(limit)=>{
-
+                // 기존 리스트 + 신규 리스트를 더함 spread 함수 
                 var addressListPromiseResult = null;
                 let addressListPromise = AddressList(userId, limit);
                 addressListPromise.then(addressListPromiseResult =>{
+                  var beforeList = list.friend_list;
+                  var appendList = addressListPromiseResult.friend_list;
+                  const newArr = [
+                    ...beforeList,
+                    ...appendList
+                  ]
+                  addressListPromiseResult.friend_list = newArr;
+                  setList(addressListPromiseResult);
                   
                 })  
 
-              }}></UserAddress>
+              }} addFriendSuccess={()=>{
+                setList(null);
+              }} ></UserAddress>
             }
           }else if(url === 'chat'){
             if(list === null){
