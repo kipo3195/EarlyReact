@@ -3,9 +3,8 @@
 /*채팅 리스트*/
 #chatListDiv{
     float: left;
-    border: 2px solid black;
     width: 380px;
-    height: 720px;
+    height: 820px;   
     padding : 0 5px;
     margin-right: 2px;
 
@@ -13,9 +12,21 @@
     position: relative;
 }
 
+#chatTitle{
+    font-family: buri;
+    font-size: 16pt;
+    width: 90%;
+}
+
+#chatList{
+    border: 1px solid black;
+    height: 96%;
+}
+
 #chatListTable{
     width: 100%;
     padding-top: 3px;
+    
 }
 
 /*채팅 생성 div*/
@@ -192,7 +203,7 @@
 #contentDiv{
     float: left;
     border: 2px solid blue;
-    height: 720px;
+    height: 820px;
     width: 50%;
 }
 
@@ -316,7 +327,7 @@
 
 
 #chatRoomText{
-    height: 20%;
+    height: 25%;
 }
 
 /*채팅 입력창*/

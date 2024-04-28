@@ -5,6 +5,8 @@ import addBtn from '../../etc/img/addressAddBtn.png';
 import userSearchCancle from '../../etc/img/userSearchCancle.png';
 import noProfile from '../../etc/img/noProfile.png';
 import AddFriendModal from '../layout/address/AddFriendModal';
+import AddressChatRoomModal from '../layout/address/AddressChatRoomModal';
+
 import { useEffect, useRef, useState } from 'react';
 
 axios.defaults.withCredentials = true;
@@ -16,8 +18,15 @@ function UserAddress(props){
     const friendList = props.list.friend_list;
     const myInfo = props.list.my_info;
     const friendCount = props.list.friend_count;
+    // 친구 추가 
     const [isAddFriendModal , setAddFriendModal] = useState(false);
 
+    // 채팅방 입장
+    const [isChatRoomModal, setEnterChatRoomModal] = useState(false);
+    const [friendInfo, setFriendInfo] = useState(false);
+
+    // 채팅방 입장시 채팅 라인 불러오기 
+    const [chatList, setChatList] = useState('');
     
     function onScrollCallBack(){
         //console.log("스크롤 전체 높이 : ", scrollRef.current?.scrollHeight); // 스크롤의 크기
@@ -48,18 +57,54 @@ function UserAddress(props){
 
     }
 
+    // 친구 추가
     function addFriend(e){
         e.preventDefault();
         setAddFriendModal(true);
     }
-
+    
     const addFriendModal = <AddFriendModal myId={myInfo.username} addFriendModalClose={()=>{setAddFriendModal(false);}} 
     addFriendSuccess={()=>{
         setAddFriendModal(false);
         props.addFriendSuccess();
     }}
     ></AddFriendModal>
+    
 
+    // 1:1 채팅방 입장
+    function enterChatRoom(e, friend){
+        e.preventDefault();
+
+        // 1:1 채팅방 내용 조회 
+
+        const addrChatRoomListPromise = addrChatRoomListRequest(friend);
+
+        addrChatRoomListPromise.then(()=>{
+        
+            setChatList();
+            setEnterChatRoomModal(true);
+            setFriendInfo(friend);
+        })
+    }
+
+    async function addrChatRoomListRequest(friend){
+        var roomKey = null;
+        if(myInfo.id < friend.id){
+            roomKey = 'R_'+myInfo.username+'|'+friend.username;
+        }else{
+            roomKey = 'R_'+friend.username+'|'+myInfo.username;
+        }
+        // /user/chatRoomLine
+
+    }
+
+    const enterChatRoomModal = <AddressChatRoomModal myInfo={myInfo} friendInfo={friendInfo} closeModal={()=>{
+        setEnterChatRoomModal(false);
+    }}></AddressChatRoomModal>
+
+    
+
+    
     return(
         <div id='addressDiv'>
             {/* 친구 추가 버튼 */}
@@ -109,9 +154,20 @@ function UserAddress(props){
                     <tbody>
 
                         <tr key={myInfo.id} className='myTr'>
+
+                            {
+                            myInfo.userProfile === '' ?
+                            <td id='myInfoNoProfileTd' >
+                                <img src={noProfile} width='70' height='70' style={{borderRadius:'20px', verticalAlign:'middle'}} alt={myInfo.username}></img>
+                                <div id="myInfoNoprofileName">
+                                    {myInfo.name[0]}
+                                </div>
+                            </td>
+                            :
                             <td className='myProfile'>
                                 <img src={myInfo.userProfile} width='70' height='70' style={{borderRadius:'20px', verticalAlign:'middle'}} alt={myInfo.username}></img>
                             </td>
+                            } 
                             <td className='myName'>
                                 {myInfo.name}
                             </td>
@@ -139,7 +195,7 @@ function UserAddress(props){
                 <table id='friendTable'>
                     <tbody>
                         {friendList.map((friend)=>
-                           <tr key={friend.id} className='friendTr'>
+                           <tr key={friend.id} className='friendTr' onDoubleClick={e=>{enterChatRoom(e, friend)}} >
                              {(friend.userProfile === '') ?   
                              <td className='friendNoprofile' >
                               {friend.name[0]}
@@ -165,9 +221,12 @@ function UserAddress(props){
                 </table>
             </div>
 
-
             {/*친구 추가 modal*/
             ((isAddFriendModal) ? addFriendModal : '')}
+
+
+            {/*1:1 대화방 입장 */
+            ((isChatRoomModal) ? enterChatRoomModal:'')}
         </div>
     )
 

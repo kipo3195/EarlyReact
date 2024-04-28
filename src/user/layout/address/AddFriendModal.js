@@ -153,7 +153,7 @@ function AddFriendModal(props){
               friendId : searchFriend.username
               }
         }).then(function(response){        
-
+            console.log(response);
             returnData = response.data;
             
         }).catch(function(error){

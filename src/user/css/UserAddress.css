@@ -1,7 +1,7 @@
 #addressDiv{
     margin-left: 10px;
-    width: 40%;
-    height: 720px;    
+    width: 30%;
+    height: 840px;    
 }
 #addressTable{
     width: 100%;
@@ -89,10 +89,26 @@
     height: 100%;
 }
 
+#myInfoNoProfileTd{
+    position: relative;
+    width: 70px;
+}
+
+#myInfoNoprofileName{
+    position: absolute;
+    top: 50%; /* 텍스트를 이미지의 중앙에 배치 */
+    left: 50%;
+    transform: translate(-50%, -50%); /* 텍스트의 중심을 이미지의 중심에 맞춤 */
+    color: white; /* 텍스트 색상 */
+    font-size: 20px; /* 텍스트 크기 */
+    font-family: buri;
+}
+
 /* 내 정보 */
 .myTr{
     width: 100%;
     height: 100%;
+    
 }
 
 /* 내 프로필 */
@@ -106,6 +122,7 @@
 .myName{
     padding-left: 10px;
     width: 100px;
+    font-family: buriBord;
 }
 
 /*내\ 상태메시지*/
@@ -116,6 +133,7 @@
 
 /**************************************************/
 /* 친구 정보 */
+
 #friendDiv{
     width: 100%;
     border: 1px solid rgb(34, 112, 25);
@@ -126,14 +144,22 @@
 
 #friendTable{
     width: 100%;
+    border-collapse: separate;
+	border-spacing: 0 2px;
+    
 }
 
 /* 친구 정보 */
 .friendTr{
     width: 100%;
-    height: 50px;
-    
+    height: 50px;   
+
 }
+
+.friendTr:hover{
+    background-color: rgb(255, 254, 233);
+}
+
 
 /*친구 프로필 */
 .friendProfile{
@@ -151,6 +177,7 @@
     color: white;
     width: 50px;
     height: 50px;
+    
 }
 
 
@@ -158,12 +185,13 @@
 .friendName{
     width: 100px;
     padding-left: 10px;
+    font-family: buriBord;
 
 }
 
 /* 상태메시지*/
 .friendStatusMsg{
-    
+
 }
 
 
@@ -393,4 +421,69 @@
     font-family: buri;
     font-size: 15pt;
     color: white;
+}
+
+
+
+/**********************************************************/
+
+/* 1:1 채팅방 입장 */
+
+#addrChatRoomDiv{
+    position: fixed;
+    top: 150px;
+    left: 750px;
+    z-index: 5;
+    width: 650px;
+    height: 800px;
+    border: 3px solid rgba(34, 49, 146, 0.5);
+    background-color: white;
+
+    
+}
+
+/* 1:1 채팅방 타이틀 */
+#addrChatRoomTitle{
+    width: 100%;
+    height: 14%;
+    font-size: 20px;
+    font-family: buri;
+    padding-left: 2px;
+}
+
+/* 1:1 대화방 참여자 이름 */
+.addrChatRoomTitleName{
+    font-family: buriBord;
+}
+
+#addrChatRoomCloseTable{
+    width: 100%;
+}
+
+/* 1:1 대화방 닫기 버튼 */
+#addrChatRoomCloseTd{
+    float: right;
+    padding-right: 5px;
+}
+
+
+/* 1:1 채팅방 내용 */
+#addrChatRoomContents{
+    width: 100%;
+    height: 60%;
+    border: 1px solid blue;
+}
+
+/* 1:1 채팅방 입력 */
+#addrChatRoomEnter{
+    width: 100%;
+    height: 20%;
+    border: 1px solid orange;
+}
+
+/* 1:1 채팅방 버튼 */
+#addrChatRoomBtn{
+    width: 100%;
+    height: 5%;
+    border: 1px solid green;
 }

@@ -362,7 +362,7 @@ function UserChatContentsInput(props){
                          > </textarea></td>
                     </tr>   
                 </tbody>
-                <tfoot id ='chatRoomButton'>
+                <tbody id ='chatRoomButton'>
                     <tr>                    
                         <td colSpan='5'>
                             <input type ='button' value='botton1'></input>
@@ -371,7 +371,7 @@ function UserChatContentsInput(props){
                             <input id='chatTextSend' type ='submit' value='전송'></input>
                         </td>            
                     </tr>
-                </tfoot>
+                </tbody>
             </table>
         </form>
 

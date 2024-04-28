@@ -115,56 +115,66 @@ function UserChatList(props){
     return (
             
              <div id ='chatListDiv'>
-                <table id ='chatListTable'>
-                    <tbody>
-                        {jsonData.map((item) =>
-                        
-                        <tr className='chatListTr' key={item.chatRoomSeq} onClick={event=> {
-                            event.preventDefault();
-                            // 리스트 클릭시 방제목 변경처리
-                            roomClick(item.chatRoomSeq, item.chatRoomUsers, item.chatRoomTitle, item.chatRoomKey);
-                        }}>
-                            <td className='chatListTitleTd'>
-                                {/* return 내에서 조건문(삼항 연산자)*/}
-                                { 
-                                    item.chatRoomTitle === null
-                                    ? makeTitle(item.chatRoomUsers)
-                                    : item.chatRoomTitle
-                                }
-                            </td>
-                                {/* return 내에서 split*/}
-                            <td className='chatListUsersTd'>{ 
-                                item.chatRoomTitle === null
-                                ? ''
-                                : makeTitle(item.chatRoomUsers)
-                                }
-                            </td>
-                            <td className='chatListLastDateTd'>
-                                {makeLastDate(item.lastLineKey)}
-                            </td>
-                            <td className='chatListUnreadCountTd'>
-                                {item.unreadCount}
-                            </td>
-                            <td>
-                            <input type='hidden' value={item.chatRoomUsers}></input>
-                            </td>
-                            
-                        </tr>
-                        )}            
-                    </tbody>
-                </table>
-
-                {/* 채팅방 생성 버튼*/}
-                <div id ='chatCreateDiv'>
+                <div>
                     <table>
                         <tbody>
-                            <tr id='chatCreateTr'>
-                                <td>
-                                    <input type='button' value='방생성' id='chatCreateBtn' onClick={(e) => {createChatRoom(e)}}></input>
-                                </td>
+                            <tr>
+                                <td id='chatTitle'>채팅</td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+                <div id ='chatList'>
+                    <table id ='chatListTable'>
+                        <tbody>
+                            {jsonData.map((item) =>
+                            
+                            <tr className='chatListTr' key={item.chatRoomSeq} onClick={event=> {
+                                event.preventDefault();
+                                // 리스트 클릭시 방제목 변경처리
+                                roomClick(item.chatRoomSeq, item.chatRoomUsers, item.chatRoomTitle, item.chatRoomKey);
+                            }}>
+                                <td className='chatListTitleTd'>
+                                    {/* return 내에서 조건문(삼항 연산자)*/}
+                                    { 
+                                        item.chatRoomTitle === null
+                                        ? makeTitle(item.chatRoomUsers)
+                                        : item.chatRoomTitle
+                                    }
+                                </td>
+                                    {/* return 내에서 split*/}
+                                <td className='chatListUsersTd'>{ 
+                                    item.chatRoomTitle === null
+                                    ? ''
+                                    : makeTitle(item.chatRoomUsers)
+                                    }
+                                </td>
+                                <td className='chatListLastDateTd'>
+                                    {makeLastDate(item.lastLineKey)}
+                                </td>
+                                <td className='chatListUnreadCountTd'>
+                                    {item.unreadCount}
+                                </td>
+                                <td>
+                                <input type='hidden' value={item.chatRoomUsers}></input>
+                                </td>
+                                
+                            </tr>
+                            )}            
+                        </tbody>
+                    </table>
+                    {/* 채팅방 생성 버튼*/}
+                    <div id ='chatCreateDiv'>
+                        <table>
+                            <tbody>
+                                <tr id='chatCreateTr'>
+                                    <td>
+                                        <input type='button' value='방생성' id='chatCreateBtn' onClick={(e) => {createChatRoom(e)}}></input>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 {// 채팅방 생성 modal 호출
