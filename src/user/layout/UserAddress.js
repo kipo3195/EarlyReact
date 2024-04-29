@@ -13,6 +13,7 @@ axios.defaults.withCredentials = true;
 
 function UserAddress(props){
 
+    const serverUrl = process.env.REACT_APP_SERVER_A_URL;
     const scrollRef = useRef();
     
     const friendList = props.list.friend_list;
@@ -26,7 +27,21 @@ function UserAddress(props){
     const [friendInfo, setFriendInfo] = useState(false);
 
     // 채팅방 입장시 채팅 라인 불러오기 
-    const [chatList, setChatList] = useState('');
+    const [lineDatas, setLineDatas] = useState('');
+    const [nextLine, setNextLine] = useState('');
+
+
+    // 채팅방 입력 처리 
+    const [roomKey, setRoomKey] = useState('');
+    const [recevier, setRecevier] = useState('');
+    const [sender, setSender] = useState('');
+    const [emptyRoomFlag, setEmptyRoomFlag] = useState(false);
+    const [title, setTitle] = useState('');
+    const [createRoomDate, setCreateRoomDate] = useState('');
+
+
+
+
     
     function onScrollCallBack(){
         //console.log("스크롤 전체 높이 : ", scrollRef.current?.scrollHeight); // 스크롤의 크기
@@ -79,32 +94,67 @@ function UserAddress(props){
 
         const addrChatRoomListPromise = addrChatRoomListRequest(friend);
 
-        addrChatRoomListPromise.then(()=>{
-        
-            setChatList();
-            setEnterChatRoomModal(true);
-            setFriendInfo(friend);
-        })
+        addrChatRoomListPromise.then((promise)=>{
+            console.log(promise);
+            var type = promise.type;
+            var data = promise.data;
+            if(type && data){
+                var result = type.result;
+                if(result === 'success'){
+
+                    setEnterChatRoomModal(true);
+                    setFriendInfo(friend);
+                    if(data.room_key){
+                        // 아직 생성되지않음. UserChatContentsInput 컴포넌트 이용함.
+                        setRoomKey(data.room_key);
+                        setRecevier(friend.username);
+                        setSender(myInfo.username);
+                        setEmptyRoomFlag(true);
+                        setTitle(myInfo.name+', '+friend.name);
+                        const today = new Date();
+                        const formattedDate = `${today.getFullYear()}${today.getMonth() + 1}${today.getDate()}${today.getSeconds()}${today.getMilliseconds()}`;
+                        setCreateRoomDate(formattedDate);
+                    
+                    }else{
+                        setLineDatas(data.chatRoomLine);
+                        setNextLine(data.nextLine);
+                    }
+                }
+            }
+        }) 
     }
 
     async function addrChatRoomListRequest(friend){
-        var roomKey = null;
+        var returnData = null;
+        var chatRoomKey = null;
         if(myInfo.id < friend.id){
-            roomKey = 'R_'+myInfo.username+'|'+friend.username;
+            chatRoomKey = 'R_'+myInfo.username+'|'+friend.username;
         }else{
-            roomKey = 'R_'+friend.username+'|'+myInfo.username;
+            chatRoomKey = 'R_'+friend.username+'|'+myInfo.username;
         }
-        // /user/chatRoomLine
+        await axios({
+            url:serverUrl+'/user/getAddrChatLine',
+            method:'post',
+            data:{
+                chatRoomKey : chatRoomKey
+            }
+        }).then(function(response){
 
+            returnData = response.data;
+
+        }).catch(function(error){
+
+            console.log(error);
+
+        });
+        return returnData;
     }
 
     const enterChatRoomModal = <AddressChatRoomModal myInfo={myInfo} friendInfo={friendInfo} closeModal={()=>{
         setEnterChatRoomModal(false);
-    }}></AddressChatRoomModal>
+    }} roomKey={roomKey} recevier={recevier} sender={sender} emptyRoomFlag={emptyRoomFlag} client={props.client} title={title}
+    createRoomDate={createRoomDate} lineDatas={lineDatas} nextLine={nextLine} ></AddressChatRoomModal>
 
-    
-
-    
     return(
         <div id='addressDiv'>
             {/* 친구 추가 버튼 */}

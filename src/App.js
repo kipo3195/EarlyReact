@@ -534,7 +534,7 @@ function App() {
                 }
               })     
             }else{
-              content = <UserAddress list={list} getAddressList={(limit)=>{
+              content = <UserAddress list={list} client={client} getAddressList={(limit)=>{
                 // 기존 리스트 + 신규 리스트를 더함 spread 함수 
                 var addressListPromiseResult = null;
                 let addressListPromise = AddressList(userId, limit);
