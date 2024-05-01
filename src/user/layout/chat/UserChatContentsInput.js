@@ -103,7 +103,7 @@ function UserChatContentsInput(props){
 
         var result = null;
 
-        //console.log(sender, roomKey, recevier, title);
+        console.log('방생성시 : ', sender, roomKey, recevier, title);
         // 방 생성
         await axios({
             method:'post',
@@ -168,12 +168,12 @@ function UserChatContentsInput(props){
                 // 라인 데이터 보여주기 
                 let line ={
                     chatRoomKey : roomKey,
-                        chatContents : message,
-                        chatReceiver : recevier,
-                        chatSender : sender,
-                        chatType : "C",
-                        chatLineKey : lineKey,
-                        chatUnreadCount : (recevier.split('|')).length-1 // 발신자에게 보여줄 미확인 건수
+                    chatContents : message,
+                    chatReceiver : recevier,
+                    chatSender : sender,
+                    chatType : "C",
+                    chatLineKey : lineKey,
+                    chatUnreadCount : (recevier.split('|')).length-1 // 발신자에게 보여줄 미확인 건수
                 }
 
                 //상위 컴포넌트에 알려줌

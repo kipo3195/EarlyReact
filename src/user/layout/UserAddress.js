@@ -95,18 +95,18 @@ function UserAddress(props){
         const addrChatRoomListPromise = addrChatRoomListRequest(friend);
 
         addrChatRoomListPromise.then((promise)=>{
-            console.log(promise);
             var type = promise.type;
             var data = promise.data;
+            
             if(type && data){
                 var result = type.result;
                 if(result === 'success'){
 
                     setEnterChatRoomModal(true);
                     setFriendInfo(friend);
-                    if(data.room_key){
+                    if(data.newChatRoomKey){
                         // 아직 생성되지않음. UserChatContentsInput 컴포넌트 이용함.
-                        setRoomKey(data.room_key);
+                        setRoomKey(data.chatRoomKey);
                         setRecevier(friend.username);
                         setSender(myInfo.username);
                         setEmptyRoomFlag(true);
@@ -114,8 +114,14 @@ function UserAddress(props){
                         const today = new Date();
                         const formattedDate = `${today.getFullYear()}${today.getMonth() + 1}${today.getDate()}${today.getSeconds()}${today.getMilliseconds()}`;
                         setCreateRoomDate(formattedDate);
-                    
+                        setLineDatas('');
+                        setNextLine(0);
                     }else{
+                        setRoomKey(data.chatRoomKey);
+                        setRecevier(friend.username);
+                        setSender(myInfo.username);
+                        setEmptyRoomFlag(false);
+                        setTitle(data.title);
                         setLineDatas(data.chatRoomLine);
                         setNextLine(data.nextLine);
                     }
@@ -127,13 +133,14 @@ function UserAddress(props){
     async function addrChatRoomListRequest(friend){
         var returnData = null;
         var chatRoomKey = null;
+        console.log('friend : ', friend.username);
         if(myInfo.id < friend.id){
             chatRoomKey = 'R_'+myInfo.username+'|'+friend.username;
         }else{
             chatRoomKey = 'R_'+friend.username+'|'+myInfo.username;
         }
         await axios({
-            url:serverUrl+'/user/getAddrChatLine',
+            url:serverUrl+'/user/getAddrChatInfo',
             method:'post',
             data:{
                 chatRoomKey : chatRoomKey

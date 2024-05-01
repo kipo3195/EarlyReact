@@ -528,7 +528,6 @@ function UserChatContents(props){
 
     
     return (
-
         //채팅창
         <div id ='contentDiv' onClick={readChatLines}>
             {// 채팅방 참여자 확인용 modal 호출

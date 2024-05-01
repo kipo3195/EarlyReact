@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import UserChatContentsInput from '../chat/UserChatContentsInput';
 
+import '../../css/UserChat.css'
+import MentionCheck from '../../../modules/MentionCheck';
+
 function AddressChatRoomModal(props){
 
     const [contentLines, setContentLines] = useState([]);
@@ -16,9 +19,7 @@ function AddressChatRoomModal(props){
     var emptyRoomFlag = props.emptyRoomFlag;
     var title = props.title;
     var createRoomDate = props.createRoomDate;
-
     var lineDatas = props.lineDatas;
-    
 
     // 닫기
     function closeModal(e){
@@ -29,17 +30,22 @@ function AddressChatRoomModal(props){
     // 채팅방 라인 그리기 
 
     useEffect(()=>{
-        
-        var lines = JSON.parse(lineDatas);
+        if(lineDatas === '' || lineDatas == undefined){
+            // 생성되지 않은 방
+            setContentLines('');
+            setNextLine(props.nextLine);
+        }else{
+            var lines = JSON.parse(lineDatas);
+              // 서버로 부터 받아온 라인들
+              setContentLines(lines);
+              // 서버로 부터 받아온 라인 중 다음 라인조회 기준 -> 라인 더 불러올때 
+              setNextLine(props.nextLine);
+              // 서버로 부터 받아온 라인 중 가장 낮은 라인
+              // setMinLineKey(lines[0].chatLineKey)
+        }
 
-          // 서버로 부터 받아온 라인들
-          setContentLines(lines);
-          // 서버로 부터 받아온 라인 중 다음 라인조회 기준 -> 라인 더 불러올때 
-          setNextLine(props.nextLine);
-          // 서버로 부터 받아온 라인 중 가장 낮은 라인
-          // setMinLineKey(lines[0].chatLineKey)
-    
     }, [lineDatas])
+    console.log(recevier);
 
     const chatContentsInput 
     = <UserChatContentsInput client={props.client} chatRoomKey={roomKey} recevier={recevier} sender={sender} emptyRoomFlag={emptyRoomFlag}
@@ -67,13 +73,27 @@ function AddressChatRoomModal(props){
         }}></UserChatContentsInput>
 
 
+        // 지명채팅 키워드가 있을때 
+        function mentionCheck(chatLine){
+            var result = '';
+    
+            result = <MentionCheck checkLine={chatLine}></MentionCheck>
+    
+            return result;
+        }    
+
     return (
         <div id='addrChatRoomDiv'>
             <div id ='addrChatRoomTitle'>
                 <table id='addrChatRoomCloseTable'>
                     <tbody>
                         <tr>
+                            {
+                                title != undefined ? 
+                            <td><span className='addrChatRoomTitleName'>{title}</span></td>
+                            :
                             <td><span className='addrChatRoomTitleName'>나</span>와 <span className='addrChatRoomTitleName'>{friendInfo.name}</span>님의 1:1 대화방</td>
+                            }
                             <td id='addrChatRoomCloseTd'>
                                 <input type='button' value='X' onClick={e=>{closeModal(e)}}></input>
                             </td>
@@ -82,12 +102,74 @@ function AddressChatRoomModal(props){
                 </table>
             </div>
             <div id ='addrChatRoomContents'>
-                <table>
+                <table id ='chatRoomContentsTable'>
                     <tbody>
                         {
-                            (contentLines=== undefined) ? (''):
+                        (contentLines === undefined) ? (''):
                         (contentLines && contentLines.map((line) =>(
-                            line.chatSeq // 채팅 라인 조회됨.. 
+                            (line.chatSender === sender)
+                            ?
+                            (<tr align ='right' key ={line.chatLineKey} className='myChatLineTR'>
+                                {/* 말풍선 크기 제어*/}
+                                <td className='chatRoomContentsTableTdETC'></td>
+
+                                <td className='chatRoomContentsTableTdReadOnly'></td>
+
+                                {/* 채팅 라인 공감 */}
+                                
+                                {/* 미확인 건수 */}
+                                <td className ='unreadCount'>
+                                    {
+                                    (line.chatUnreadCount === '0')
+                                    ?
+                                    ''
+                                    :
+                                    line.chatUnreadCount
+                                    }
+                                </td>
+                                {/* 채팅 라인 */} 
+                                <td className='chatRoomContentsTableRTd'>
+                                    
+                                    {/*지명채팅인지 정규식으로 체크*/}          
+                                    {line.chatContents.includes('@mt') ? 
+    
+                                    mentionCheck(line.chatContents)
+
+                                    : line.chatContents}
+
+                                </td>
+                            </tr>
+                            )
+                            :
+                                // 상대방의 채팅 라인
+                                (<tr align ='left' key ={line.chatLineKey} className='othersChatLineTR'>
+                                {/* 채팅 라인 */} 
+                                <td className='chatRoomContentsTableLTd' >
+                                    {line.chatSenderName} 님의 말 : 
+                                    
+                                    {/*지명채팅인지 정규식으로 체크*/}          
+                                    {line.chatContents.includes('@mt') ? 
+    
+                                    mentionCheck(line.chatContents)
+
+                                : line.chatContents}
+                                </td>
+                                {/* 미확인 건수 */}
+                                <td className ='unreadCount'>
+                                    {
+                                    (line.chatUnreadCount === '0')
+                                    ?
+                                    ''
+                                    :
+                                    line.chatUnreadCount
+                                    }
+                                    </td>
+                                {/* 채팅 라인 공감 */}
+                            
+                                <td className='chatRoomContentsTableTdReadOnly'></td>
+                                {/* 말풍선 크기 제어*/}
+                                <td className='chatRoomContentsTableTdETC'></td>
+                            </tr>)
                         )))
                     }
                     </tbody>
