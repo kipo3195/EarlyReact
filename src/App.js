@@ -598,7 +598,7 @@ function App() {
                 chatListRefresh={()=>{
                   // 채팅 입력시 리스트 갱신 요청
 
-                  console.log('신규 채팅방 생성시 리스트 갱신 요청');
+                  //console.log('신규 채팅방 생성시 리스트 갱신 요청');
                   var chatListPromiseResult = null;
                   let chatListPromise = ChatList(userId); 
                   

@@ -7,8 +7,8 @@ function UserChatContentsInput(props){
 
     const serverUrl = process.env.REACT_APP_SERVER_A_URL;
 
+    
     const [contents, setContents] = useState('');
-
     // 지명채팅 모달 Flag
     const [isMentionModal, setMentionModal] = useState(false);
     // 참여자 = 지명대상 = 서버로 부터 받아온
@@ -20,6 +20,9 @@ function UserChatContentsInput(props){
     const [wordArray, setWordArray] = useState(null);
     // 변경이 일어난 배열의 index
     const [wordArrayIdx, setWordArrayIdx] = useState(null);
+
+    // 빈값일때 입력 못하게 함
+    const [emptyCheck, setEmptyCheck] = useState(false);
 
     var client = props.client;
     var roomKey = props.chatRoomKey;
@@ -56,16 +59,16 @@ function UserChatContentsInput(props){
 
     // textarea에서 엔터 클릭시 일단 
     function enterSend(e){
+    
         //console.log('onKeyUp 이벤트 : ', e.target.value);
          e.preventDefault(); //onkeyUp의 기본이벤트를 차단하지 않으면 2번 호출됨. 
-        
-        if(contents === '\n'){
-            setContents('');
-            return;
-        }
-
-        if((contents !== '') && (e.code === 'Enter' || e.key ==='Enter')){
+         if(contents === '\n'){
+             setContents('');
+             return;
+            }
             
+            if((contents !== '') && (e.key ==='Enter')){
+
             // 줄 바꿈은 메시지를 보내지 않는다.
             if(e.nativeEvent.shiftKey){
                 return;
@@ -73,7 +76,8 @@ function UserChatContentsInput(props){
                 if(contents !== '\n'){
                     // 대화내용 없이 엔터는 \n -> 채팅 전송 안함.
 
-                    console.log(emptyRoomFlag);
+                    //console.log(emptyRoomFlag);
+
                     if(emptyRoomFlag){
                     
                         // 비동기로 방생성 API 호출 이후에 채팅 라인 전달 처리
@@ -133,7 +137,7 @@ function UserChatContentsInput(props){
     }
 
       // 전송버튼 클릭시 
-    function sendMessage(message, enterFlag){
+    function sendMessage(message){
         
         if(message === null || message === ''){
             return;
@@ -145,11 +149,7 @@ function UserChatContentsInput(props){
         lineKeyPromise.then(promisePromiseResult=>{
             if(promisePromiseResult !== 'error'){
                 var lineKey = promisePromiseResult;       
-                console.log('채팅 발신');         
-                if(enterFlag){
-                    // 엔터로 전송시 개행처리 \n 제거 
-                    message = message.substr(0, message.length-1);
-                }
+                        
                 // 웹소켓 채팅 발신
                 client.publish({
                     // 데이터를 보내는 경로 /app + 서버(UserChatController)의 @MessageMapping(/test/message)
@@ -237,7 +237,7 @@ function UserChatContentsInput(props){
         // console.log('onChange시 이벤트 감지 : ', e.target.value);
         // 입력데이터
         var word = e.target.value;
-
+        
         // 입력데이터 줄바꿈
         var wordArr = word.split('\n');
         // console.log(wordArr);
@@ -338,6 +338,46 @@ function UserChatContentsInput(props){
         }}>
     </UserChatMentionModal>
 
+        // 키가 입력 될때마다 감지 값은 handleChange 함수가 변경함. 
+        const handleKeyDown = (event) => {
+            
+            if (event.key === 'Enter' && event.shiftKey) {
+            // console.log('Shift+Enter 입력됨');         
+            }
+            
+            else if (event.key === 'Enter' && contents.trim().length == 0) {
+            event.preventDefault(); // 기본 동작 취소
+            //console.log('단순 Enter 입력 차단됨');
+
+            }else if(event.key === 'Enter'){
+                // 채팅 발송
+                // console.log('발신 내용 : ', event.target.value);
+                if(emptyRoomFlag){
+                    
+                    // 비동기로 방생성 API 호출 이후에 채팅 라인 전달 처리
+                    // 생성자, 룸키, 참여자, 방제목
+                    const roomKeyPromise = putRoomKey(sender, roomKey, recevier, title);
+                    roomKeyPromise.then(roomKeyPromiseResult=>{
+                        // console.log(roomKeyPromiseResult);
+                        // 20240312 여기까지 확인함. 
+
+                        sendMessage(event.target.value);
+                        setMentionModal(false);
+                        setEmptyRoomFlag(false);
+                    })
+
+                }else{
+                     sendMessage(event.target.value);
+                     setMentionModal(false);
+                }
+            }
+        };
+
+        // 바뀔때 마다 감지해서 contents를 변경함. 
+        const handleChange = (event) => {
+            setContents(event.target.value);
+        };
+
     return (
     
     <div id ='chatRoomText'>
@@ -353,12 +393,10 @@ function UserChatContentsInput(props){
                     <tr>                                
                         <td>
                             <textarea id='chatTextArea' rows="9" style={{width:"100%"}} placeholder='채팅을 입력해주세요... [줄바꿈 Shift + Enter]'
-                         onKeyUp={e=> enterSend(e)}
-                         onChange={e=> changeText(e)}
-                         value ={
-                            contents
-                        }
-                         onKeyDown={e=> escKeyDown(e)}
+                         onChange={handleChange}
+                         value ={contents}
+                         onKeyDown={handleKeyDown}
+  
                          > </textarea></td>
                     </tr>   
                 </tbody>

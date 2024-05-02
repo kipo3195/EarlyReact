@@ -335,10 +335,13 @@
     width: 100%;
 }
 
+
+
 #chatTextArea{
     border: none;
     resize: none;
     background-color: rgb(255, 255, 255);
+    white-space: pre-line;
 }
 
 #chatTextArea:focus {

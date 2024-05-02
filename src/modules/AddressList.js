@@ -16,7 +16,6 @@ async function AddressList(userId, limit){
             "limit" : limit
         }
     }).then(function(response){
-        console.log(response);
         returnData = response.data;
     }).catch(function(error){
         console.log(error);

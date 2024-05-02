@@ -104,10 +104,11 @@ function UserAddress(props){
 
                     setEnterChatRoomModal(true);
                     setFriendInfo(friend);
+                  
                     if(data.newChatRoomKey){
                         // 아직 생성되지않음. UserChatContentsInput 컴포넌트 이용함.
-                        setRoomKey(data.chatRoomKey);
-                        setRecevier(friend.username);
+                        setRoomKey(data.newChatRoomKey);
+                        setRecevier(myInfo.username+'|'+friend.username);
                         setSender(myInfo.username);
                         setEmptyRoomFlag(true);
                         setTitle(myInfo.name+', '+friend.name);

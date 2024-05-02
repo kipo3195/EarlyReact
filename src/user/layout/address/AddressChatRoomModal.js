@@ -45,7 +45,6 @@ function AddressChatRoomModal(props){
         }
 
     }, [lineDatas])
-    console.log(recevier);
 
     const chatContentsInput 
     = <UserChatContentsInput client={props.client} chatRoomKey={roomKey} recevier={recevier} sender={sender} emptyRoomFlag={emptyRoomFlag}
@@ -89,7 +88,7 @@ function AddressChatRoomModal(props){
                     <tbody>
                         <tr>
                             {
-                                title != undefined ? 
+                                title !== undefined ? 
                             <td><span className='addrChatRoomTitleName'>{title}</span></td>
                             :
                             <td><span className='addrChatRoomTitleName'>나</span>와 <span className='addrChatRoomTitleName'>{friendInfo.name}</span>님의 1:1 대화방</td>
