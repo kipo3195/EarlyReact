@@ -31,7 +31,7 @@ const Join = (props) => {
             method:'GET',
             url : serverUrl+'idDupCheck',
             params:{
-                "username":username
+                "username": "11"
               }
         }).then(function(response){        
             const result = response.data.result;

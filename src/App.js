@@ -564,7 +564,8 @@ function App() {
               // console.log('리스트 최초 호출')
 
               var chatListPromiseResult = null;
-              let chatListPromise = ChatList(userId);
+              console.log('1111111111111111111, userId : ', userId);
+              let chatListPromise = ChatList(userId); // 1
               chatListPromise.then(chatListPromiseResult =>{
                 
                 setList(chatListPromiseResult.chat_list);
@@ -600,7 +601,8 @@ function App() {
 
                   //console.log('신규 채팅방 생성시 리스트 갱신 요청');
                   var chatListPromiseResult = null;
-                  let chatListPromise = ChatList(userId); 
+                  console.log('222222222222222222222222');
+                  let chatListPromise = ChatList(userId); // 2
                   
                   chatListPromise.then(chatListPromiseResult =>{
                     
@@ -616,7 +618,8 @@ function App() {
                 chatListReload={(chat)=>{
                   // 채팅 수신시 건수 갱신 + 리스트 갱신
                   var chatListPromiseResult = null;
-                  let chatListPromise = ChatList(userId); 
+                  console.log('3333333333333333');
+                  let chatListPromise = ChatList(userId); // 3
                   chatListPromise.then(chatListPromiseResult =>{
 
                     //console.log('신규 데이터 수신으로 인한 리스트 갱신 요청  : ', chatListPromiseResult.chat_list)

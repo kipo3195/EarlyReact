@@ -168,7 +168,7 @@ function UserChat(props){
             // 더 상위 컴포넌트로 이동
             props.chatListReload();
 
-        }}createEmptyRoom={(recevier, roomTitle)=>{
+        }} createEmptyRoom={(recevier, roomTitle)=>{
             // 방 입장시와 동일한 로직 태우기 
 
             const today = new Date();

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import UserChatContentsInput from '../chat/UserChatContentsInput';
 
-import '../../css/UserChat.css'
+
 import MentionCheck from '../../../modules/MentionCheck';
 
 function AddressChatRoomModal(props){

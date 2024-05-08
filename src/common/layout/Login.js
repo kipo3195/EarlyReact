@@ -36,7 +36,6 @@ function Login(props){
 
   const serverUrl = process.env.REACT_APP_SERVER_A_URL;
 
-
   var flag = cookie.load("flag");
 
   useEffect(()=>{

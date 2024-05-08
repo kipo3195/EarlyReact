@@ -2,6 +2,7 @@
     margin-left: 10px;
     width: 30%;
     height: 840px;    
+    float: left;
 }
 #addressTable{
     width: 100%;
@@ -10,6 +11,10 @@
 /**************************************************/
 
 /* 친구 타이틀 */
+#addressBtnDiv{
+    width: 95%;
+}
+
 #addressTitle{
     font-family: buri;
     font-size: 16pt;
@@ -79,7 +84,7 @@
 /**************************************************/
 /* 내 정보 */
 #myInfoDiv{
-    width: 100%;
+    width: 95%;
     border: 1px solid rgb(34, 112, 25);
     height: 80px;
 }
@@ -135,7 +140,7 @@
 /* 친구 정보 */
 
 #friendDiv{
-    width: 100%;
+    width: 95%;
     border: 1px solid rgb(34, 112, 25);
     height: 82%;
     overflow-y: scroll;
@@ -197,6 +202,7 @@
 
 /*친구 숫자 */
 #friendCountDiv{
+    width: 95%;
     margin-top: 3px;
     margin-bottom: 3px;
 }
@@ -430,22 +436,17 @@
 /* 1:1 채팅방 입장 */
 
 #addrChatRoomDiv{
-    position: fixed;
-    top: 150px;
-    left: 680px;
-    z-index: 5;
-    width: 650px;
-    height: 800px;
-    border: 3px solid rgba(34, 49, 146, 0.5);
-    background-color: white;
-
-    
+    border: 2px solid blue;
+    height: 780px;   
+    width: 30%;
+    margin-top: 40px;
+    float: left;
 }
 
 /* 1:1 채팅방 타이틀 */
 #addrChatRoomTitle{
     width: 100%;
-    height: 14%;
+    height: 15%;
     font-size: 20px;
     font-family: buri;
     padding-left: 2px;
@@ -470,7 +471,8 @@
 /* 1:1 채팅방 내용 */
 #addrChatRoomContents{
     width: 100%;
-    height: 60%;
+    overflow-y: scroll;
+    height: 65%;
     border: 1px solid blue;
 }
 

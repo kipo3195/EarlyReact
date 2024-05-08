@@ -163,125 +163,148 @@ function UserAddress(props){
     }} roomKey={roomKey} recevier={recevier} sender={sender} emptyRoomFlag={emptyRoomFlag} client={props.client} title={title}
     createRoomDate={createRoomDate} lineDatas={lineDatas} nextLine={nextLine} ></AddressChatRoomModal>
 
+    function click(e){
+        e.preventDefault(e);
+        axios({
+            url:serverUrl+'/address/test',
+            method:'get',
+            params:{
+                "username":sender
+              }
+        }).then(function(response){
+
+
+
+        }).catch(function(error){
+
+            console.log(error);
+
+        });
+
+    }
+
     return(
-        <div id='addressDiv'>
-            {/* 친구 추가 버튼 */}
-            <div id='addressBtnDiv'>
-                <table id='addressTable'>
-                    <tbody>
-                        <tr>
-                            <td id ='addressTitle'>주소록</td>
-                            <td id ='addressSearch'>
-                                <img src={searchBtn} alt={searchBtn} width='25px' onClick={(e)=>{
-                                    searchUser(e);
-                                }}></img>
-                            </td>
-                            <td id ='addressAdd'>
-                                <img src={addBtn} alt={addBtn} width='30px' onClick={(e)=>{
-                                    addFriend(e);
-                                }}></img>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div>
+            <div id='addressDiv'>
+                {/* 친구 추가 버튼 */}
+                <div id='addressBtnDiv'>
+                    <table id='addressTable'>
+                        <tbody>
+                            <tr>
+                                <td id ='addressTitle'>주소록</td>
+                                <td id ='addressSearch'>
+                                    <img src={searchBtn} alt={searchBtn} width='25px' onClick={(e)=>{
+                                        searchUser(e);
+                                    }}></img>
+                                </td>
+                                <td id ='addressAdd'>
+                                    <img src={addBtn} alt={addBtn} width='30px' onClick={(e)=>{
+                                        addFriend(e);
+                                    }}></img>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-            {/* 검색창 */}
-            <div id='addressSearchDiv'>
-                <table id ='addressSearchTable'>
+                {/* 검색창 */}
+                <div id='addressSearchDiv'>
+                    <table id ='addressSearchTable'>
+                            <tr>
+                                <td>
+                                    <img src={searchBtn} className='addrSearch' width='20px' alt='searchBtn'></img>
+                                </td>
+                                <td colSpan='2'>
+                                    <input type='text' id='addrSearchText' ></input>
+                                </td>
+                                <td>
+                                    <img src={userSearchCancle} className='addrSearch' width='20px' alt='userSearchCancle' onClick={e=>{
+                                        
+                                    }}></img>
+                                </td>
+                            </tr>
+                    </table>
+                </div>
+
+
+                {/* 내 정보 */}
+                <div id='myInfoDiv'>
+                    <table id='myTable'>
+                        <tbody>
+
+                            <tr key={myInfo.id} className='myTr'>
+
+                                {
+                                myInfo.userProfile === '' ?
+                                <td id='myInfoNoProfileTd' >
+                                    <img src={noProfile} width='70' height='70' style={{borderRadius:'20px', verticalAlign:'middle'}} alt={myInfo.username}></img>
+                                    <div id="myInfoNoprofileName">
+                                        {myInfo.name[0]}
+                                    </div>
+                                </td>
+                                :
+                                <td className='myProfile'>
+                                    <img src={myInfo.userProfile} width='70' height='70' style={{borderRadius:'20px', verticalAlign:'middle'}} alt={myInfo.username}></img>
+                                </td>
+                                } 
+                                <td className='myName'>
+                                    {myInfo.name}
+                                </td>
+                                <td className='myStatusMsg'>
+                                    상태메시지
+                                </td>
+
+                                <input type='hidden' value ={myInfo.username}></input>
+                                
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id='friendCountDiv'>
+                    <table>
                         <tr>
                             <td>
-                                <img src={searchBtn} className='addrSearch' width='20px' alt='searchBtn'></img>
-                            </td>
-                            <td colSpan='2'>
-                                <input type='text' id='addrSearchText' ></input>
-                            </td>
-                            <td>
-                                <img src={userSearchCancle} className='addrSearch' width='20px' alt='userSearchCancle' onClick={e=>{
-                                    
-                                }}></img>
+                                친구 {friendCount}
                             </td>
                         </tr>
-                </table>
-            </div>
+                    </table>
+                </div>
 
-
-            {/* 내 정보 */}
-            <div id='myInfoDiv'>
-                <table id='myTable'>
-                    <tbody>
-
-                        <tr key={myInfo.id} className='myTr'>
-
-                            {
-                            myInfo.userProfile === '' ?
-                            <td id='myInfoNoProfileTd' >
-                                <img src={noProfile} width='70' height='70' style={{borderRadius:'20px', verticalAlign:'middle'}} alt={myInfo.username}></img>
-                                <div id="myInfoNoprofileName">
-                                    {myInfo.name[0]}
-                                </div>
-                            </td>
-                            :
-                            <td className='myProfile'>
-                                <img src={myInfo.userProfile} width='70' height='70' style={{borderRadius:'20px', verticalAlign:'middle'}} alt={myInfo.username}></img>
-                            </td>
-                            } 
-                            <td className='myName'>
-                                {myInfo.name}
-                            </td>
-                            <td className='myStatusMsg'>
-                                상태메시지
-                            </td>
-
-                            <input type='hidden' value ={myInfo.username}></input>
+                {/* 사용자 리스트 */}
+                <div id='friendDiv' ref={scrollRef} onScroll={onScrollCallBack}>
+                    <table id='friendTable'>
+                        <tbody>
+                            {friendList.map((friend)=>
+                            <tr key={friend.id} className='friendTr' onDoubleClick={e=>{enterChatRoom(e, friend)}} >
+                                {(friend.userProfile === '' || friend.userProfile == null) ?   
+                                <td className='friendNoprofile' >
+                                {friend.name[0]}
+                                </td>
+                                :
+                                <td className='friendProfile'>
+                                <img src={friend.userProfile} width='50' height='50' style={{borderRadius:'20px', verticalAlign:'middle'}} alt={friend.username}></img>
+                                </td>
+                                }
                             
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div id='friendCountDiv'>
-                <table>
-                    <tr>
-                        <td>
-                            친구 {friendCount}
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            {/* 사용자 리스트 */}
-            <div id='friendDiv' ref={scrollRef} onScroll={onScrollCallBack}>
-                <table id='friendTable'>
-                    <tbody>
-                        {friendList.map((friend)=>
-                           <tr key={friend.id} className='friendTr' onDoubleClick={e=>{enterChatRoom(e, friend)}} >
-                             {(friend.userProfile === '') ?   
-                             <td className='friendNoprofile' >
-                              {friend.name[0]}
-                             </td>
-                             :
-                             <td className='friendProfile'>
-                             <img src={friend.userProfile} width='50' height='50' style={{borderRadius:'20px', verticalAlign:'middle'}} alt={friend.username}></img>
-                             </td>
-                             }
-                          
-                            <td className='friendName'>
-                                {friend.name}
-                            </td>
-                            <td className='friendStatusMsg'>
-                                상태메시지
-                            </td>
+                                <td className='friendName'>
+                                    {friend.name}
+                                </td>
+                                <td className='friendStatusMsg'>
+                                    상태메시지
+                                </td>
 
-                            <input type='hidden' value ={friend.username}></input>
-                            
-                           </tr>
-                        )}
-                    </tbody>
-                </table>
+                                <input type='hidden' value ={friend.username}></input>
+                                
+                            </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/*친구 추가 modal*/
+                ((isAddFriendModal) ? addFriendModal : '')}
+
             </div>
-
-            {/*친구 추가 modal*/
-            ((isAddFriendModal) ? addFriendModal : '')}
-
 
             {/*1:1 대화방 입장 */
             ((isChatRoomModal) ? enterChatRoomModal:'')}
