@@ -90,8 +90,6 @@ function UserAddress(props){
     function enterChatRoom(e, friend){
         e.preventDefault();
 
-        // 1:1 채팅방 내용 조회 
-
         const addrChatRoomListPromise = addrChatRoomListRequest(friend);
 
         addrChatRoomListPromise.then((promise)=>{
@@ -99,7 +97,7 @@ function UserAddress(props){
             var data = promise.data;
             
             if(type && data){
-                var result = type.result;
+                var result = type;
                 if(result === 'success'){
 
                     setEnterChatRoomModal(true);
@@ -119,7 +117,7 @@ function UserAddress(props){
                         setNextLine(0);
                     }else{
                         setRoomKey(data.chatRoomKey);
-                        setRecevier(friend.username);
+                        setRecevier(myInfo.username+'|'+friend.username);
                         setSender(myInfo.username);
                         setEmptyRoomFlag(false);
                         setTitle(data.title);
@@ -141,19 +139,17 @@ function UserAddress(props){
             chatRoomKey = 'R_'+friend.username+'|'+myInfo.username;
         }
         await axios({
-            url:serverUrl+'/user/getAddrChatInfo',
+            url:serverUrl+'/user/getChatLines',
             method:'post',
             data:{
-                chatRoomKey : chatRoomKey
+                roomKey : chatRoomKey,
+                enterType : "a",
+                userId : myInfo.username
             }
         }).then(function(response){
-
             returnData = response.data;
-
         }).catch(function(error){
-
             console.log(error);
-
         });
         return returnData;
     }

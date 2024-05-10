@@ -164,7 +164,7 @@ function UserChatContentsInput(props){
                         chatLineKey : lineKey
                     })
                 });
-            
+                
                 // 라인 데이터 보여주기 
                 let line ={
                     chatRoomKey : roomKey,
@@ -393,10 +393,9 @@ function UserChatContentsInput(props){
                     <tr>                                
                         <td>
                             <textarea id='chatTextArea' rows="9" style={{width:"100%"}} placeholder='채팅을 입력해주세요... [줄바꿈 Shift + Enter]'
-                         onChange={handleChange}
-                         value ={contents}
-                         onKeyDown={handleKeyDown}
-  
+                                onChange={handleChange}
+                                value ={contents}
+                                onKeyDown={handleKeyDown}
                          > </textarea></td>
                     </tr>   
                 </tbody>
