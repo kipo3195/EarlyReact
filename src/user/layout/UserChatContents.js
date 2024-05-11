@@ -19,6 +19,9 @@ function UserChatContents(props){
 
     const serverUrl = process.env.REACT_APP_SERVER_A_URL;
     
+    // 더불러오기 끝
+    const [endLineFlag, setEndLineFlag] = useState(false);
+
     // const [title, setTitle] = useState(null);
     const [contentLines, setContentLines] = useState([]); // []하지 않으면 최초 채팅시 contentLine is not iterable..
     const [nextLine, setNextLine] = useState();
@@ -58,8 +61,6 @@ function UserChatContents(props){
     var recvData = props.recvData;
     var lineDatas = props.lineData;
 
-    var readLines = props.readLines;
-
     var reloadLines = props.reloadLines;
 
     var reloadLineEvent = props.reloadLineEvent;
@@ -71,46 +72,58 @@ function UserChatContents(props){
             //nextLine 이 '0'인 경우 최초 호출시 서버에서 하나도 받은게 없음 -> 요청하지 않도록 처리
             
             // 채팅 라인 더 불러오기 
-            const promise = getChatRoomLine();
-            promise.then(PromiseResult=>{
-                 //console.log(PromiseResult.chatRoomLine);
-                // console.log(PromiseResult.nextLine);
-                if(PromiseResult.chatRoomLine != null){
-                    var json = JSON.parse(PromiseResult.chatRoomLine);
-                    if(json != null){
-                        // 리액트에서 array를 합치는 방법(spread) 더 불러온 라인을 기존 라인 위에 더하기
-                        const newArr = [
-                            ...json, // 더 불러온 라인
-                            ...contentLines // 기존에 그려진 라인 
-                        ]
-                        // console.log(newArr);
-                        console.log('1');
-                       setContentLines(newArr);
-                       //setMinLineKey(json[0].chatLineKey);
+            if(!endLineFlag){
+                const getChatRoomLinePromise = getChatRoomLine();
+                getChatRoomLinePromise.then(promise=>{
+                    var type = promise.type;
+                    var data = promise.data;
+                    console.log(data);
+                    if(type && data){
+                        var result = type;
+                        if(result === 'success'){
+                            console.log(data);
+                            var appendLine = data.chatRoomLine;
+                            if(appendLine != undefined){
+                                appendLine = JSON.parse(appendLine);
+                                console.log(appendLine);
+                                 // 리액트에서 array를 합치는 방법(spread) 더 불러온 라인을 기존 라인 위에 더하기
+                                  const newArr = [
+                                ...appendLine, // 더 불러온 라인
+                                ...contentLines // 기존에 그려진 라인 
+                                 ]
+                                 console.log(newArr);
+                                 console.log(appendLine[0].chatLineKey)
+                                setContentLines(newArr);
+                                setScrollFix(true);
+                                setNextLine(appendLine[0].chatLineKey);
+                            }else{
+                                setEndLineFlag(true);
+                            }
+    
+                        }
                     }
-                }
-                setScrollFix(true);
-                setNextLine(PromiseResult.nextLine);
-
-            })
+                })
+            }else{
+            
+            }
         }
     }
     // 채팅 라인을 더 조회 하는 함수
     async function getChatRoomLine(){
         var result = null;
-    
         await axios({
             method:'POST',
-            url: serverUrl + '/user/chatRoomLineAppend',
+            url: serverUrl + '/user/getChatLines',
             data:{
-                chatRoomKey : roomKey,
-                lastLineKey : nextLine
+                roomKey : roomKey,
+                enterType : "c",
+                readLineKey : nextLine,
+                userId : sender
             }}).then(function(response){
-                //console.log(response.data);
+                console.log(response.data);
                 result = response.data;
             }).catch(function(error){
                 console.log(error);
-                
             })
 
         return result;
@@ -126,17 +139,15 @@ function UserChatContents(props){
                 // 미확인 건수 갱신
                 // 현재 내가 보고 있는 라인들 = contentLines을 복사한 copyContentLines을 반복하면서 갱신된 라인 reloadLines의 키(라인키)에 따른 
                 // value(건수) 갱신 후 setContentLines
-                if(unreadLineMap[copyContentLines[i].chatLineKey] !== undefined){
-                    // console.log(copyContentLines[i]);
-                    copyContentLines[i].chatUnreadCount = unreadLineMap[copyContentLines[i].chatLineKey];
-                }
+                    if(unreadLineMap[copyContentLines[i].chatLineKey] !== undefined){
+                        // console.log(copyContentLines[i]);
+                        copyContentLines[i].chatUnreadCount = unreadLineMap[copyContentLines[i].chatLineKey];
+                    }
                 } 
-                console.log('2');
                 setContentLines(copyContentLines);
                 // 모두읽음 -> 신규 수신한 라인 초기화
                 setNewRecvLine(null);
-
-             console.log('호출 순서 1');
+                
         }
 
     }, [reloadLines]);
@@ -156,16 +167,13 @@ function UserChatContents(props){
         // == 는 값
         // undefined는 null과 같은 '값'
         // 최초 랜더링시 lineDatas가 undifined인 경우 대비
+
         if(lineDatas != null){
             
-            var lines = JSON.parse(lineDatas);
-            
-            // 서버로 부터 받아온 라인들
-            setContentLines(lines);
+            // 서버로 부터 받아온 라인들 -> 받아오자마자 json으로 변환함. 
+            setContentLines(lineDatas);
             // 서버로 부터 받아온 라인 중 다음 라인조회 기준 -> 라인 더 불러올때 
             setNextLine(props.nextLine);
-            // 서버로 부터 받아온 라인 중 가장 낮은 라인
-            // setMinLineKey(lines[0].chatLineKey)
             
         }else{
             // 서버로 부터 받아온 채팅이 없을때  lineDatas = undefined
@@ -177,6 +185,7 @@ function UserChatContents(props){
             // 방을 입장할때마다 UserChatContents 해당 방에 해당하는 UserChatContents 컴포넌트가 호출 되므로 
             // 현재 UserChatContents컴포넌트가 unMount 된다. 해당 컴포넌트에 해당하는 modal을 닫기 위하여 작성하였다. 
             setChatRoomUserModal(false);
+            setEndLineFlag(false);
         }
     
     }, [lineDatas])
@@ -264,9 +273,9 @@ function UserChatContents(props){
             url: serverUrl + '/user/readLines',
             data:{
                 chatRoomKey : roomKey,
-                recvLine : newRecvLine
+                userId : sender
             }}).then(function(response){
-                //console.log('readLines : ', response.data);
+                // console.log('readLines : ', response.data);
                 result = response.data;
             }).catch(function(error){
                 console.log(error);
@@ -281,11 +290,14 @@ function UserChatContents(props){
 
         if(newRecvLine !== null){
             const readLinePromise = read();
-            readLinePromise.then(promiseResult=>{
-                
-                if(promiseResult !== 'error'){
-                     console.log(promiseResult);
-                    props.readLines(promiseResult.chat);
+            readLinePromise.then(promise=>{
+                var type = promise.type;
+                var data = promise.data;
+                if(type && data){
+                    var result = type;
+                    if(result === 'success'){
+                        props.readLines(data.chat);
+                    }
                 }
             })
         }else{
@@ -525,8 +537,6 @@ function UserChatContents(props){
                 setChatRoomUserList(null);
             }}></UserChatRoomUsersModal>
 
-
-    
     return (
         //채팅창
         <div id ='contentDiv' onClick={readChatLines}>

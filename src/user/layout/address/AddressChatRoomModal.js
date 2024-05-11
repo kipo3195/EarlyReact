@@ -3,12 +3,18 @@ import UserChatContentsInput from '../chat/UserChatContentsInput';
 
 
 import MentionCheck from '../../../modules/MentionCheck';
+import axios from 'axios';
+
+axios.defaults.withCredentials = true;
 
 function AddressChatRoomModal(props){
+
+    const serverUrl = process.env.REACT_APP_SERVER_A_URL;
 
     const [contentLines, setContentLines] = useState([]);
     const scrollRef = useRef();
     const [nextLine, setNextLine] = useState([]);
+    const [endLineFlag, setEndLineFlag] = useState(false);
 
     var myInfo = props.myInfo;
     var friendInfo = props.friendInfo;
@@ -27,24 +33,128 @@ function AddressChatRoomModal(props){
         props.closeModal();
     }
 
-    // 채팅방 라인 그리기 
-
-    useEffect(()=>{
+       // 채팅방 라인 그리기 
+       useEffect(()=>{
         if(lineDatas === '' || lineDatas == undefined){
             // 생성되지 않은 방
             setContentLines('');
             setNextLine(props.nextLine);
         }else{
+            // 서버로 부터 받아온 라인들
             var lines = JSON.parse(lineDatas);
-              // 서버로 부터 받아온 라인들
-              setContentLines(lines);
-              // 서버로 부터 받아온 라인 중 다음 라인조회 기준 -> 라인 더 불러올때 
-              setNextLine(props.nextLine);
-              // 서버로 부터 받아온 라인 중 가장 낮은 라인
-              // setMinLineKey(lines[0].chatLineKey)
+
+            setContentLines(lines);
+
+            // 서버로 부터 받아온 라인 중 가장 낮은 라인 
+            setNextLine(lines[0].chatLineKey);
         }
+        return(
+            // 해당 방에 대해서 채팅 라인을 다 불러왔다면
+            // 방을 옮겨서 들어갈때 초기화 해주기 위함.
+            setEndLineFlag(false)
+        )
 
     }, [lineDatas])
+
+    // 채팅 라인 더 불러오기 
+    function getChatLines(e){
+        e.preventDefault();
+        if(!endLineFlag){
+            const getChatLinesPromise = getChatLinesRequest();
+            
+            getChatLinesPromise.then((promise)=>{
+                console.log(promise);
+                var type = promise.type;
+                var data = promise.data;
+                if(type && data){
+                    var result = type;
+                    if(result === 'success'){
+                        var temp = data.chatRoomLine;
+                        if(temp != undefined){
+                            var beforeContents = [...contentLines];
+                            var appendContents = JSON.parse(temp);
+                            const newArr = [
+                                ...appendContents,
+                                ...beforeContents
+                            ]
+                            setContentLines(newArr);
+                            setNextLine(newArr[0].chatLineKey);
+                        }else{
+                            setEndLineFlag(true);
+                        }
+                    }
+                } 
+            })
+        }else{
+            //console.log('더 불러올 라인 없음');
+        }
+        
+    }
+    
+    async function getChatLinesRequest(){
+        var returnData = null;
+        await axios({
+            url:serverUrl+'/user/getChatLines',
+            method:'post',
+            data:{
+                roomKey : roomKey,
+                enterType : "a",
+                userId : myInfo.username,
+                readLineKey : nextLine
+            }
+        }).then(function(response){
+            
+            returnData = response.data;
+            
+        }).catch(function(error){
+            console.log(error);
+        });
+
+        return returnData;
+    }
+
+    // 채팅방 모달 클릭시 읽음처리 
+    function readChat(e){
+        e.preventDefault();
+        
+        const readChatPromise = readChatRequest();
+
+        readChatPromise.then((promise)=>{
+            var type = promise.type;
+            var data = promise.data;
+            if(type && data){
+                var result = type;
+                if(result === 'success'){
+                    props.readLines(data.chat);
+                }
+            }
+        })
+    }
+
+    async function readChatRequest(){
+
+        var returnData = null;
+
+        await axios({
+            url:serverUrl+'/user/readLines',
+            method:'post',
+            data:{
+             chatRoomKey : roomKey,
+             userId : sender
+            }
+        }).then(function(response){
+            
+            returnData = response.data;
+            console.log(returnData);
+            
+        }).catch(function(error){
+            console.log(error);
+        });
+
+        return returnData;
+    }
+
+
 
     const chatContentsInput 
     = <UserChatContentsInput client={props.client} chatRoomKey={roomKey} recevier={recevier} sender={sender} emptyRoomFlag={emptyRoomFlag}
@@ -82,7 +192,7 @@ function AddressChatRoomModal(props){
         }    
 
     return (
-        <div id='addrChatRoomDiv'>
+        <div id='addrChatRoomDiv' onClick={e=>{readChat(e)}}>
             <div id ='addrChatRoomTitle'>
                 <table id='addrChatRoomCloseTable'>
                     <tbody>
@@ -95,6 +205,9 @@ function AddressChatRoomModal(props){
                             }
                             <td id='addrChatRoomCloseTd'>
                                 <input type='button' value='X' onClick={e=>{closeModal(e)}}></input>
+                            </td>
+                            <td >
+                                <input type='button' value='더 불러오기' onClick={e=>{getChatLines(e)}}></input>
                             </td>
                         </tr>
                     </tbody>

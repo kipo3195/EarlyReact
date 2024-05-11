@@ -39,7 +39,7 @@ function UserChatContentsInput(props){
     useEffect(()=>{
 
         // 해당영역은 신규 생성(채팅X) -> 기존방 입장 혹은 기존방 입장 -> 신규생성시에만 호출된다. 
-        console.log('_emptyRoomFlag : ', _emptyRoomFlag);
+        //console.log('_emptyRoomFlag : ', _emptyRoomFlag);
         setEmptyRoomFlag(_emptyRoomFlag);
 
     }, [_emptyRoomFlag])

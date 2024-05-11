@@ -144,7 +144,8 @@ function UserAddress(props){
             data:{
                 roomKey : chatRoomKey,
                 enterType : "a",
-                userId : myInfo.username
+                userId : myInfo.username,
+                readLineKey : "99999999999999999"
             }
         }).then(function(response){
             returnData = response.data;
@@ -157,7 +158,9 @@ function UserAddress(props){
     const enterChatRoomModal = <AddressChatRoomModal myInfo={myInfo} friendInfo={friendInfo} closeModal={()=>{
         setEnterChatRoomModal(false);
     }} roomKey={roomKey} recevier={recevier} sender={sender} emptyRoomFlag={emptyRoomFlag} client={props.client} title={title}
-    createRoomDate={createRoomDate} lineDatas={lineDatas} nextLine={nextLine} ></AddressChatRoomModal>
+    createRoomDate={createRoomDate} lineDatas={lineDatas} nextLine={nextLine} readLines={(chat)=>{
+        props.chatListReload(chat);
+    }}></AddressChatRoomModal>
 
     function click(e){
         e.preventDefault(e);

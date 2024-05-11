@@ -96,16 +96,17 @@ function UserChat(props){
     
         await axios({
             method:'POST',
-            url: serverUrl +'/user/chatRoomLine',
+            url: serverUrl +'/user/getChatLines',
             data:{
-                chatRoomKey : chatRoomKey 
+                roomKey : chatRoomKey,
+                enterType : "c",
+                readLineKey : "99999999999999999",
+                userId : sender
+
             }}).then(function(response){
-                //console.log('UserChat의 라인 조회 데이터 : ', response.data);
-                if(response.data.flag === 'fail'){
-                    result = response.data.error_code;
-                }else{
-                    result = response.data;
-                }
+
+                result = response.data;
+
             }).catch(function(error){
                 console.log(error);
                 
@@ -141,27 +142,33 @@ function UserChat(props){
             }
                   
             // 여기서 기존 라인 DB 조회 이후 재랜더링 + 20240122 해당 요청시 읽음처리 추가
-            const promise = getChatRoomLines(_chatRoomKey);
+            const getChatLInesPromise = getChatRoomLines(_chatRoomKey);
             
-            promise.then(promisePromiseResult=>{
+            getChatLInesPromise.then((promise)=>{
+                var type = promise.type;
+                var data = promise.data;
 
-                if(promisePromiseResult.error_code != null){
-                    console.log('로그아웃 처리예정');
-                }else{
-                    //console.log('라인 데이터 확인 : ', promisePromiseResult.chatRoomLine);
-                    //console.log(promisePromiseResult.nextLine);
+                if(type && data){
+                    var result = type;
+                    if(result === 'success'){
+                        var lines = data.chatRoomLine;
+                        lines = JSON.parse(lines);
+                        setLineData(lines);
+                        setNextLine(lines[0].chatLineKey);
 
-                    setLineData(promisePromiseResult.chatRoomLine);
-                    setNextLine(promisePromiseResult.nextLine);
-                    setChatRoomSeq(chatRoomSeq);
-                    setChatRoomTitle(chatRoomTitle);
-                    setRoomKey(_chatRoomKey);
-                    setChatRoomUsers(chatRoomUsers);
-                    setEmptyRoomFlag(false); // 방 생성시와 구분
-                    setEmptyRoomUsers(null); // 방 생성시와 구분
-                    // 최초 방입장시 읽음처리 + 입장 한 방 갱신용
-                    props.chatListReload();
-                }
+                        setChatRoomSeq(chatRoomSeq);
+                        setChatRoomTitle(chatRoomTitle);
+                        setRoomKey(_chatRoomKey);
+                        setChatRoomUsers(chatRoomUsers);
+                        setEmptyRoomFlag(false); // 방 생성시와 구분
+                        setEmptyRoomUsers(null); // 방 생성시와 구분
+                        // 최초 방입장시 읽음처리 + 입장 한 방 갱신용
+                        props.chatListReload();
+
+                    }else{
+                        //에러 정리 
+                    }
+                }                
             })
 
         }} chatListReload={()=>{
@@ -208,7 +215,6 @@ function UserChat(props){
 
     // 방 입장 및 채팅 라인 수신 recvData
     if(chatRoomSeq !== null && chatRoomKey !== null) {
-        
         userChatContents 
         = <UserChatContents 
             sender={sender} client={client} 

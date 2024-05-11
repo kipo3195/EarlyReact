@@ -8,6 +8,7 @@ const Join = (props) => {
     
     const [username, setUsername] = useState('');
     const [dupFlag, setDupFlag] = useState('');
+    const [checkUsername, setCheckUsername] = useState(null);
     // react의 onChange는 상태가 변경될때마다 호출됨. 
     const idChange = (e) =>{
         setUsername(e.target.value);
@@ -31,7 +32,7 @@ const Join = (props) => {
             method:'GET',
             url : serverUrl+'idDupCheck',
             params:{
-                "username": "11"
+                "username": username
               }
         }).then(function(response){        
             const result = response.data.result;
@@ -39,9 +40,11 @@ const Join = (props) => {
             if(result === 'true'){
                 alert("중복된 계정이 존재합니다. 다시 입력하세요");
                 setDupFlag(null);
+                setCheckUsername(null);
             }else{
                 alert("가입 가능한 계정입니다.");
                 setDupFlag('false');
+                setCheckUsername(username);
                 // 문자열로 만듦
             }
             
@@ -72,6 +75,14 @@ const Join = (props) => {
                         setDupFlag(null);
                         return;
                     }
+
+                    if(checkUsername !== username){
+                        alert("중복체크한 ID와 입력한 ID가 일치하지 않습니다. 다시 입력해주세요.");
+                        setDupFlag(null);
+                        setCheckUsername(null);
+                        return;
+                    }
+
                     const userId = username;
                     const password = event.target.password.value;
                     const passwordCheck = event.target.passwordCheck.value;
@@ -94,7 +105,8 @@ const Join = (props) => {
                                         password:password,
                                         name:name,
                                         phoneNumber:phoneNumber,
-                                        birthDay:birth
+                                        birthDay:birth,
+                                        userProfile:""
                                     }
                                 }).then(function(response){
                                     const result = response.data.flag;
@@ -168,6 +180,7 @@ const Join = (props) => {
                                 <a id ='joinTableALink' href='' onClick={event=>{
                                     event.preventDefault();
                                     props.back();
+                                    setCheckUsername(null);
                                 }}>뒤로가기</a>
                             </td>
                             <td className='joinTableSideTd'></td>
@@ -175,8 +188,6 @@ const Join = (props) => {
                     </table>
                 </form>
             </div>
-           
-           
         </div>
     )
 }

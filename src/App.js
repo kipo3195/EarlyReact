@@ -547,12 +547,12 @@ function App() {
                   ]
                   addressListPromiseResult.friend_list = newArr;
                   setList(addressListPromiseResult);
-                  
                 })  
-
               }} addFriendSuccess={()=>{
                 setList(null);
-              }} ></UserAddress>
+              }} chatListReload={(chat)=>{
+                setChatUnread(parseInt(chat));
+              }}></UserAddress>
             }
           }else if(url === 'chat'){
             if(list === null){
@@ -564,18 +564,24 @@ function App() {
               // console.log('리스트 최초 호출')
 
               var chatListPromiseResult = null;
-              console.log('1111111111111111111, userId : ', userId);
               let chatListPromise = ChatList(userId); // 1
-              chatListPromise.then(chatListPromiseResult =>{
-                
-                setList(chatListPromiseResult.chat_list);
-                
+              chatListPromise.then(promise =>{
+                var type = promise.type;
+                var data = promise.data;
+                if(type && data){
+                  if(type ==='success'){
+                    setList(data.chat_list);
+                  }else{
+                    console.log('chatList server check !')
+                    setList(type);
+                  }
+                }
               })
             }else{
               // 최초 호출로 리스트 정보 받고 .... 리스트만 랜더링
               // 리스트가 없거나 사용자 토큰으로 받을 수 없는 경우 다르게 조건처리해야함. 
               // console.log(list);
-              if(list === "C403"){
+              if(list === 'fail'){
                 navigate('/');
                 // access token 발급 사용자가 아님(서버 DB에 없는 경우)
                 alert('비정상적인 정보로 서버에 요청하므로 로그아웃 됩니다.');
@@ -589,7 +595,7 @@ function App() {
                 setList(null);
                 setChatRoomUnread(null);
                 setMode('login');
-              }else if(list === "C404"){
+              }else if(list === 'empty'){
                 // 채팅 리스트가 없는경우
                 content = <UserNoChat></UserNoChat>
               }else{
@@ -601,16 +607,18 @@ function App() {
 
                   //console.log('신규 채팅방 생성시 리스트 갱신 요청');
                   var chatListPromiseResult = null;
-                  console.log('222222222222222222222222');
                   let chatListPromise = ChatList(userId); // 2
-                  
-                  chatListPromise.then(chatListPromiseResult =>{
-                    
-                    var reloadList = chatListPromiseResult.chat_list;
-                    if(reloadList !== undefined){
-                      setList(chatListPromiseResult.chat_list);
-                    }else{
-                      alert('로그아웃 !');
+
+                  chatListPromise.then(promise =>{
+                    var type = promise.type;
+                    var data = promise.data;
+                    if(type && data){
+                      if(type ==='success'){
+                        setList(data.chat_list);
+                      }else{
+                        console.log('chatList server check !')
+                        setList(type);
+                      }
                     }
                   })
                 }}
@@ -618,18 +626,21 @@ function App() {
                 chatListReload={(chat)=>{
                   // 채팅 수신시 건수 갱신 + 리스트 갱신
                   var chatListPromiseResult = null;
-                  console.log('3333333333333333');
                   let chatListPromise = ChatList(userId); // 3
                   chatListPromise.then(chatListPromiseResult =>{
 
-                    //console.log('신규 데이터 수신으로 인한 리스트 갱신 요청  : ', chatListPromiseResult.chat_list)
-                    var reloadList = chatListPromiseResult.chat_list;
-                    if(reloadList !== undefined){
-                      setList(chatListPromiseResult.chat_list);
-                      setChatUnread(parseInt(chat));
-                    }else{
-                      alert('로그아웃 !');
-                    }
+                    chatListPromise.then(promise =>{
+                      var type = promise.type;
+                      var data = promise.data;
+                      if(type && data){
+                        if(type ==='success'){
+                          setList(data.chat_list);
+                        }else{
+                          console.log('chatList server check !')
+                          setList(type);
+                        }
+                      }
+                    })
                   })
               
                 }}></UserChat>
