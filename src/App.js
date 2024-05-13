@@ -157,11 +157,11 @@ function App() {
 
   }
 
-  function webSocketCallback(stompClient, userId, chat, accesstoken){
+  function webSocketCallback(stompClient, userId, chat, accesstoken, worker){
         // 로그인 완료 + 웹소켓 구독(자신의 ID) 완료
 
         // 20240121 - access token refresh worker 시작 
-        const worker = new Worker();
+    
         accessTokenRefresh(accesstoken, userId, worker);
 
         // 로그인 후 최초 axios.defaults.headers.common['Authorization'] = `Bearer ${token}`; 처리를 위함 
@@ -233,7 +233,8 @@ function App() {
             //console.log('로그아웃 요청시 sockjs client', client);      -- 웹소켓 연결확인용
             client.deactivate();
           }
-          tokenWorker.terminate();
+          //20240513 
+          //tokenWorker.terminate();
           setTokenWorker(null);
           setClient(null);
           setList(null);
@@ -249,7 +250,7 @@ function App() {
           //console.log('로그아웃 요청시 sockjs client', client);      -- 웹소켓 연결확인용
           client.deactivate();
         }
-        tokenWorker.terminate();
+        //tokenWorker.terminate();
         setTokenWorker(null);
         setClient(null);
         setList(null);
@@ -354,6 +355,7 @@ function App() {
       }).then(function(response){
         const flag = response.data.flag;
         const accesstoken  = response.data.token;
+        
         //console.log('로그인시 결과 : ', response)
         // 채팅 미확인 건수
         const chat = response.data.chat;
@@ -362,6 +364,9 @@ function App() {
           //axios.defaults.headers.common['Authorization'] = `Bearer ${accesstoken}`;
           // console.log('변경 전 ',accesstoken );
           
+          //access token 발급을 위한 webworker 생성 웹소켓 disconnect시 terminate(); -> 사용하지 않음 기존 로그아웃 시 terminate() 주석처리 
+          const worker = new Worker();
+        
           // 웹소켓 구독 추가 
           stompClient = new StompJs.Client({
             //brokerURL : "ws://localhost:8080/earlyShake", // 직접접근인데..안됨
@@ -376,12 +381,21 @@ function App() {
                 // console.log("connect web socket userID : ", userId);
                 // 자신의 ID를 url로 하는 구독 추가, setClient
                 stompClient.subscribe("/topic/user/" + userId, subCallback);
-                stompClient.subscribe("/queue/user/" + userId, webSocketCallback(stompClient, userId, chat, accesstoken));
+                stompClient.subscribe("/queue/user/" + userId, webSocketCallback(stompClient, userId, chat, accesstoken, worker));
                 
             },
             onStompError: (frame) => {
                 console.error(frame);
             },
+            onDisconnect:()=>{
+              // 기존은 로그아웃시 worker.terminate()를 통해 웹 워커를 종료시켰다. 
+              // 하지만 서버와 연결이 정상적이지 않게 끊어진 경우 = 로그아웃에도 웹워커를 통해 accessToken을 갱신하는 처리가 죽지않아서 
+              // 객체를 생성한 시점에 terminate 처리를 수행하도록 수정하였다.
+              // 아마 비동기적인 요소로 인해 로그인 시점(webSocketCallback 메소드 내부에서 생성한 객체)에 useState를 통해서 전역으로 처리 하도록 한다고해도
+              // 이후 로그아웃 시점에는 worker를 알 수 없는 상황이 생겨 terminate하더라도 정확하게 처리가 되지 않는 현상으로 인해 
+              // worker가 죽지 않고 서버에 accessToken 갱신 처리를 요청 하였다고 생각한다. 
+              worker.terminate();
+            }
         
         });
         
@@ -456,7 +470,7 @@ function App() {
 
       console.log('deactivate sockjs 이후 client', client);      // -- 웹소켓 연결확인용
      
-      tokenWorker.terminate();
+      //tokenWorker.terminate();
       setTokenWorker(null);
       setClient(null);
       setList(null);
@@ -589,7 +603,7 @@ function App() {
                   //console.log('로그아웃 요청시 sockjs client', client);      -- 웹소켓 연결확인용
                   client.deactivate();
                 }
-                tokenWorker.terminate();
+                //tokenWorker.terminate();
                 setTokenWorker(null);
                 setClient(null);
                 setList(null);
