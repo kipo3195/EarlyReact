@@ -16,6 +16,9 @@ function AddressChatRoomModal(props){
     const [nextLine, setNextLine] = useState([]);
     const [endLineFlag, setEndLineFlag] = useState(false);
 
+    // 최초 수신한 채팅 라인- null이아닌경우는 읽어야할 채팅이 존재함. 
+    const [newRecvLine, setNewRecvLine] = useState(null);
+
     var myInfo = props.myInfo;
     var friendInfo = props.friendInfo;
 
@@ -26,6 +29,7 @@ function AddressChatRoomModal(props){
     var title = props.title;
     var createRoomDate = props.createRoomDate;
     var lineDatas = props.lineDatas;
+    var recvData = props.recvData;
 
     // 닫기
     function closeModal(e){
@@ -33,8 +37,8 @@ function AddressChatRoomModal(props){
         props.closeModal();
     }
 
-       // 채팅방 라인 그리기 
-       useEffect(()=>{
+    // 채팅방 라인 그리기 
+    useEffect(()=>{
         if(lineDatas === '' || lineDatas == undefined){
             // 생성되지 않은 방
             setContentLines('');
@@ -117,20 +121,27 @@ function AddressChatRoomModal(props){
     function readChat(e){
         e.preventDefault();
         
-        const readChatPromise = readChatRequest();
-
-        readChatPromise.then((promise)=>{
-            var type = promise.type;
-            var data = promise.data;
-            if(type && data){
-                var result = type;
-                if(result === 'success'){
-                    props.readLines(data.chat);
+        if(newRecvLine != null){
+            // 신규 채팅 라인이 있을때만..
+            const readChatPromise = readChatRequest();
+    
+            readChatPromise.then((promise)=>{
+                var type = promise.type;
+                var data = promise.data;
+                if(type && data){
+                    var result = type;
+                    if(result === 'success'){
+                        props.readLines(data.chat);
+    
+                        // 모든 라인을 읽음 처리함. 
+                        setNewRecvLine(null);
+                    }
                 }
-            }
-        })
+            })
+        }
     }
 
+    // 읽음처리
     async function readChatRequest(){
 
         var returnData = null;
@@ -143,10 +154,8 @@ function AddressChatRoomModal(props){
              userId : sender
             }
         }).then(function(response){
-            
+
             returnData = response.data;
-            console.log(returnData);
-            
         }).catch(function(error){
             console.log(error);
         });
@@ -154,6 +163,37 @@ function AddressChatRoomModal(props){
         return returnData;
     }
 
+    // 실시간 채팅 수신 
+    useEffect(()=>{
+
+        if(recvData != null){
+            var json = JSON.parse(props.recvData);
+            let recvLine = {
+                chatSender : json.chatSender,
+                chatContents : json.chatContents,
+                chatUnreadCount : json.chatUnreadCount,
+                chatLineKey : json.chatLineKey
+            };
+    
+            // 기존라인에 더하기 (아래에 append)
+            var copyContentLines = [...contentLines];
+            copyContentLines.push(recvLine);
+            setContentLines(copyContentLines);
+    
+            // 20240127 기존 사용 로직 -> contentsLine과 newContentsLines을 분리하여 보여줌 
+            // var copyContentLines = [...newContentLines];
+            // copyContentLines.push(recvLine);
+            // setNewContentLines(copyContentLines);
+            
+            // 수신시에는 scrollTop이 0이 아니기 때문에 고정됨.
+            // setScrollFix(true);
+            // console.log(json.chatLineKey, newRecvLine)
+            // 최초 수신한 라인
+            if(newRecvLine == null){
+                setNewRecvLine(json.chatLineKey);
+            }
+        }
+    },[recvData]);
 
 
     const chatContentsInput 

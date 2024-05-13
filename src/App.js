@@ -175,7 +175,6 @@ function App() {
         // useNagivate hook을 사용하는 상위 컴포넌트 (현재의 상위 컴포넌트는 App)는 <BrowserRouter> 컴포넌트로 감싸 있어야 한다. (index.js 확인)
         navigate('/user'); 
         setMode('user');
-
         
   }
 
@@ -393,7 +392,7 @@ function App() {
               // 객체를 생성한 시점에 terminate 처리를 수행하도록 수정하였다.
               // 아마 비동기적인 요소로 인해 로그인 시점(webSocketCallback 메소드 내부에서 생성한 객체)에 useState를 통해서 전역으로 처리 하도록 한다고해도
               // 이후 로그아웃 시점에는 worker를 알 수 없는 상황이 생겨 terminate하더라도 정확하게 처리가 되지 않는 현상으로 인해 
-              // worker가 죽지 않고 서버에 accessToken 갱신 처리를 요청 하였다고 생각한다. 
+              // worker가 죽지 않고 서버에 accessToken 갱신 처리를 요청 하였다고 생각한다.      
               worker.terminate();
             }
         

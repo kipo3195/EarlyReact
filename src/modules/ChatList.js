@@ -17,7 +17,7 @@ async function ChatList(props){
         }
     }).then(function(response){
 
-        console.log('ChatList', response);
+        //console.log('ChatList', response);
         returnData = response.data;
         //console.log(returnData);
         

@@ -19,7 +19,6 @@ self.addEventListener('message', e =>{
   function tokenVerificationken(user, accesstoken){
 
     const serverUrl = process.env.REACT_APP_SERVER_A_URL;
-    console.log('여기를 호출하는가 ? ', accesstoken);
     var _accesstoken = null;
 
     axios({

@@ -39,10 +39,12 @@ function UserAddress(props){
     const [title, setTitle] = useState('');
     const [createRoomDate, setCreateRoomDate] = useState('');
 
+    // 웹소켓 클라이언트 : 실시간 채팅 수신을 위함. 
+    var client = props.client;
 
+    // 채팅 수신 데이터
+    const [recvData, setRecvData] = useState(null);
 
-
-    
     function onScrollCallBack(){
         //console.log("스크롤 전체 높이 : ", scrollRef.current?.scrollHeight); // 스크롤의 크기
         //console.log('스크롤의 위치 : ', scrollRef.current?.scrollTop); // 스크롤 바 탑의 위치
@@ -100,33 +102,76 @@ function UserAddress(props){
                 var result = type;
                 if(result === 'success'){
 
-                    setEnterChatRoomModal(true);
-                    setFriendInfo(friend);
-                  
-                    if(data.newChatRoomKey){
-                        // 아직 생성되지않음. UserChatContentsInput 컴포넌트 이용함.
-                        setRoomKey(data.newChatRoomKey);
-                        setRecevier(myInfo.username+'|'+friend.username);
-                        setSender(myInfo.username);
-                        setEmptyRoomFlag(true);
-                        setTitle(myInfo.name+', '+friend.name);
-                        const today = new Date();
-                        const formattedDate = `${today.getFullYear()}${today.getMonth() + 1}${today.getDate()}${today.getSeconds()}${today.getMilliseconds()}`;
-                        setCreateRoomDate(formattedDate);
-                        setLineDatas('');
-                        setNextLine(0);
-                    }else{
-                        setRoomKey(data.chatRoomKey);
-                        setRecevier(myInfo.username+'|'+friend.username);
-                        setSender(myInfo.username);
-                        setEmptyRoomFlag(false);
-                        setTitle(data.title);
-                        setLineDatas(data.chatRoomLine);
-                        setNextLine(data.nextLine);
+                    if(client !== null){
+                        var roomKey = null;
+                        setEnterChatRoomModal(true);
+                        setFriendInfo(friend);
+                        if(data.newChatRoomKey){
+                            // 아직 생성되지않음. UserChatContentsInput 컴포넌트 이용함.
+                            roomKey = data.newChatRoomKey;
+                            setRoomKey(data.newChatRoomKey);
+                            setRecevier(myInfo.username+'|'+friend.username);
+                            setSender(myInfo.username);
+                            setEmptyRoomFlag(true);
+                            setTitle(myInfo.name+', '+friend.name);
+                            const today = new Date();
+                            const formattedDate = `${today.getFullYear()}${today.getMonth() + 1}${today.getDate()}${today.getSeconds()}${today.getMilliseconds()}`;
+                            setCreateRoomDate(formattedDate);
+                            setLineDatas('');
+                            setNextLine(0);
+                        }else{
+                            roomKey = data.chatRoomKey;
+                            setRoomKey(data.chatRoomKey);
+                            setRecevier(myInfo.username+'|'+friend.username);
+                            setSender(myInfo.username);
+                            setEmptyRoomFlag(false);
+                            setTitle(data.title);
+                            setLineDatas(data.chatRoomLine);
+                            setNextLine(data.nextLine);
+                        }
+
+                        client.subscribe('/topic/room/'+roomKey, chatRoomCallback, {id:roomKey});
+
                     }
                 }
             }
         }) 
+    }
+
+    // 입장한 채팅방의 대화 callback 함수 
+    function chatRoomCallback(message){
+    
+        if (message.body) {
+            // console.log('chatRoomCallback : ', message.body);
+            var recvJson = JSON.parse(message.body);
+            var type = recvJson.type;
+            
+            // 일반 채팅 수신
+            // {"chatSender":"","chatLineKey":"","chatUnreadCount":"","chatRoomKey":"","chatContents":"","type":"chat"}
+            if(type === 'chat'){
+                var chatSender = recvJson.chatSender;
+                if(sender !== chatSender){
+                    setRecvData(message.body);
+                }
+
+            // 채팅방 라인별 미확인 건수 갱신   
+            // {"result":{"20240130230411054":"0","20240130230415410":"0"},"type":"readLines"}
+            }
+            else if(type ==='readLines'){
+                
+               // setReloadLines(recvJson.result);
+                
+            // 채팅방 라인의 좋아요, 굿, 체크
+            // {"lineKey":"20240204151128490","like":"0","check":"1","roomKey":"R_231212224649930","type":"lineEvent"}
+            }else if(type ==='lineEvent'){
+                
+               // setReloadLineEvent(recvJson);
+
+            }
+
+          } else {
+            
+          }
     }
 
     async function addrChatRoomListRequest(friend){
@@ -155,7 +200,7 @@ function UserAddress(props){
         return returnData;
     }
 
-    const enterChatRoomModal = <AddressChatRoomModal myInfo={myInfo} friendInfo={friendInfo} closeModal={()=>{
+    const enterChatRoomModal = <AddressChatRoomModal recvData={recvData} myInfo={myInfo} friendInfo={friendInfo} closeModal={()=>{
         setEnterChatRoomModal(false);
     }} roomKey={roomKey} recevier={recevier} sender={sender} emptyRoomFlag={emptyRoomFlag} client={props.client} title={title}
     createRoomDate={createRoomDate} lineDatas={lineDatas} nextLine={nextLine} readLines={(chat)=>{
