@@ -16,6 +16,8 @@ function AddressChatRoomModal(props){
     const [nextLine, setNextLine] = useState([]);
     const [endLineFlag, setEndLineFlag] = useState(false);
 
+    const [recvUser, setRecvUser] = useState(null);
+
     // 최초 수신한 채팅 라인- null이아닌경우는 읽어야할 채팅이 존재함. 
     const [newRecvLine, setNewRecvLine] = useState(null);
 
@@ -52,6 +54,7 @@ function AddressChatRoomModal(props){
             // 서버로 부터 받아온 라인 중 가장 낮은 라인 
             setNextLine(lines[0].chatLineKey);
         }
+
         return(
             // 해당 방에 대해서 채팅 라인을 다 불러왔다면
             // 방을 옮겨서 들어갈때 초기화 해주기 위함.
@@ -59,6 +62,47 @@ function AddressChatRoomModal(props){
         )
 
     }, [lineDatas])
+
+     // 참여자 조회 
+     useEffect(()=>{
+      
+        const getRecvUserPromise = getRecvUser();
+        getRecvUserPromise.then((promise)=>{
+            var type = promise.type;
+            var data = promise.data;
+            if(type && data){
+                if(type ==='success'){
+                    setRecvUser(data.recv_user);
+                }
+            }
+        })
+
+        return(
+            setRecvUser(null)
+        )
+
+    }, [roomKey])
+
+    // 참여자 조회 요청
+
+    async function getRecvUser(){
+
+        var returnData = null;
+        await axios({
+            url:serverUrl+'/user/getRecvUser',
+            method:'post',
+            data:{
+                roomKey : roomKey,
+                userId : myInfo.username
+            }
+        }).then(function(response){
+            returnData = response.data;
+        }).catch(function(error){
+            console.log(error);
+        })
+        return returnData;
+
+    }
 
     // 채팅 라인 더 불러오기 
     function getChatLines(e){
@@ -165,14 +209,16 @@ function AddressChatRoomModal(props){
 
     // 실시간 채팅 수신 
     useEffect(()=>{
-
         if(recvData != null){
             var json = JSON.parse(props.recvData);
             let recvLine = {
                 chatSender : json.chatSender,
                 chatContents : json.chatContents,
                 chatUnreadCount : json.chatUnreadCount,
-                chatLineKey : json.chatLineKey
+                chatLineKey : json.chatLineKey,
+                chatSenderName : recvUser[0].name 
+                // 20240514 recvUser가 리스트 형식임. 다만, 주소록 채팅은 1:1 채팅이므로 0번째 인덱스의 사용자가 곧 상대방을 의미함.
+                // 만약 참여자 조회 API를 이용하여 여러명이 있는 채팅방의 참여자를 구하려면 반복문을 돌면서 사용자 ID와 비교하는 로직 필요함. 
             };
     
             // 기존라인에 더하기 (아래에 append)

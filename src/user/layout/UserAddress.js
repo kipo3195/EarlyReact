@@ -30,7 +30,6 @@ function UserAddress(props){
     const [lineDatas, setLineDatas] = useState('');
     const [nextLine, setNextLine] = useState('');
 
-
     // 채팅방 입력 처리 
     const [roomKey, setRoomKey] = useState('');
     const [recevier, setRecevier] = useState('');
@@ -92,12 +91,18 @@ function UserAddress(props){
     function enterChatRoom(e, friend){
         e.preventDefault();
 
+        
         const addrChatRoomListPromise = addrChatRoomListRequest(friend);
 
         addrChatRoomListPromise.then((promise)=>{
             var type = promise.type;
             var data = promise.data;
-            
+
+            // 기존 방 구독 취소 
+            if(roomKey != null){
+                client.unsubscribe(roomKey);
+            }
+
             if(type && data){
                 var result = type;
                 if(result === 'success'){
@@ -206,26 +211,6 @@ function UserAddress(props){
     createRoomDate={createRoomDate} lineDatas={lineDatas} nextLine={nextLine} readLines={(chat)=>{
         props.chatListReload(chat);
     }}></AddressChatRoomModal>
-
-    function click(e){
-        e.preventDefault(e);
-        axios({
-            url:serverUrl+'/address/test',
-            method:'get',
-            params:{
-                "username":sender
-              }
-        }).then(function(response){
-
-
-
-        }).catch(function(error){
-
-            console.log(error);
-
-        });
-
-    }
 
     return(
         <div>
