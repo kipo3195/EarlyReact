@@ -59,7 +59,7 @@ function UserChat(props){
     function chatRoomCallback(message){
     
         if (message.body) {
-            console.log('chatRoomCallback : ', message.body);
+            // console.log('chatRoomCallback : ', message.body);
             var recvJson = JSON.parse(message.body);
             var type = recvJson.type;
             

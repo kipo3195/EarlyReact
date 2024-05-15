@@ -208,10 +208,6 @@ function UserChatContents(props){
         }else if(scrollRef.current?.scrollTop === 0 && scrollFix){
             scrollRef.current.scrollTop = 10;
         }
-
-        
-        
-
     })
     
     // 채팅 수신시                               ------------------------    4

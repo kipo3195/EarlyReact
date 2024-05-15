@@ -33,21 +33,18 @@ function UserAddress(props){
     // 채팅방 입력 처리 
     const [roomKey, setRoomKey] = useState('');
     const [recevier, setRecevier] = useState('');
-    const [sender, setSender] = useState('');
+    const [sender, setSender] = useState(props.list.my_info.username);
     const [emptyRoomFlag, setEmptyRoomFlag] = useState(false);
     const [title, setTitle] = useState('');
     const [createRoomDate, setCreateRoomDate] = useState('');
 
     // 웹소켓 클라이언트 : 실시간 채팅 수신을 위함. 
     var client = props.client;
-
     // 채팅 수신 데이터
     const [recvData, setRecvData] = useState(null);
 
     function onScrollCallBack(){
-        //console.log("스크롤 전체 높이 : ", scrollRef.current?.scrollHeight); // 스크롤의 크기
-        //console.log('스크롤의 위치 : ', scrollRef.current?.scrollTop); // 스크롤 바 탑의 위치
-        //console.log("요소의 높이 : ", scrollRef.current?.clientHeight); // 스크롤 바의 크기 
+       
         if(scrollRef.current?.scrollHeight <= (scrollRef.current?.scrollTop + scrollRef.current?.clientHeight + 1)){
             if(friendCount === friendList.length){
                 // 더 호출 할 거 없음
@@ -90,7 +87,6 @@ function UserAddress(props){
     // 1:1 채팅방 입장
     function enterChatRoom(e, friend){
         e.preventDefault();
-
         
         const addrChatRoomListPromise = addrChatRoomListRequest(friend);
 
@@ -116,19 +112,17 @@ function UserAddress(props){
                             roomKey = data.newChatRoomKey;
                             setRoomKey(data.newChatRoomKey);
                             setRecevier(myInfo.username+'|'+friend.username);
-                            setSender(myInfo.username);
                             setEmptyRoomFlag(true);
                             setTitle(myInfo.name+', '+friend.name);
                             const today = new Date();
                             const formattedDate = `${today.getFullYear()}${today.getMonth() + 1}${today.getDate()}${today.getSeconds()}${today.getMilliseconds()}`;
                             setCreateRoomDate(formattedDate);
                             setLineDatas('');
-                            setNextLine(0);
+                            setNextLine(0); // 채팅방 입장후 더 가져오기 처리 안하기 위함
                         }else{
                             roomKey = data.chatRoomKey;
                             setRoomKey(data.chatRoomKey);
                             setRecevier(myInfo.username+'|'+friend.username);
-                            setSender(myInfo.username);
                             setEmptyRoomFlag(false);
                             setTitle(data.title);
                             setLineDatas(data.chatRoomLine);
@@ -182,7 +176,7 @@ function UserAddress(props){
     async function addrChatRoomListRequest(friend){
         var returnData = null;
         var chatRoomKey = null;
-        console.log('friend : ', friend.username);
+        // console.log('friend : ', friend.username);
         if(myInfo.id < friend.id){
             chatRoomKey = 'R_'+myInfo.username+'|'+friend.username;
         }else{
@@ -282,9 +276,9 @@ function UserAddress(props){
                                 <td className='myStatusMsg'>
                                     상태메시지
                                 </td>
-
-                                <input type='hidden' value ={myInfo.username}></input>
-                                
+                                <td>
+                                    <input type='hidden' value ={myInfo.username}></input>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

@@ -10,9 +10,9 @@ axios.defaults.withCredentials = true;
 function AddressChatRoomModal(props){
 
     const serverUrl = process.env.REACT_APP_SERVER_A_URL;
+    const scrollRef = useRef();
 
     const [contentLines, setContentLines] = useState([]);
-    const scrollRef = useRef();
     const [nextLine, setNextLine] = useState([]);
     const [endLineFlag, setEndLineFlag] = useState(false);
 
@@ -20,6 +20,9 @@ function AddressChatRoomModal(props){
 
     // 최초 수신한 채팅 라인- null이아닌경우는 읽어야할 채팅이 존재함. 
     const [newRecvLine, setNewRecvLine] = useState(null);
+
+    // 스크롤을 가장 아래로 
+    const [srcollToBottom, setScrollToBottom] = useState(false);
 
     var myInfo = props.myInfo;
     var friendInfo = props.friendInfo;
@@ -45,6 +48,7 @@ function AddressChatRoomModal(props){
             // 생성되지 않은 방
             setContentLines('');
             setNextLine(props.nextLine);
+        
         }else{
             // 서버로 부터 받아온 라인들
             var lines = JSON.parse(lineDatas);
@@ -53,6 +57,9 @@ function AddressChatRoomModal(props){
 
             // 서버로 부터 받아온 라인 중 가장 낮은 라인 
             setNextLine(lines[0].chatLineKey);
+
+            // 입장시 스크롤을 가장 아래로 이동시킴
+            setScrollToBottom(true);
         }
 
         return(
@@ -68,6 +75,7 @@ function AddressChatRoomModal(props){
       
         const getRecvUserPromise = getRecvUser();
         getRecvUserPromise.then((promise)=>{
+            //console.log(promise);
             var type = promise.type;
             var data = promise.data;
             if(type && data){
@@ -76,17 +84,13 @@ function AddressChatRoomModal(props){
                 }
             }
         })
-
         return(
             setRecvUser(null)
         )
-
     }, [roomKey])
 
     // 참여자 조회 요청
-
     async function getRecvUser(){
-
         var returnData = null;
         await axios({
             url:serverUrl+'/user/getRecvUser',
@@ -101,44 +105,8 @@ function AddressChatRoomModal(props){
             console.log(error);
         })
         return returnData;
-
     }
 
-    // 채팅 라인 더 불러오기 
-    function getChatLines(e){
-        e.preventDefault();
-        if(!endLineFlag){
-            const getChatLinesPromise = getChatLinesRequest();
-            
-            getChatLinesPromise.then((promise)=>{
-                console.log(promise);
-                var type = promise.type;
-                var data = promise.data;
-                if(type && data){
-                    var result = type;
-                    if(result === 'success'){
-                        var temp = data.chatRoomLine;
-                        if(temp != undefined){
-                            var beforeContents = [...contentLines];
-                            var appendContents = JSON.parse(temp);
-                            const newArr = [
-                                ...appendContents,
-                                ...beforeContents
-                            ]
-                            setContentLines(newArr);
-                            setNextLine(newArr[0].chatLineKey);
-                        }else{
-                            setEndLineFlag(true);
-                        }
-                    }
-                } 
-            })
-        }else{
-            //console.log('더 불러올 라인 없음');
-        }
-        
-    }
-    
     async function getChatLinesRequest(){
         var returnData = null;
         await axios({
@@ -240,8 +208,7 @@ function AddressChatRoomModal(props){
             }
         }
     },[recvData]);
-
-
+    
     const chatContentsInput 
     = <UserChatContentsInput client={props.client} chatRoomKey={roomKey} recevier={recevier} sender={sender} emptyRoomFlag={emptyRoomFlag}
           title={title} createRoomDate ={createRoomDate} 
@@ -257,26 +224,74 @@ function AddressChatRoomModal(props){
             var copyContentLines = [...contentLines];
             copyContentLines.push(line);
             setContentLines(copyContentLines);
-           
-            //console.log('add line 호출');
-            // 리스트 갱신용 
-            // props.refreshList();
 
-            // 채팅 발신시 스크롤 제일 하단으로 이동함. 
-            //scrollRef.current.scrollTop = scrollRef.current?.scrollHeight;
-            
+            // 신규채팅 수신시 스크롤을 가장 아래로 이동시킴
+            setScrollToBottom(true);
         }}></UserChatContentsInput>
+        
+
+    // 지명채팅 키워드가 있을때 
+    function mentionCheck(chatLine){
+        var result = '';
+
+        result = <MentionCheck checkLine={chatLine}></MentionCheck>
+
+        return result;
+    }    
+
+    // 스크롤 위치를 바닥으로 변경시키는 함수 
+    useEffect(() => {
+        if(srcollToBottom){
+            scrollRef.current.scrollTop = scrollRef.current?.scrollHeight;
+            setScrollToBottom(false);
+        }
+    }, [srcollToBottom]);
+
+    // 채팅 라인 더 불러오기 처리 
+    function onScrollCallBack(){
+
+        console.log("스크롤 전체 높이 : ", scrollRef.current?.scrollHeight); // 스크롤의 크기
+        console.log('스크롤의 위치 : ', scrollRef.current?.scrollTop); // 스크롤 바 탑의 위치
+        console.log("요소의 높이 : ", scrollRef.current?.clientHeight); // 스크롤 바의 크기 
+        console.log('');
 
 
-        // 지명채팅 키워드가 있을때 
-        function mentionCheck(chatLine){
-            var result = '';
+        if(scrollRef.current?.scrollTop === 0 && nextLine !== '0'){
+            //nextLine 이 '0'인 경우 최초 호출시 서버에서 하나도 받은게 없음 -> 요청하지 않도록 처리
+            if(!endLineFlag){
+                const getChatLinesPromise = getChatLinesRequest();
+                
+                getChatLinesPromise.then((promise)=>{
+                    console.log(promise);
+                    var type = promise.type;
+                    var data = promise.data;
+                    if(type && data){
+                        var result = type;
+                        if(result === 'success'){
+                            var temp = data.chatRoomLine;
+                            if(temp != undefined){
+                                var beforeContents = [...contentLines];
+                                var appendContents = JSON.parse(temp);
+                                const newArr = [
+                                    ...appendContents,
+                                    ...beforeContents
+                                ]
+                                setContentLines(newArr);
+                                setNextLine(newArr[0].chatLineKey);
+                                console.log(scrollRef.current.scrollTop);
+                                scrollRef.current.scrollTop = 5;
+                            }else{
+                                setEndLineFlag(true);
+                            }
+                        }
+                    } 
+                })
+            }else{
+                //console.log('더 불러올 라인 없음');
+            } 
+        }
+    }
     
-            result = <MentionCheck checkLine={chatLine}></MentionCheck>
-    
-            return result;
-        }    
-
     return (
         <div id='addrChatRoomDiv' onClick={e=>{readChat(e)}}>
             <div id ='addrChatRoomTitle'>
@@ -292,14 +307,11 @@ function AddressChatRoomModal(props){
                             <td id='addrChatRoomCloseTd'>
                                 <input type='button' value='X' onClick={e=>{closeModal(e)}}></input>
                             </td>
-                            <td >
-                                <input type='button' value='더 불러오기' onClick={e=>{getChatLines(e)}}></input>
-                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div id ='addrChatRoomContents'>
+            <div id ='addrChatRoomContents' ref={scrollRef} onScroll={onScrollCallBack}>
                 <table id ='chatRoomContentsTable'>
                     <tbody>
                         {
