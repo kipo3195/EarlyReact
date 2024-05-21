@@ -2,6 +2,9 @@ import '../../css/UserChat.css';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import UserChatMentionModal from './UserChatMentionModal';
+import FileSendModal from '../../../modules/FileSendModal';
+import { useImperativeFilePicker } from 'use-file-picker';
+import fileSendModalImg from '../../../etc/img/fileSendModalImg.png';
 
 function UserChatContentsInput(props){
 
@@ -23,6 +26,10 @@ function UserChatContentsInput(props){
 
     // 빈값일때 입력 못하게 함
     const [emptyCheck, setEmptyCheck] = useState(false);
+
+    // 파일 전송시 전송할 파일
+    const [file, setFile] = useState(null);
+    const [fileFlag, setFileFlag] = useState(false);
 
     var client = props.client;
     var roomKey = props.chatRoomKey;
@@ -378,13 +385,49 @@ function UserChatContentsInput(props){
             setContents(event.target.value);
         };
 
+        // 파일 업로드 모달 생성 
+        function fileUpload(e){
+
+            var file = e.target.files[0];
+            console.log(file);
+            if(file !== undefined){
+                setFile(file);
+                setFileFlag(true);
+            }
+        }
+
+        const fileSendModal = <FileSendModal file={file} closeModal={()=>{
+            setFile(null);
+            setFileFlag(false);
+        }}></FileSendModal>
+
+        const { openFilePicker, filesContent, loading, errors, plainFiles, clear, removeFileByIndex, removeFileByReference } =
+        useImperativeFilePicker({
+          multiple: false,
+          readAs: 'Text',
+          readFilesContent: true,
+        });
+
+        // 현재는 파일 하나만 되게끔 처리함. 
+        useEffect(()=>{
+            console.log(plainFiles);
+            if(plainFiles.length > 0){
+                setFile(plainFiles[0]);
+                setFileFlag(true);
+
+                // plainFiles을 clear하는 함수
+                clear({
+
+                });
+            }
+        },[plainFiles])
+
     return (
     
     <div id ='chatRoomText'>
         <form onSubmit={event=>{
             event.preventDefault();
             // stomp pub
-
             sendMessage(event.target.chatTextArea.value, false);
 
             }}>
@@ -402,7 +445,9 @@ function UserChatContentsInput(props){
                 <tbody id ='chatRoomButton'>
                     <tr>                    
                         <td colSpan='5'>
-                            <input type ='button' value='botton1'></input>
+                            <img className= 'chatRoomButtonImg' src={fileSendModalImg} alt='fileSendModalImg' width='25px' onClick={()=>{
+                                    openFilePicker();
+                                }}></img>
                             <input type ='button' value='botton2'></input>
                             <input type ='button' value='botton3'></input>
                             <input id='chatTextSend' type ='submit' value='전송'></input>
@@ -414,6 +459,8 @@ function UserChatContentsInput(props){
 
         {/* 지명 채팅 대상자 리스트 모달*/}
         {isMentionModal ? chatMentionModal : ''}
+        {/* 파일 전송 모달 생성*/}
+        {fileFlag ? fileSendModal: ''}
     </div>
                  
     )
