@@ -396,7 +396,7 @@ function UserChatContentsInput(props){
             }
         }
 
-        const fileSendModal = <FileSendModal file={file} closeModal={()=>{
+        const fileSendModal = <FileSendModal file={file} sender={sender}closeModal={()=>{
             setFile(null);
             setFileFlag(false);
         }}></FileSendModal>
@@ -414,7 +414,6 @@ function UserChatContentsInput(props){
             if(plainFiles.length > 0){
                 setFile(plainFiles[0]);
                 setFileFlag(true);
-
                 // plainFiles을 clear하는 함수
                 clear({
 
@@ -447,7 +446,7 @@ function UserChatContentsInput(props){
                         <td colSpan='5'>
                             <img className= 'chatRoomButtonImg' src={fileSendModalImg} alt='fileSendModalImg' width='25px' onClick={()=>{
                                     openFilePicker();
-                                }}></img>
+                            }}></img>
                             <input type ='button' value='botton2'></input>
                             <input type ='button' value='botton3'></input>
                             <input id='chatTextSend' type ='submit' value='전송'></input>
