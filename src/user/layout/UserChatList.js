@@ -113,7 +113,6 @@ function UserChatList(props){
     }
 
     return (
-            
              <div id ='chatListDiv'>
                 <div>
                     <table>

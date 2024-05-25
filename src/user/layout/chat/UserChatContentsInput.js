@@ -9,8 +9,7 @@ import fileSendModalImg from '../../../etc/img/fileSendModalImg.png';
 function UserChatContentsInput(props){
 
     const serverUrl = process.env.REACT_APP_SERVER_A_URL;
-
-    
+    const notSupportType = process.env.REACT_APP_NOT_SUPPORT_TYPE;
     const [contents, setContents] = useState('');
     // 지명채팅 모달 Flag
     const [isMentionModal, setMentionModal] = useState(false);
@@ -94,13 +93,13 @@ function UserChatContentsInput(props){
                             // console.log(roomKeyPromiseResult);
                             // 20240312 여기까지 확인함. 
 
-                            sendMessage(contents, true);
+                            sendMessage(contents, 'chat');
                             setMentionModal(false);
                             setEmptyRoomFlag(false);
                         })
 
                     }else{
-                         sendMessage(contents, true);
+                         sendMessage(contents, 'chat');
                          setMentionModal(false);
                     }
 
@@ -144,55 +143,80 @@ function UserChatContentsInput(props){
     }
 
       // 전송버튼 클릭시 
-    function sendMessage(message){
+    function sendMessage(message, type){
         
         if(message === null || message === ''){
             return;
         }
 
-        // 라인키 발급 로직 
-        const lineKeyPromise = getLineKey();
-        
-        lineKeyPromise.then(promisePromiseResult=>{
-            if(promisePromiseResult !== 'error'){
-                var lineKey = promisePromiseResult;       
-                        
-                // 웹소켓 채팅 발신
-                client.publish({
-                    // 데이터를 보내는 경로 /app + 서버(UserChatController)의 @MessageMapping(/test/message)
-                    // chatType 동적 처리하기 TODO
-                    destination:"/app/user/chat",
-                    body:JSON.stringify({
-                        chatRoomKey : roomKey,
-                        chatContents : message,
-                        chatReceiver : recevier,
-                        chatSender : sender,
-                        chatType : "C",
-                        chatLineKey : lineKey
-                    })
-                });
-                
-                // 라인 데이터 보여주기 
-                let line ={
-                    chatRoomKey : roomKey,
-                    chatContents : message,
-                    chatReceiver : recevier,
-                    chatSender : sender,
-                    chatType : "C",
-                    chatLineKey : lineKey,
-                    chatUnreadCount : (recevier.split('|')).length-1 // 발신자에게 보여줄 미확인 건수
+        if(type === 'chat'){
+            // 라인키 발급 로직 
+            const lineKeyPromise = getLineKey();
+            
+            lineKeyPromise.then(promisePromiseResult=>{
+                if(promisePromiseResult !== 'error'){
+                    var lineKey = promisePromiseResult;       
+                            
+                    chatPub(roomKey, message, recevier, sender, 'C', lineKey);
+                    
+
+                }else{
+                    console.log('채팅 전송 실패');
                 }
-
-                //상위 컴포넌트에 알려줌
-                props.addLine(line);  
-
-                // textarea 초기화용
-                setContents('');
-
-            }else{
-                console.log('채팅 전송 실패');
+            })
+        }else if(type === 'file'){
+            if(emptyRoomFlag){
+                putRoom(null, 'file');
             }
-        })
+
+            var fileMessage = message.previewUrl;
+            var fileType = message.fileType;
+            var fileHash = message.fileHash;
+            
+            chatPub(roomKey, fileMessage, recevier, sender, fileType, fileHash);
+
+        }else{
+            alert(notSupportType);
+        }
+    }
+
+    // 채팅 발신 
+    function chatPub(roomKey, message, recevier, sender, type, lineKey){
+
+          // 웹소켓 채팅 발신
+          client.publish({
+            // 데이터를 보내는 경로 /app + 서버(UserChatController)의 @MessageMapping(/test/message)
+            // chatType 동적 처리하기 TODO
+            destination:"/app/user/chat",
+            body:JSON.stringify({
+                chatRoomKey : roomKey,
+                chatContents : message,
+                chatReceiver : recevier,
+                chatSender : sender,
+                chatType : type,
+                chatLineKey : lineKey
+            })
+        });
+        
+        // 라인 데이터 보여주기 
+        let line ={
+            chatRoomKey : roomKey,
+            chatContents : message,
+            chatReceiver : recevier,
+            chatSender : sender,
+            chatType : "C",
+            chatLineKey : lineKey,
+            chatUnreadCount : (recevier.split('|')).length-1 // 발신자에게 보여줄 미확인 건수
+        }
+
+        //상위 컴포넌트에 알려줌
+        props.addLine(line);  
+
+        if(type === 'C') {
+            // textarea 초기화용
+            setContents('');
+        }
+
     }
 
     // 라인키 발급 API 호출
@@ -360,46 +384,46 @@ function UserChatContentsInput(props){
                 // 채팅 발송
                 // console.log('발신 내용 : ', event.target.value);
                 if(emptyRoomFlag){
-                    
-                    // 비동기로 방생성 API 호출 이후에 채팅 라인 전달 처리
-                    // 생성자, 룸키, 참여자, 방제목
-                    const roomKeyPromise = putRoomKey(sender, roomKey, recevier, title);
-                    roomKeyPromise.then(roomKeyPromiseResult=>{
-                        // console.log(roomKeyPromiseResult);
-                        // 20240312 여기까지 확인함. 
-
-                        sendMessage(event.target.value);
-                        setMentionModal(false);
-                        setEmptyRoomFlag(false);
-                    })
-
+                    putRoom(event.target.value, 'chat');
                 }else{
-                     sendMessage(event.target.value);
+                     sendMessage(event.target.value, 'chat');
                      setMentionModal(false);
                 }
             }
         };
+
+        // 방 생성
+        function putRoom(data, type){
+            // 비동기로 방생성 API 호출 이후에 채팅 라인 전달 처리
+            // 생성자, 룸키, 참여자, 방제목
+            const roomKeyPromise = putRoomKey(sender, roomKey, recevier, title);
+            roomKeyPromise.then(roomKeyPromiseResult=>{
+                if(type === 'chat'){
+                    // console.log(roomKeyPromiseResult);
+                    // 20240312 여기까지 확인함. 
+                    sendMessage(data, 'chat');
+                    setMentionModal(false);
+                    setEmptyRoomFlag(false);
+                }
+            })
+        }
 
         // 바뀔때 마다 감지해서 contents를 변경함. 
         const handleChange = (event) => {
             setContents(event.target.value);
         };
 
-        // 파일 업로드 모달 생성 
-        function fileUpload(e){
-
-            var file = e.target.files[0];
-            console.log(file);
-            if(file !== undefined){
-                setFile(file);
-                setFileFlag(true);
-            }
-        }
-
-        const fileSendModal = <FileSendModal file={file} sender={sender}closeModal={()=>{
+        // 파일 선택 이후 모달. 
+        const fileSendModal = <FileSendModal file={file} sender={sender} 
+            closeModal={()=>{
+            setFile(null);
+            setFileFlag(false);}} 
+            
+            fileSend={(fileSendData)=>{
             setFile(null);
             setFileFlag(false);
-        }}></FileSendModal>
+            sendMessage(fileSendData, 'file');
+        }} ></FileSendModal>
 
         const { openFilePicker, filesContent, loading, errors, plainFiles, clear, removeFileByIndex, removeFileByReference } =
         useImperativeFilePicker({
@@ -427,7 +451,7 @@ function UserChatContentsInput(props){
         <form onSubmit={event=>{
             event.preventDefault();
             // stomp pub
-            sendMessage(event.target.chatTextArea.value, false);
+            sendMessage(event.target.chatTextArea.value, 'chat');
 
             }}>
             <table id ='chatTable'>

@@ -5,27 +5,72 @@ import axios from 'axios';
 function FileSendModal(props){
 
     const serverUrl = process.env.REACT_APP_SERVER_FILE_URL;
+    const fileSendErrorMsg = process.env.REACT_APP_FILE_SENDING_ERROR_MSG; 
 
     const [previewUrl, setPreviewUrl] = useState(null);
     const [file, setFile] = useState(null);
     const [sender, setSender] = useState(null);
+
+    // chatType에 이용. 
+    const [fileType, setFileType] = useState(null);
 
     function closeModal(e){
         e.preventDefault();
         props.closeModal();
     }
 
+    console.log(previewUrl);
+
     useEffect(()=>{
         var temp = props.file;
-        console.log(temp);
-        const imageUrl = URL.createObjectURL(temp);
-        setPreviewUrl(imageUrl);
-        setFile(temp);
-        setSender(props.sender);
+        if(temp){
+            console.log(temp);
+            const imageUrl = URL.createObjectURL(temp);
+            setPreviewUrl(imageUrl);
+            setFile(temp);
+            setSender(props.sender);
+            if(temp.type){
+                if(temp.type.match('image')){
+                    setFileType('I');
+                }else{
+                    setFileType('F');
+                }
+            }
+        }
     }, [props.file])
 
     // 파일 전송 버튼 클릭시
-    const fileUpload = async(e) => {
+    function fileHash(e){
+        e.preventDefault();
+
+        const fileHashRequestPromise = fileHashRequest();
+
+        fileHashRequestPromise.then(promise=>{
+            var fileHash = promise.fileHash;
+            fileUpload(e, fileHash);
+        })
+
+    }
+
+    async function fileHashRequest(){
+        var returnData = null;
+
+        await axios({
+            method:'get',
+            url: serverUrl+'getFileHash',
+        }).then(function(response){
+    
+            //console.log('ChatList', response);
+            returnData = response.data;
+            //console.log(returnData);
+    
+        }).catch(function(error){
+            console.log(error);
+        })
+        return returnData;
+    }
+
+    const fileUpload = async(e, fileHash) => {
         e.preventDefault();
         // 파일 없으면 창닫아버림.
         if(!file){
@@ -33,9 +78,9 @@ function FileSendModal(props){
             return;
         }
         const formData = new FormData();
-        console.log(file);
         formData.append('fileData', file);
         formData.append('senderId', sender);
+        formData.append('fileHash', fileHash);
         try {
             let axiosConfig = {
                 headers: {
@@ -43,10 +88,21 @@ function FileSendModal(props){
                 }
             }
             const response = await axios.post(serverUrl+'upload', formData, axiosConfig);
-            console.log(response.data)
-          } catch (error) {
+            
+            if(response.data && response.data.type === 'fail'){
+                alert(fileSendErrorMsg);
+                props.closeModal();
+            }else{
+                const fileSendData = {
+                    'fileHash' : fileHash,
+                    'previewUrl' : previewUrl,
+                    'fileType' : fileType
+                }
+                props.fileSend(fileSendData);
+            }
+        } catch (error) {
             console.error(error);
-          }
+        }
     }
 
     return (
@@ -85,7 +141,7 @@ function FileSendModal(props){
                         <tbody>
                             <tr>
                                 <td>
-                                    <input type='button' value='전송' onClick={e=>fileUpload(e)}></input>
+                                    <input type='button' value='전송' onClick={e=>fileHash(e)}></input>
                                 </td>
                             </tr>
                         </tbody>

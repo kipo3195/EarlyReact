@@ -152,10 +152,14 @@ function UserChat(props){
                     var result = type;
                     if(result === 'success'){
                         var lines = data.chatRoomLine;
-                        lines = JSON.parse(lines);
-                        setLineData(lines);
-                        setNextLine(lines[0].chatLineKey);
-
+                        if(lines !== undefined){
+                            lines = JSON.parse(lines);
+                            setLineData(lines);
+                            setNextLine(lines[0].chatLineKey);
+                        }else{
+                            setLineData(null);
+                            setNextLine('0');
+                        }
                         setChatRoomSeq(chatRoomSeq);
                         setChatRoomTitle(chatRoomTitle);
                         setRoomKey(_chatRoomKey);

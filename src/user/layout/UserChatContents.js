@@ -18,6 +18,7 @@ axios.defaults.withCredentials = true;
 function UserChatContents(props){
 
     const serverUrl = process.env.REACT_APP_SERVER_A_URL;
+    const fileServerUrl = process.env.REACT_APP_SERVER_FILE_URL;
     
     // 더불러오기 끝
     const [endLineFlag, setEndLineFlag] = useState(false);
@@ -132,7 +133,7 @@ function UserChatContents(props){
     // 내가 속한 채팅방의 라인의 미확인 사용자 건수 갱신          --------------------  1
     useEffect(()=>{
         
-        if(reloadLines !== undefined){
+        if(!reloadLines && reloadLines !== undefined){
             var unreadLineMap = reloadLines;
             var copyContentLines = [...contentLines];
                 for(let i = 0; i < copyContentLines.length; i++){
@@ -500,8 +501,12 @@ function UserChatContents(props){
                 // 참조하는 값으로 useState를 사용해 봤자 리액트는 다시 랜더링 하지 않는다. 
                 
                 // 신규 채팅은 아래로 더함
-                var copyContentLines = [...contentLines];
-                copyContentLines.push(line);
+                if(contentLines){
+                    var copyContentLines = [...contentLines];
+                    copyContentLines.push(line);
+                }else{
+                    copyContentLines = line;
+                }
                 setContentLines(copyContentLines);
                
                 //console.log('add line 호출');
@@ -532,6 +537,22 @@ function UserChatContents(props){
                 setChatRoomUserModal(false);
                 setChatRoomUserList(null);
             }}></UserChatRoomUsersModal>
+
+    const imageLoad = async(fileHash) => {
+        var returnData = null;
+
+        const formData = new FormData();
+        formData.append('fileHash', fileHash);
+        const response = await axios.post(fileServerUrl+'imageLoad', formData)
+        console.log('파일 : ', response.data);
+        if(response.status == 200){
+            returnData = URL.createObjectURL(response.data);
+        }
+    }
+
+        
+        
+
 
     return (
         //채팅창
@@ -621,16 +642,30 @@ function UserChatContents(props){
                                                 }
                                             </td>
                                             {/* 채팅 라인 */} 
+
+                                            {
+                                            line.chatType === 'C' 
+                                                ? 
                                             <td className='chatRoomContentsTableRTd'>
-                                                
                                                 {/*지명채팅인지 정규식으로 체크*/}          
                                                 {line.chatContents.includes('@mt') ? 
-                                                
                                                 mentionCheck(line.chatContents)
-
                                                 : line.chatContents}
 
+                                            </td> : 
+                                            <td>
+                                                {   
+                                                    line.chatType ==='I' 
+                                                        ?
+                                                    /* 여기는 이미지*/
+                                                    <img src={imageLoad(line.chatLineKey)} alt={line.chatLineKey} height='100px' width='100px'></img>
+                                                        :
+                                                    /* 여기는 파일*/
+                                                    <span></span>
+                                                }
                                             </td>
+                                            }
+                                           
                                         </tr>
                                         )
                                         :
