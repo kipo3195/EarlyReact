@@ -49,6 +49,9 @@ function UserChatContents(props){
     // true scroll 상단으로 고정(더 불러오기)
     const[scrollFix, setScrollFix] = useState(false);
 
+    // 이미지 로딩 flag
+    const [imageLoadFlag, setImageLoadFlag] = useState('');
+
     // 방 생성시에만 요청되는 flag
     var emptyRoomFlag = props.emptyRoomFlag;
     var createRoomDate = props.createRoomDate;
@@ -538,21 +541,42 @@ function UserChatContents(props){
                 setChatRoomUserList(null);
             }}></UserChatRoomUsersModal>
 
-    const imageLoad = async(fileHash) => {
+    function imageLoad(seq, lineKey){
+        // const imageLoadPromise = imageLoadRequest(lineKey);
+        
+        // imageLoadPromise.then((promise)=>{
+        //     // 여기서부터 contentsLines 불러와서 가지고있는 chatContent변경해보기..
+        //     for(var i = 0; i < contentLines.length; i++){
+        //         if(contentLines[i].chatSeq === seq){
+        //             console.log('seq : ', seq)
+        //             contentLines[i].chatContents = 'data:image/png;base64,'+promise;
+        //             // 변경된 이미지를 반영하여 화면을 다시 그리기 위함. 
+        //             setImageLoadFlag(seq);
+        //             return;
+        //         }
+        //     }
+        // })
+
+    }      
+
+    async function imageLoadRequest(lineKey){
         var returnData = null;
 
-        const formData = new FormData();
-        formData.append('fileHash', fileHash);
-        const response = await axios.post(fileServerUrl+'imageLoad', formData)
-        console.log('파일 : ', response.data);
-        if(response.status == 200){
-            returnData = URL.createObjectURL(response.data);
-        }
+        await axios({
+            method:'POST',
+            url: fileServerUrl+'imageLoad',
+            params:{
+                "fileHash":lineKey
+            }
+        }).then(function(response){
+            returnData = response.data;
+        }).catch(function(error){
+            console.log(error);
+        })
+        return returnData;
     }
-
-        
-        
-
+    
+    console.log(contentLines);
 
     return (
         //채팅창
@@ -658,7 +682,7 @@ function UserChatContents(props){
                                                     line.chatType ==='I' 
                                                         ?
                                                     /* 여기는 이미지*/
-                                                    <img src={imageLoad(line.chatLineKey)} alt={line.chatLineKey} height='100px' width='100px'></img>
+                                                    <img src={line.chatContents} alt={line.chatLineKey} height='100px' width='100px'></img>
                                                         :
                                                     /* 여기는 파일*/
                                                     <span></span>

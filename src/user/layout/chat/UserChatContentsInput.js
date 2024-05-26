@@ -169,11 +169,10 @@ function UserChatContentsInput(props){
                 putRoom(null, 'file');
             }
 
-            var fileMessage = message.previewUrl;
             var fileType = message.fileType;
             var fileHash = message.fileHash;
             
-            chatPub(roomKey, fileMessage, recevier, sender, fileType, fileHash);
+            chatPub(roomKey, '', recevier, sender, fileType, fileHash);
 
         }else{
             alert(notSupportType);
@@ -416,13 +415,13 @@ function UserChatContentsInput(props){
         // 파일 선택 이후 모달. 
         const fileSendModal = <FileSendModal file={file} sender={sender} 
             closeModal={()=>{
-            setFile(null);
-            setFileFlag(false);}} 
+                setFile(null);
+                setFileFlag(false);}} 
             
             fileSend={(fileSendData)=>{
-            setFile(null);
-            setFileFlag(false);
-            sendMessage(fileSendData, 'file');
+                setFile(null);
+                setFileFlag(false);
+                sendMessage(fileSendData, 'file');
         }} ></FileSendModal>
 
         const { openFilePicker, filesContent, loading, errors, plainFiles, clear, removeFileByIndex, removeFileByReference } =
