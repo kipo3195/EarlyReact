@@ -168,11 +168,16 @@ function UserChatContentsInput(props){
             if(emptyRoomFlag){
                 putRoom(null, 'file');
             }
-
+            
             var fileType = message.fileType;
             var fileHash = message.fileHash;
+            //var fileName = message.fileName;
             
-            chatPub(roomKey, '', recevier, sender, fileType, fileHash);
+            console.log('fileType', fileType);
+            console.log('fileHash', fileHash);
+            //console.log('fileName', fileName);
+
+            chatPub(roomKey, '', recevier, sender, fileType, fileHash);         
 
         }else{
             alert(notSupportType);

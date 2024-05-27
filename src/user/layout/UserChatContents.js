@@ -575,9 +575,29 @@ function UserChatContents(props){
         })
         return returnData;
     }
-    
-    console.log(contentLines);
 
+    function fileDownLoad(e, line){
+        console.log(line);
+        const fileDownLoadPromise = fileDownLoadRequest(line);
+    }
+
+    async function fileDownLoadRequest(line){
+        var lineKey = line.chatLineKey;
+        var resultData = null;
+        await axios({
+            method:'POST',
+            url: fileServerUrl + 'download',
+            data : {
+                fileHash : lineKey
+            }}).then(function(response){
+                // console.log('readLines : ', response.data);
+                resultData = response.data;
+            }).catch(function(error){
+                console.log(error);
+            })
+            return resultData;
+    }
+    
     return (
         //채팅창
         <div id ='contentDiv' onClick={readChatLines}>
@@ -685,7 +705,11 @@ function UserChatContents(props){
                                                     <img src={line.chatContents} alt={line.chatLineKey} height='100px' width='100px'></img>
                                                         :
                                                     /* 여기는 파일*/
-                                                    <span></span>
+                                                    <>
+                                                        <span className='chatFileName' onClick={(e)=>{fileDownLoad(e, line)}}>{line.chatContents}</span>
+                                                        {/* <a href={line.chatContents} download={line.chatLineKey+'.txt'}>{line.chatLineKey}</a> */}
+                                                        <span className='chatFileDate'> ~ 다운로드 가능기간</span>
+                                                    </>
                                                 }
                                             </td>
                                             }

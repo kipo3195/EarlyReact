@@ -9,6 +9,7 @@ function FileSendModal(props){
 
     const [previewUrl, setPreviewUrl] = useState(null);
     const [file, setFile] = useState(null);
+    const [fileName, setFileName] = useState(null);
     const [sender, setSender] = useState(null);
 
     // chatType에 이용. 
@@ -25,12 +26,13 @@ function FileSendModal(props){
         var temp = props.file;
         if(temp){
             console.log(temp);
-            const imageUrl = URL.createObjectURL(temp);
-            setPreviewUrl(imageUrl);
             setFile(temp);
             setSender(props.sender);
+            setFileName(temp.name);
             if(temp.type){
                 if(temp.type.match('image')){
+                    const imageUrl = URL.createObjectURL(temp);
+                    setPreviewUrl(imageUrl);
                     setFileType('I');
                 }else{
                     setFileType('F');
@@ -96,7 +98,8 @@ function FileSendModal(props){
                 const fileSendData = {
                     'fileHash' : fileHash,
                     'previewUrl' : previewUrl,
-                    'fileType' : fileType
+                    'fileType' : fileType,
+                    'fileName' : fileName
                 }
                 props.fileSend(fileSendData);
             }
@@ -128,8 +131,13 @@ function FileSendModal(props){
                     <table id ='fileSendListTable'>
                         <tbody>
                             <tr>
-                                <td id ='fileSendListTableLTd'><img src={previewUrl}  width='40px' height='40px' alt="uploaded"></img></td>
+                                {(previewUrl) 
+                                    ? 
+                                (<td id ='fileSendListTableLTd'><img src={previewUrl}  width='40px' height='40px' alt="uploaded"></img></td>)
+                                    :
+                                (<td></td>)}
                                 <td>{file ? file.name : ''}</td>
+                                <td>{file ? file.size : ''}</td>
                             </tr>
                         </tbody>
                     </table>

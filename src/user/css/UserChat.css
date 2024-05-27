@@ -739,3 +739,18 @@
     height: 15%;
 }
 
+/* 파일 다운로드 가능 라인 */
+.chatFileName{
+    font-family: buri;
+    font-size: 16px;
+    color: rgb(72, 144, 152) ;
+}
+.chatFileName:hover{
+    text-decoration: underline;
+}
+
+/* 보관 기간*/
+.chatFileDate{
+    font-size: 10px;
+    color: blue;
+}
