@@ -49,9 +49,6 @@ function UserChatContents(props){
     // true scroll 상단으로 고정(더 불러오기)
     const[scrollFix, setScrollFix] = useState(false);
 
-    // 이미지 로딩 flag
-    const [imageLoadFlag, setImageLoadFlag] = useState('');
-
     // 방 생성시에만 요청되는 flag
     var emptyRoomFlag = props.emptyRoomFlag;
     var createRoomDate = props.createRoomDate;
@@ -540,57 +537,30 @@ function UserChatContents(props){
                 setChatRoomUserModal(false);
                 setChatRoomUserList(null);
             }}></UserChatRoomUsersModal>
-
-    function imageLoad(seq, lineKey){
-        // const imageLoadPromise = imageLoadRequest(lineKey);
-        
-        // imageLoadPromise.then((promise)=>{
-        //     // 여기서부터 contentsLines 불러와서 가지고있는 chatContent변경해보기..
-        //     for(var i = 0; i < contentLines.length; i++){
-        //         if(contentLines[i].chatSeq === seq){
-        //             console.log('seq : ', seq)
-        //             contentLines[i].chatContents = 'data:image/png;base64,'+promise;
-        //             // 변경된 이미지를 반영하여 화면을 다시 그리기 위함. 
-        //             setImageLoadFlag(seq);
-        //             return;
-        //         }
-        //     }
-        // })
-
-    }      
-
-    async function imageLoadRequest(lineKey){
-        var returnData = null;
-
-        await axios({
-            method:'POST',
-            url: fileServerUrl+'imageLoad',
-            params:{
-                "fileHash":lineKey
-            }
-        }).then(function(response){
-            returnData = response.data;
-        }).catch(function(error){
-            console.log(error);
-        })
-        return returnData;
-    }
-
+   
     function fileDownLoad(e, line){
-        console.log(line);
-        const fileDownLoadPromise = fileDownLoadRequest(line);
+        var lineKey = line.chatLineKey;
+        const fileDownLoadPromise = fileDownLoadRequest(lineKey);
+        fileDownLoadPromise.then(promise=>{
+            const url = window.URL.createObjectURL(promise);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', line.chatContents); 
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+        })
     }
 
-    async function fileDownLoadRequest(line){
-        var lineKey = line.chatLineKey;
+    async function fileDownLoadRequest(lineKey){
         var resultData = null;
         await axios({
-            method:'POST',
+            method:'get',
             url: fileServerUrl + 'download',
-            data : {
-                fileHash : lineKey
+            responseType : 'blob',
+            params : {
+                'fileHash' : lineKey
             }}).then(function(response){
-                // console.log('readLines : ', response.data);
                 resultData = response.data;
             }).catch(function(error){
                 console.log(error);
@@ -707,7 +677,7 @@ function UserChatContents(props){
                                                     /* 여기는 파일*/
                                                     <>
                                                         <span className='chatFileName' onClick={(e)=>{fileDownLoad(e, line)}}>{line.chatContents}</span>
-                                                        {/* <a href={line.chatContents} download={line.chatLineKey+'.txt'}>{line.chatLineKey}</a> */}
+                                                         {/* <a href={fileServerUrl+'download?fileHash='+line.chatLineKey}>여기눌려서 다운</a>  */}
                                                         <span className='chatFileDate'> ~ 다운로드 가능기간</span>
                                                     </>
                                                 }
