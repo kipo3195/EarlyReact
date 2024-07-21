@@ -35,6 +35,7 @@ function AddressChatRoomModal(props){
     var createRoomDate = props.createRoomDate;
     var lineDatas = props.lineDatas;
     var recvData = props.recvData;
+    var name = props.name;
 
     // 닫기
     function closeModal(e){
@@ -210,7 +211,7 @@ function AddressChatRoomModal(props){
     },[recvData]);
     
     const chatContentsInput 
-    = <UserChatContentsInput client={props.client} chatRoomKey={roomKey} recevier={recevier} sender={sender} emptyRoomFlag={emptyRoomFlag}
+    = <UserChatContentsInput name={name} client={props.client} chatRoomKey={roomKey} recevier={recevier} sender={sender} emptyRoomFlag={emptyRoomFlag}
           title={title} createRoomDate ={createRoomDate} 
           addLine={(line)=>{
             // 채팅 발신시

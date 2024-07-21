@@ -357,7 +357,7 @@ function App() {
         const accesstoken  = response.data.token;
         const name = response.data.name;
         
-        console.log('로그인시 결과 : ', response)
+        // console.log('로그인시 결과 : ', response)
         // 채팅 미확인 건수
         const chat = response.data.chat;
         if(flag === 'success' && accesstoken !== null){
@@ -549,7 +549,7 @@ function App() {
                 }
               })     
             }else{
-              content = <UserAddress list={list} client={client} getAddressList={(limit)=>{
+              content = <UserAddress list={list} client={client} name={name} getAddressList={(limit)=>{
                 // 기존 리스트 + 신규 리스트를 더함 spread 함수 
                 var addressListPromiseResult = null;
                 let addressListPromise = AddressList(userId, limit);

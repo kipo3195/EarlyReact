@@ -16,6 +16,7 @@ function UserAddress(props){
     const serverUrl = process.env.REACT_APP_SERVER_A_URL;
     const scrollRef = useRef();
     
+    const name = props.name;
     const friendList = props.list.friend_list;
     const myInfo = props.list.my_info;
     const friendCount = props.list.friend_count;
@@ -199,7 +200,7 @@ function UserAddress(props){
         return returnData;
     }
 
-    const enterChatRoomModal = <AddressChatRoomModal recvData={recvData} myInfo={myInfo} friendInfo={friendInfo} closeModal={()=>{
+    const enterChatRoomModal = <AddressChatRoomModal name={name} recvData={recvData} myInfo={myInfo} friendInfo={friendInfo} closeModal={()=>{
         setEnterChatRoomModal(false);
     }} roomKey={roomKey} recevier={recevier} sender={sender} emptyRoomFlag={emptyRoomFlag} client={props.client} title={title}
     createRoomDate={createRoomDate} lineDatas={lineDatas} nextLine={nextLine} readLines={(chat)=>{
