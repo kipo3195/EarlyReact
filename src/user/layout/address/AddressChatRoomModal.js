@@ -250,11 +250,10 @@ function AddressChatRoomModal(props){
     // 채팅 라인 더 불러오기 처리 
     function onScrollCallBack(){
 
-        console.log("스크롤 전체 높이 : ", scrollRef.current?.scrollHeight); // 스크롤의 크기
-        console.log('스크롤의 위치 : ', scrollRef.current?.scrollTop); // 스크롤 바 탑의 위치
-        console.log("요소의 높이 : ", scrollRef.current?.clientHeight); // 스크롤 바의 크기 
-        console.log('');
-
+        // console.log("스크롤 전체 높이 : ", scrollRef.current?.scrollHeight); // 스크롤의 크기
+        // console.log('스크롤의 위치 : ', scrollRef.current?.scrollTop); // 스크롤 바 탑의 위치
+        // console.log("요소의 높이 : ", scrollRef.current?.clientHeight); // 스크롤 바의 크기 
+        // console.log('');
 
         if(scrollRef.current?.scrollTop === 0 && nextLine !== '0'){
             //nextLine 이 '0'인 경우 최초 호출시 서버에서 하나도 받은게 없음 -> 요청하지 않도록 처리
@@ -315,7 +314,7 @@ function AddressChatRoomModal(props){
                 <table id ='chatRoomContentsTable'>
                     <tbody>
                         {
-                        (contentLines === undefined) ? (''):
+                        (contentLines === undefined || contentLines === null) ? (''):
                         (contentLines && contentLines.map((line) =>(
                             (line.chatSender === sender)
                             ?

@@ -106,7 +106,7 @@ function App() {
   const [list, setList] = useState(null);
   const [client, setClient] = useState(null);
   const [userId, setUserId] = useState(null);
-
+  const [name, setName] = useState(null);
   
   
   // accesstoken 갱신 worker
@@ -157,7 +157,7 @@ function App() {
 
   }
 
-  function webSocketCallback(stompClient, userId, chat, accesstoken, worker){
+  function webSocketCallback(stompClient, userId, chat, accesstoken, worker, name){
         // 로그인 완료 + 웹소켓 구독(자신의 ID) 완료
 
         // 20240121 - access token refresh worker 시작 
@@ -171,6 +171,7 @@ function App() {
         setUserId(userId);
         setClient(stompClient);
         setChatUnread(parseInt(chat));
+        setName(name);
         // 인증 완료 이후에 useNavigate를 이용하여 url을 변경함. 단, useNavigate를 사용하기 위해서는 react-router-dom 설치가 필요하며,
         // useNagivate hook을 사용하는 상위 컴포넌트 (현재의 상위 컴포넌트는 App)는 <BrowserRouter> 컴포넌트로 감싸 있어야 한다. (index.js 확인)
         navigate('/user'); 
@@ -354,8 +355,9 @@ function App() {
       }).then(function(response){
         const flag = response.data.flag;
         const accesstoken  = response.data.token;
+        const name = response.data.name;
         
-        //console.log('로그인시 결과 : ', response)
+        console.log('로그인시 결과 : ', response)
         // 채팅 미확인 건수
         const chat = response.data.chat;
         if(flag === 'success' && accesstoken !== null){
@@ -380,7 +382,7 @@ function App() {
                 // console.log("connect web socket userID : ", userId);
                 // 자신의 ID를 url로 하는 구독 추가, setClient
                 stompClient.subscribe("/topic/user/" + userId, subCallback);
-                stompClient.subscribe("/queue/user/" + userId, webSocketCallback(stompClient, userId, chat, accesstoken, worker));
+                stompClient.subscribe("/queue/user/" + userId, webSocketCallback(stompClient, userId, chat, accesstoken, worker, name));
                 
             },
             onStompError: (frame) => {
@@ -613,7 +615,7 @@ function App() {
                 content = <UserNoChat></UserNoChat>
               }else{
                 //console.log('APP.js list : ',list);
-                content = <UserChat list={list} client={client} userId ={userId} chatRoomUnread={chatRoomUnread} 
+                content = <UserChat list={list} client={client} userId ={userId} name={name} chatRoomUnread={chatRoomUnread} 
                 
                 chatListRefresh={()=>{
                   // 채팅 입력시 리스트 갱신 요청

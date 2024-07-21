@@ -233,6 +233,7 @@ function UserAddress(props){
                 {/* 검색창 */}
                 <div id='addressSearchDiv'>
                     <table id ='addressSearchTable'>
+                        <tbody>
                             <tr>
                                 <td>
                                     <img src={searchBtn} className='addrSearch' width='20px' alt='searchBtn'></img>
@@ -246,6 +247,7 @@ function UserAddress(props){
                                     }}></img>
                                 </td>
                             </tr>
+                        </tbody>
                     </table>
                 </div>
 
@@ -315,9 +317,9 @@ function UserAddress(props){
                                 <td className='friendStatusMsg'>
                                     상태메시지
                                 </td>
-
-                                <input type='hidden' value ={friend.username}></input>
-                                
+                                <td>
+                                    <input type='hidden' value ={friend.username}></input>
+                                </td>
                             </tr>
                             )}
                         </tbody>

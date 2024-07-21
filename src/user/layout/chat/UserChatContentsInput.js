@@ -34,6 +34,7 @@ function UserChatContentsInput(props){
     var roomKey = props.chatRoomKey;
     var recevier = props.recevier;
     var sender = props.sender;  
+    var name = props.name;
     var title = props.title;
     var createRoomDate = props.createRoomDate;
     
@@ -157,7 +158,7 @@ function UserChatContentsInput(props){
                 if(promisePromiseResult !== 'error'){
                     var lineKey = promisePromiseResult;       
                             
-                    chatPub(roomKey, message, recevier, sender, 'C', lineKey);
+                    chatPub(roomKey, message, recevier, sender, 'C', lineKey, name);
                     
 
                 }else{
@@ -177,7 +178,7 @@ function UserChatContentsInput(props){
             console.log('fileHash', fileHash);
             //console.log('fileName', fileName);
 
-            chatPub(roomKey, '', recevier, sender, fileType, fileHash);         
+            chatPub(roomKey, '', recevier, sender, fileType, fileHash, name);         
 
         }else{
             alert(notSupportType);
@@ -185,7 +186,7 @@ function UserChatContentsInput(props){
     }
 
     // 채팅 발신 
-    function chatPub(roomKey, message, recevier, sender, type, lineKey){
+    function chatPub(roomKey, message, recevier, sender, type, lineKey, name){
 
           // 웹소켓 채팅 발신
           client.publish({
@@ -198,7 +199,8 @@ function UserChatContentsInput(props){
                 chatReceiver : recevier,
                 chatSender : sender,
                 chatType : type,
-                chatLineKey : lineKey
+                chatLineKey : lineKey,
+                chatSenderName : name
             })
         });
         
@@ -438,7 +440,7 @@ function UserChatContentsInput(props){
 
         // 현재는 파일 하나만 되게끔 처리함. 
         useEffect(()=>{
-            console.log(plainFiles);
+            // console.log(plainFiles);
             if(plainFiles.length > 0){
                 setFile(plainFiles[0]);
                 setFileFlag(true);

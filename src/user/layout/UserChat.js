@@ -46,6 +46,9 @@ function UserChat(props){
     // 발신자 id
     const sender = props.userId;
 
+    // 발신자 이름
+    const name = props.name;
+
     // 신규 수신 채팅방 및 건수 
     const chatRoomUnread = props.chatRoomUnread;
 
@@ -59,7 +62,7 @@ function UserChat(props){
     function chatRoomCallback(message){
     
         if (message.body) {
-            // console.log('chatRoomCallback : ', message.body);
+            console.log('chatRoomCallback : ', message.body);
             var recvJson = JSON.parse(message.body);
             var type = recvJson.type;
             
@@ -224,7 +227,7 @@ function UserChat(props){
             sender={sender} client={client} 
             chatRoomTitle={chatRoomTitle} chatRoomKey={chatRoomKey} createRoomDate={createRoomDate}
             chatRoomUsers={chatRoomUsers} recvData={recvData} lineData={lineData} nextLine={nextLine} reloadLines={reloadLines}
-            reloadLineEvent={reloadLineEvent} emptyRoomFlag ={emptyRoomFlag}
+            reloadLineEvent={reloadLineEvent} emptyRoomFlag ={emptyRoomFlag} name={name}
             readLines={(chat)=>{
                 // 채팅방 입장 이후 이벤트 감지 읽음 처리
                 props.chatListReload(chat);

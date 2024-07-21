@@ -57,6 +57,7 @@ function UserChatContents(props){
     var roomKey = props.chatRoomKey;
     
     var sender = props.sender;
+    var name = props.name;
     var recevier = props.chatRoomUsers;
 
     var recvData = props.recvData;
@@ -226,7 +227,8 @@ function UserChatContents(props){
                 chatSender : json.chatSender,
                 chatContents : json.chatContents,
                 chatUnreadCount : json.chatUnreadCount,
-                chatLineKey : json.chatLineKey
+                chatLineKey : json.chatLineKey,
+                chatSenderName : json.chatSenderName
             };
 
             // 기존라인에 더하기 (아래에 append)
@@ -491,7 +493,7 @@ function UserChatContents(props){
 
     const chatContentsInput 
         = <UserChatContentsInput client={props.client} chatRoomKey={roomKey} recevier={recevier} sender={sender} emptyRoomFlag={emptyRoomFlag}
-              title={title} createRoomDate ={createRoomDate}
+              title={title} createRoomDate ={createRoomDate} name={name}
               addLine={(line)=>{
                 // 채팅 발신시
                 // 여기서 props로 받아오는 값을 set 하더라도 props의 값이 빠지지는 않는다.  
@@ -591,9 +593,12 @@ function UserChatContents(props){
                 <div id='chatRoomContentsChild' ref={scrollRef} onScroll={onScrollCallBack}>
                     <table id='chatRoomContentsTable'>
                         <tbody>
-                            {/* 이하 조회한 채팅*/}
+                            {/* 이하 조회한 채팅*/
+                            //  console.log('############ contentLines :', contentLines)
+                             }
                             {
-                                (contentLines === undefined) ? ('') : ( 
+                               
+                                (contentLines === undefined || contentLines === null) ? ('') : ( 
                                     contentLines && contentLines.map((line) => (
                                         (line.chatSender === sender)
                                         ?

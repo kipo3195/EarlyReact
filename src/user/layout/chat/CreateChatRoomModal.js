@@ -121,7 +121,6 @@ function CreateChatRoomModal(props){
 
     return(
         <div id='createChatRoomModalParent'>
-            
             {(chatRoomTitleProcess) 
             ? (
                 // 이하 방생성에서 확인 버튼 클릭시 - 채팅방 타이틀 입력으로 전환 
@@ -160,10 +159,6 @@ function CreateChatRoomModal(props){
                                         <input type='text' id='chatRoomTitleInputTd' placeholder='채팅방 이름입력' onChange={e=>{enterRoomTitle(e)}}></input>
                                     </td>
                                 </tr>
-                              
-                                <tr>
-
-                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -182,7 +177,6 @@ function CreateChatRoomModal(props){
                         </table>
                     </div>
                 </div>
-
 
                 ): (
 
@@ -203,55 +197,52 @@ function CreateChatRoomModal(props){
                                     <span>대화상대 선택</span>
                                 </td>
                             </tr>
-
                         </tbody>
                     </table>
-                    
                     {/* 이하 사용자 검색창 */}
                     <table id ='createChatRoomUserSearchTable'>
-                        <tr>
-                            <td>
-                                <img src={userSearch} className='userSearchImg'></img>
-                            </td>
-                            <td colSpan='2'>
-                                <input type='text' id='createChatRoomSearch' onChange={e=> changeSearchText(e, false)}
-                                value ={searchContents} autoFocus></input>
-                            </td>
-                            <td>
-                                <img src={userSearchCancle} className='userSearchImg' id='userSearchCancle' onClick={e=>{
-                                    clearSearchValue();
-                                }}></img>
-                            </td>
-                        </tr>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <img src={userSearch} className='userSearchImg'></img>
+                                </td>
+                                <td colSpan='2'>
+                                    <input type='text' id='createChatRoomSearch' onChange={e=> changeSearchText(e, false)}
+                                    value ={searchContents} autoFocus></input>
+                                </td>
+                                <td>
+                                    <img src={userSearchCancle} className='userSearchImg' id='userSearchCancle' onClick={e=>{
+                                        clearSearchValue();
+                                    }}></img>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
-
                     {/* 이하 사용자 리스트 */}
                     <div id ='createChatRoomUserList'>
                         <table  id ='createChatRoomUserListTable'>
                             <thead>
-                                <tr id = 'createChatRoomSearchUserTitle'>
+                                <tr id = 'createChatRoomSearchUserTitle' >
                                     <td colSpan='3' style={{paddingLeft:10}} >
                                         친구 {searchUsersCount}
                                     </td>
                                 </tr>
                             </thead>
                             <tbody>
-                             
-                                    {/*사용자 반복해서 나오게 처리 */}
-                                    {
-                                        (searchUsers === undefined) ? ('') : (
-                                            searchUsers.map((user)=>(
-                                                ((user.username === makeUserId) ? (<></>) : 
-                                                <tr className='createChatRoomSearchUserTr'>
-                                                <td className="createChatRoomSearchUserProfile">early!</td> {/* 프로필 사진 TODO */}
-                                                <td className="createChatRoomSearchUserName">{user.name}</td>
-                                                <td><input type='checkbox' onChange={e=>{isChecked(e, user)}}></input></td>
-                                                </tr>    
-                                                )                                        
-                                        ))
-                                        )
-                                    }
-                                
+                                {/*사용자 반복해서 나오게 처리 */}
+                                {
+                                    (searchUsers === undefined || searchUsers === null) ? ('') : (
+                                        searchUsers.map((user)=>(
+                                            ((user.username === makeUserId) ? (<></>) : 
+                                            <tr className='createChatRoomSearchUserTr' key={user.username}>
+                                            <td className="createChatRoomSearchUserProfile">early!</td> {/* 프로필 사진 TODO */}
+                                            <td className="createChatRoomSearchUserName">{user.name}</td>
+                                            <td><input type='checkbox' onChange={e=>{isChecked(e, user)}}></input></td>
+                                            </tr>    
+                                            )                                        
+                                    ))
+                                    )
+                                }
                             </tbody>    
                         </table>
                     </div>

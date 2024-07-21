@@ -85,9 +85,7 @@ function FileSendModal(props){
         formData.append('fileHash', fileHash);
         try {
             let axiosConfig = {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                }
+                
             }
             const response = await axios.post(serverUrl+'upload', formData, axiosConfig);
             
