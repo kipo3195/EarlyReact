@@ -20,12 +20,12 @@ function FileSendModal(props){
         props.closeModal();
     }
 
-    console.log(previewUrl);
+    //console.log(previewUrl);
 
     useEffect(()=>{
         var temp = props.file;
         if(temp){
-            console.log(temp);
+            //console.log(temp);
             setFile(temp);
             setSender(props.sender);
             setFileName(temp.name);

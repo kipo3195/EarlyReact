@@ -222,9 +222,9 @@ function CreateChatRoomModal(props){
                     <div id ='createChatRoomUserList'>
                         <table  id ='createChatRoomUserListTable'>
                             <thead>
-                                <tr id = 'createChatRoomSearchUserTitle' >
+                                <tr id ='createChatRoomSearchUserTitle' >
                                     <td colSpan='3' style={{paddingLeft:10}} >
-                                        친구 {searchUsersCount}
+                                        친구 {searchUsersCount ? searchUsersCount-1 : 0 }
                                     </td>
                                 </tr>
                             </thead>
@@ -233,13 +233,13 @@ function CreateChatRoomModal(props){
                                 {
                                     (searchUsers === undefined || searchUsers === null) ? ('') : (
                                         searchUsers.map((user)=>(
-                                            ((user.username === makeUserId) ? (<></>) : 
+                                            user.username !== makeUserId && (
                                             <tr className='createChatRoomSearchUserTr' key={user.username}>
-                                            <td className="createChatRoomSearchUserProfile">early!</td> {/* 프로필 사진 TODO */}
+                                            <td className="createChatRoomSearchUserProfile">early!</td>{/* 프로필 사진 TODO */}
                                             <td className="createChatRoomSearchUserName">{user.name}</td>
                                             <td><input type='checkbox' onChange={e=>{isChecked(e, user)}}></input></td>
                                             </tr>    
-                                            )                                        
+                                            )                                       
                                     ))
                                     )
                                 }

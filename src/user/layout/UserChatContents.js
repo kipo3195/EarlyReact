@@ -79,11 +79,11 @@ function UserChatContents(props){
                 getChatRoomLinePromise.then(promise=>{
                     var type = promise.type;
                     var data = promise.data;
-                    console.log(data);
+                    //console.log(data);
                     if(type && data){
                         var result = type;
                         if(result === 'success'){
-                            console.log(data);
+                            //console.log(data);
                             var appendLine = data.chatRoomLine;
                             if(appendLine != undefined){
                                 appendLine = JSON.parse(appendLine);
@@ -93,8 +93,8 @@ function UserChatContents(props){
                                 ...appendLine, // 더 불러온 라인
                                 ...contentLines // 기존에 그려진 라인 
                                  ]
-                                 console.log(newArr);
-                                 console.log(appendLine[0].chatLineKey)
+                                 //console.log(newArr);
+                                //console.log(appendLine[0].chatLineKey)
                                 setContentLines(newArr);
                                 setScrollFix(true);
                                 setNextLine(appendLine[0].chatLineKey);
@@ -491,6 +491,7 @@ function UserChatContents(props){
     }
 
 
+
     const chatContentsInput 
         = <UserChatContentsInput client={props.client} chatRoomKey={roomKey} recevier={recevier} sender={sender} emptyRoomFlag={emptyRoomFlag}
               title={title} createRoomDate ={createRoomDate} name={name}
@@ -569,6 +570,29 @@ function UserChatContents(props){
             })
             return resultData;
     }
+
+    // 파일 다운로드 가능 기간 조회 
+    function fileDownloadExp(lineKey, daysToAdd){
+         // 날짜 문자열을 파싱하여 Date 객체 생성
+        const year = lineKey.substring(0, 4);
+        const month = lineKey.substring(4, 6) - 1; // JavaScript에서는 월이 0부터 시작하므로 -1 처리
+        const day = lineKey.substring(6, 8);
+        const hour = lineKey.substring(8, 10);
+        const minute = lineKey.substring(10, 12);
+        const second = lineKey.substring(12, 14);
+
+        const date = new Date(year, month, day, hour, minute, second);
+
+        // 지정된 일수를 더함
+        date.setDate(date.getDate() + daysToAdd);
+
+        // 결과를 "YYYYMMDDHHmmss" 형식의 문자열로 포맷팅
+        const formattedYear = date.getFullYear();
+        const formattedMonth = ("0" + (date.getMonth() + 1)).slice(-2); // 월에 1을 더하고 두 자리로 맞춤
+        const formattedDay = ("0" + date.getDate()).slice(-2); // 일을 두 자리로 맞춤
+
+        return `${formattedYear}${formattedMonth}${formattedDay}`;
+        };
     
     return (
         //채팅창
@@ -661,7 +685,6 @@ function UserChatContents(props){
                                                 }
                                             </td>
                                             {/* 채팅 라인 */} 
-
                                             {
                                             line.chatType === 'C' 
                                                 ? 
@@ -680,10 +703,13 @@ function UserChatContents(props){
                                                     <img src={line.chatContents} alt={line.chatLineKey} height='100px' width='100px'></img>
                                                         :
                                                     /* 여기는 파일*/
-                                                    <>
+                                                    <>  
+                                                        <td className='chatRoomContentsTableRTd'>
                                                         <span className='chatFileName' onClick={(e)=>{fileDownLoad(e, line)}}>{line.chatContents}</span>
+                                                        <br/>
                                                          {/* <a href={fileServerUrl+'download?fileHash='+line.chatLineKey}>여기눌려서 다운</a>  */}
-                                                        <span className='chatFileDate'> ~ 다운로드 가능기간</span>
+                                                        <span className='chatFileDate'> 다운로드 만료 - {fileDownloadExp(line.chatLineKey, 30)}</span>
+                                                        </td>
                                                     </>
                                                 }
                                             </td>
@@ -692,19 +718,41 @@ function UserChatContents(props){
                                         </tr>
                                         )
                                         :
+                                        
                                         // 상대방의 채팅 라인
                                         (<tr align ='left' key ={line.chatLineKey} className='othersChatLineTR'>
                                             {/* 채팅 라인 */} 
+                                            {
+                                            line.chatType === 'C' 
+                                            ?
                                             <td className='chatRoomContentsTableLTd' >
-                                                {line.chatSenderName} 님의 말 : 
-                                                
+                                                {line.chatSenderName} 님의 말 :                                             
                                                 {/*지명채팅인지 정규식으로 체크*/}          
-                                                {line.chatContents.includes('@mt') ? 
-                                                
+                                                {line.chatContents.includes('@mt') ?                                               
                                                 mentionCheck(line.chatContents)
-
                                                 : line.chatContents}
                                             </td>
+                                            :
+                                            <td>
+                                            {   
+                                                line.chatType ==='I' 
+                                                    ?
+                                                /* 여기는 이미지*/
+                                                <img src={line.chatContents} alt={line.chatLineKey} height='100px' width='100px'></img>
+                                                    :
+                                                /* 여기는 파일*/
+                                                 
+                                                 <td className='chatRoomContentsTableLTd' >
+                                                    {line.chatSenderName} 님의 말 : 
+                                                    <span className='chatFileName' onClick={(e)=>{fileDownLoad(e, line)}}>{line.chatContents}</span>
+                                                     {/* <a href={fileServerUrl+'download?fileHash='+line.chatLineKey}>여기눌려서 다운</a>  */}
+                                                     <br/>
+                                                    <span className='chatFileDate'> 다운로드 만료 - {fileDownloadExp(line.chatLineKey, 30)}</span>
+                                                 </td>
+                                               
+                                            }
+                                            </td>
+                                            }
                                             {/* 미확인 건수 */}
                                             <td className ='unreadCount'>
                                                 {

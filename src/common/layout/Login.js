@@ -98,11 +98,11 @@ function Login(props){
                           <input type='password' name='password' placeholder=' 비밀번호' size="30"></input>
                         </td>
                       </tr>
-                      <tr>
+                      {/* <tr>
                         <td>
                           <input type='checkbox'></input>
                         </td>
-                      </tr>
+                      </tr> */}
                       <tr>
                           <td>
                             <input id='loginSubmit' type='submit' value='로그인' ></input>

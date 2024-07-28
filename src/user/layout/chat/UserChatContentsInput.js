@@ -169,16 +169,16 @@ function UserChatContentsInput(props){
             if(emptyRoomFlag){
                 putRoom(null, 'file');
             }
-            
+            //console.log("file obj : ", message);
             var fileType = message.fileType;
             var fileHash = message.fileHash;
-            //var fileName = message.fileName;
+            var fileName = message.fileName;
             
-            console.log('fileType', fileType);
-            console.log('fileHash', fileHash);
-            //console.log('fileName', fileName);
+            //console.log('fileType', fileType);
+            //console.log('fileHash', fileHash);
+            //console.log('33333 fileName', fileName);
 
-            chatPub(roomKey, '', recevier, sender, fileType, fileHash, name);         
+            chatPub(roomKey, fileName, recevier, sender, fileType, fileHash, name);         
 
         }else{
             alert(notSupportType);
@@ -210,7 +210,7 @@ function UserChatContentsInput(props){
             chatContents : message,
             chatReceiver : recevier,
             chatSender : sender,
-            chatType : "C",
+            chatType : type,
             chatLineKey : lineKey,
             chatUnreadCount : (recevier.split('|')).length-1 // 발신자에게 보여줄 미확인 건수
         }
